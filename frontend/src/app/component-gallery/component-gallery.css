@@ -6,7 +6,7 @@
 }
 
 .component-gallery__item {
-  border: 1px solid #2a2a2a;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -15,8 +15,8 @@
   margin: 0;
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
-  border-bottom: 1px solid #2a2a2a;
-  background: #1a1a1a;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 
 .component-gallery__preview {
