@@ -1,0 +1,87 @@
+/*
+  Basic sidebar layout — enough structure to look like a real panel.
+  Feel free to change any of this; nothing here depends on exact values.
+*/
+
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  border-right: 1px solid #2a2a2a;
+  height: 100%;
+}
+
+.accounts-list__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.75rem;
+}
+
+.accounts-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  overflow-y: auto;
+}
+
+.accounts-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 150ms ease, transform 100ms ease;
+}
+
+.accounts-list__item:active {
+  transform: scale(0.98);
+}
+
+.accounts-list__item:focus-visible {
+  outline: 2px solid #af744c;
+  outline-offset: -2px;
+}
+
+.accounts-list__row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.accounts-list__name {
+  font-weight: 600;
+}
+
+.accounts-list__type {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.accounts-list__balance {
+  font-variant-numeric: tabular-nums;
+}
+
+.accounts-list__empty {
+  padding: 0.75rem 1rem;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.accounts-list__item--selected {
+  background: #1e1e1e;
+  box-shadow: inset 3px 0 0 #af744c;
+}
+
+.accounts-list__item:hover {
+  background: #262626;
+}
+
+.accounts-list__item--selected:hover {
+  background: #232323;
+}
