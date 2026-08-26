@@ -1,0 +1,66 @@
+.current-price {
+  font-size: 3rem;
+}
+
+.trade-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.trade-header {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.trade-name {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.trade-symbol {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.trade-prices,
+.trade-day-range {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trade-prices .label,
+.trade-day-range .label {
+  display: block;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.trade-prices .value,
+.trade-day-range .value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.timeframe-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.price-history {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-width: 700px;
+  padding: 2rem;
+  text-align: center;
+  color: #999;
+  /* align-self: center; */
+}
