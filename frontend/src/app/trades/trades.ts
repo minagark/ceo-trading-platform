@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, DecimalPipe } from '@angular/common';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 
 interface PriceHistoryPoint {
   time: string;
@@ -8,7 +9,7 @@ interface PriceHistoryPoint {
 }
 
 @Component({
-  imports: [CommonModule, FormsModule, DecimalPipe],
+  imports: [CommonModule, FormsModule, DecimalPipe, MatSlideToggle],
   selector: 'app-trades',
   styleUrl: './trades.css',
   templateUrl: './trades.html',
