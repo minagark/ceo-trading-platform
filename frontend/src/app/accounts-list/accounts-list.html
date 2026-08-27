@@ -1,0 +1,52 @@
+<!--
+  Accounts list sidebar.
+
+  Angular templating cheatsheet for what's below:
+    - `@for (item of items(); track item.id) { ... }` loops over a signal's
+      value. `track` tells Angular how to identify each item so it can
+      efficiently update the DOM instead of re-rendering everything.
+    - `{{ expression }}` is interpolation — prints a value as text.
+    - `[class.foo]="condition"` toggles the CSS class "foo" based on a boolean.
+    - `(click)="handler()"` binds a DOM event to a component method.
+-->
+
+<aside class="accounts-list">
+  <header class="accounts-list__header">
+    <h2>Accounts</h2>
+  </header>
+  
+  <ul class="accounts-list__items">
+    <li
+      class="accounts-list__item"
+      [class.accounts-list__item--selected]="selectedAccountId() === null"
+      (click)="selectAllAccounts()"
+      (keydown.enter)="selectAllAccounts()"
+      (keydown.space)="$event.preventDefault(); selectAllAccounts()"
+      tabindex="0"
+      role="button"
+    >
+      <span class="accounts-list__name">All Accounts</span>
+      <span class="accounts-list__total">{{ totalBalance() | currency }}</span>
+    </li>
+    @for (account of accounts(); track account.id) {
+      <li
+        class="accounts-list__item"
+        [class.accounts-list__item--selected]="account.id === selectedAccountId()"
+        (click)="selectAccount(account)"
+        (keydown.enter)="selectAccount(account)"
+        (keydown.space)="$event.preventDefault(); selectAccount(account)"
+        tabindex="0"
+        role="button"
+      >
+        <span class="accounts-list__row">
+          <span class="accounts-list__name">{{ account.name }}</span>
+          <span class="accounts-list__type">{{ account.type }}</span>
+        </span>
+        <span class="accounts-list__balance">{{account.balance | currency}}</span>
+      </li>
+    } @empty {
+      <!-- Shown automatically when accounts() is an empty array. -->
+      <li class="accounts-list__empty">No accounts yet.</li>
+    }
+  </ul>
+</aside>

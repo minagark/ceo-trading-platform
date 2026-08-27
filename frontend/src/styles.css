@@ -1,1 +1,67 @@
 /* You can add global styles to this file, and also import other style files */
+
+/*
+  ---------------------------------------------------------------------------
+  Theme: yellow & black
+  ---------------------------------------------------------------------------
+  Design tokens for the whole app, exposed as CSS custom properties on :root
+  so every component stylesheet can reference them instead of hard-coding
+  hex values. Keep this the single source of truth for color — when the
+  theme changes, it should only need to change here.
+
+  Palette notes:
+    - Backgrounds are warm near-blacks (not pure #000) so the yellow accents
+      don't vibrate against them.
+    - The yellow scale is a muted gold rather than a saturated/neon yellow —
+      reads as "modern fintech" instead of "caution tape".
+    - Prefer the semantic tokens (--color-accent, --color-surface, etc.) in
+      component CSS; the numbered scales exist mainly to derive those.
+*/
+
+:root {
+  /* Neutrals (warm near-black surfaces) */
+  --color-bg: #201d1a;
+  --color-surface: #1a1815;
+  --color-surface-hover: #221f1a;
+  --color-surface-raised: #221f1a;
+  --color-surface-raised-hover: #2a261f;
+  --color-border: #322d24;
+  --color-border-strong: #423b2d;
+
+  /* Text */
+  --color-text: #f5f1e6;
+  --color-text-muted: rgba(245, 241, 230, 0.68);
+  --color-text-faint: rgba(245, 241, 230, 0.45);
+
+  /* Yellow / gold accent scale */
+  --color-yellow-100: #fbf0cd;
+  --color-yellow-300: #f0d27a;
+  --color-yellow-500: #e3b53c;
+  --color-yellow-600: #c99a26;
+  --color-yellow-700: #9c761b;
+
+  --color-accent: var(--color-yellow-500);
+  --color-accent-hover: var(--color-yellow-600);
+  --color-accent-text: #1a1509;
+  --color-accent-soft: rgba(227, 181, 60, 0.14);
+
+  --color-danger: #e0553f;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}

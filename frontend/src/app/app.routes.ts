@@ -4,6 +4,7 @@ import { Trades } from './trades/trades';
 import { TransactionHistory } from './transaction-history/transaction-history';
 import { MarketAnalysis } from './market-analysis/market-analysis';
 import { PortfolioPerformance } from './portfolio-performance/portfolio-performance';
+import { ComponentGallery } from './component-gallery/component-gallery';
 
 export const routes: Routes = [
   { path: 'home', component: HomePage },
@@ -11,4 +12,5 @@ export const routes: Routes = [
   { path: 'history', component: TransactionHistory },
   { path: 'portfolio', component: PortfolioPerformance },
   { path: 'analysis', component: MarketAnalysis },
+  { path: 'components', component: ComponentGallery },
 ];
