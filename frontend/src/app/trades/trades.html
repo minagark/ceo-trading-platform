@@ -1,1 +1,58 @@
-<p>trades works!</p>
+<div class="trade-page">;
+  <div class="trade-header">
+    <h1 class="trade-name">{{ name }}</h1>
+    <span class="trade-symbol">{{ symbol }}</span>
+  </div>
+
+  <div class="trade-prices">
+    <div class="current-price">
+      <span class="label">Current Price</span>
+      <span class="value" [ngStyle]="{ 'font-size': '3rem', 'color': currentPrice > previousClose ? 'green' : 'red' }">
+        {{ currentPrice | number: '1.2-2' }}
+      </span>
+    </div>
+    <div class="previous-close">
+      <span class="label">Previous Close</span>
+      <span class="value">{{ previousClose | number: '1.2-2' }}</span>
+    </div>
+  </div>
+
+  <div class="trade-day-range">
+    <div class="timeframe-select">
+      <label for="timeframe">Time Frame</label>
+      <select id="timeframe" [(ngModel)]="selectedTimeFrame">
+        <option *ngFor="let tf of timeFrames" [value]="tf">{{ tf }}</option>Z
+      </select>
+    </div>
+    <div class="high-price">
+      <span class="label">High Today</span>
+      <span class="value">{{ highPriceToday | number: '1.2-2' }}</span>
+    </div>
+    <div class="low-price">
+      <span class="label">Low Today</span>
+      <span class="value">{{ lowPriceToday | number: '1.2-2' }}</span>
+    </div>
+  </div>
+
+  <div class="price-history">
+    <!-- placeholder until real chart data/library is integrated -->
+    <p class="chart-placeholder">Price history chart for: {{ selectedTimeFrame }}</p>
+  </div>
+</div>
+
+
+<!-- 
+Information needed:
+top row:
+Name (top middle)
+Symbol (top middle, after name)
+second row:
+Current Price (left)
+Previous close (right)
+third row:
+Time frame dropdown (left)
+High Price today (middle)
+Low Price today (right)
+last section:
+Price history graph (depending on time frame dropdown; for now, just do a placeholder which just says the time frame)
+-->

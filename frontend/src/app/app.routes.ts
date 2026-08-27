@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 import { HomePage } from './home-page/home-page';
 import { Trades } from './trades/trades';
+import { TransactionHistory } from './transaction-history/transaction-history';
 import { MarketAnalysis } from './market-analysis/market-analysis';
 import { PortfolioPerformance } from './portfolio-performance/portfolio-performance';
-import { TransactionHistory } from './transaction-history/transaction-history';
 import { PortfolioComposition } from './portfolio-composition/portfolio-composition';
 import { ComponentGallery } from './component-gallery/component-gallery';
 
@@ -16,14 +16,3 @@ export const routes: Routes = [
   { path: 'analysis', component: MarketAnalysis },
   { path: 'components', component: ComponentGallery },
 ];
-
-
-
-/*
-      <a href="ceos-mn-home"><i class="lni lni-home"></i> Home</a>
-      <a href="ceos-mn-market-analysis"><i class="lni lni-home"></i> Trades</a>
-      <a href="ceos-mn-home"><i class="lni lni-home"></i> Transaction History</a>
-      <a href="ceos-mn-trades"><i class="lni lni-home"></i> Portfolio Performance</a>
-      <a href="ceos-mn-transactions"><i class="lni lni-home"></i> Market Analysis</a>
-
-*/

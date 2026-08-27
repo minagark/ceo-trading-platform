@@ -1,7 +1,65 @@
-/*
-  TODO: not yet styled.
-  When you build this out, use the theme tokens defined in
-  frontend/src/styles.css (--color-bg, --color-surface, --color-accent,
-  --color-border, --color-text, etc.) instead of hard-coding colors, so this
-  stays consistent with the rest of the app's yellow & black theme.
-*/
+.current-price {
+  font-size: 3rem;
+}
+
+.trade-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.trade-header {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.trade-name {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.trade-symbol {
+  font-size: 1.1rem;
+  color: --color-text;
+}
+
+.trade-prices,
+.trade-day-range {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trade-prices .label,
+.trade-day-range .label {
+  display: block;
+  font-size: 0.85rem;
+  color: --color-text;
+}
+
+.trade-prices .value,
+.trade-day-range .value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.timeframe-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.price-history {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-width: 700px;
+  padding: 2rem;
+  text-align: center;
+  color: --color-accent;
+}
