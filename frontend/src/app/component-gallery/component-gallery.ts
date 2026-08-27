@@ -1,7 +1,7 @@
 import { Component, Type } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
 import { HomePage } from '../home-page/home-page';
-import { Trades } from '../trades/trades';
+import { Trades } from '../trade-screen/trade-screen';
 import { TransactionHistory } from '../transaction-history/transaction-history';
 import { PortfolioPerformance } from '../portfolio-performance/portfolio-performance';
 import { MarketAnalysis } from '../market-analysis/market-analysis';

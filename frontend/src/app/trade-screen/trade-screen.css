@@ -1,0 +1,116 @@
+.trade-screen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  align-items: flex-start;
+}
+
+.order-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  flex: 1 1 320px;
+  max-width: 420px;
+}
+
+h2 {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+}
+
+h2 small {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* --- Order form --- */
+
+.side-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.side-toggle button {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.side-toggle button.active {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.order-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.amount-row {
+  align-items: flex-start;
+}
+
+.amount-row .order-field {
+  margin-bottom: 0;
+}
+
+.amount-field {
+  flex: 1;
+}
+
+.order-field select,
+.order-field input {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.5rem;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.order-estimate {
+  font-variant-numeric: tabular-nums;
+  margin: 0.85rem 0;
+}
+
+.order-error {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.order-submit {
+  width: 100%;
+  padding: 0.65rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.order-submit:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.order-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

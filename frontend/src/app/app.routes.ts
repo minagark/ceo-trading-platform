@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomePage } from './home-page/home-page';
-import { Trades } from './trades/trades';
+import { Trades } from './trade-screen/trade-screen';
 import { MarketAnalysis } from './market-analysis/market-analysis';
 import { PortfolioPerformance } from './portfolio-performance/portfolio-performance';
 import { TransactionHistory } from './transaction-history/transaction-history';
