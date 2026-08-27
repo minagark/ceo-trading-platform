@@ -1,0 +1,10 @@
+<div class="component-gallery">
+  @for (entry of entries; track entry.name) {
+    <section class="component-gallery__item">
+      <h2 class="component-gallery__title">{{ entry.name }}</h2>
+      <div class="component-gallery__preview">
+        <ng-container *ngComponentOutlet="entry.component" />
+      </div>
+    </section>
+  }
+</div>
