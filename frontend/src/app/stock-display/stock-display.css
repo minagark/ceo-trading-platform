@@ -1,14 +1,13 @@
-.current-price {
-  font-size: 3rem;
+.stock-display-page {
+  display: block;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.stock-display-page {
+.stock-display-page mat-card-content {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 1rem;
 }
 
 .stock-display-header {
@@ -16,6 +15,7 @@
   justify-content: center;
   align-items: baseline;
   gap: 0.5rem;
+  padding: 1rem 1rem 0;
 }
 
 .stock-display-name {
@@ -25,7 +25,7 @@
 
 .stock-display-symbol {
   font-size: 1.1rem;
-  color: #666;
+  color: var(--mat-sys-tertiary);
 }
 
 .stock-display-prices,
@@ -49,18 +49,26 @@
   font-weight: 600;
 }
 
+.current-price-value {
+  font-size: 3rem;
+}
+
+.current-price-value.positive {
+  color: green;
+}
+
+.current-price-value.negative {
+  color: red;
+}
+
 .timeframe-select {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  /* width: 8rem; */
 }
 
 .price-history {
   border: 1px solid #ddd;
-  border-radius: 8px;
-  max-width: 700px;
+  border-radius: 0px;
   padding: 2rem;
   text-align: center;
   color: #999;
-  /* align-self: center; */
 }

@@ -1,44 +1,48 @@
-<div class="stock-display-page">;
+<mat-card class="stock-display-page" appearance="outlined">
   <div class="stock-display-header">
     <h1 class="stock-display-name">{{ name }}</h1>
     <span class="stock-display-symbol">{{ symbol }}</span>
   </div>
 
-  <div class="stock-display-prices">
-    <div class="current-price">
-      <span class="label">Current Price</span>
-      <span class="value" [ngStyle]="{ 'font-size': '3rem', 'color': currentPrice > previousClose ? 'green' : 'red' }">
-        {{ currentPrice | number: '1.2-2' }}
-      </span>
+  <mat-card-content>
+    <div class="stock-display-prices">
+      <div class="current-price">
+        <span class="label">Current Price</span>
+        <span class="value current-price-value" [class.positive]="currentPrice > previousClose" [class.negative]="currentPrice <= previousClose">
+          {{ currentPrice | number: '1.2-2' }}
+        </span>
+      </div>
+      <div class="previous-close">
+        <span class="label">Previous Close</span>
+        <span class="value">{{ previousClose | number: '1.2-2' }}</span>
+      </div>
     </div>
-    <div class="previous-close">
-      <span class="label">Previous Close</span>
-      <span class="value">{{ previousClose | number: '1.2-2' }}</span>
-    </div>
-  </div>
 
-  <div class="stock-display-day-range">
-    <div class="timeframe-select">
-      <label for="timeframe">Time Frame</label>
-      <select id="timeframe" [(ngModel)]="selectedTimeFrame">
-        <option *ngFor="let tf of timeFrames" [value]="tf">{{ tf }}</option>Z
-      </select>
+    <div class="stock-display-day-range">
+      <mat-form-field class="timeframe-select" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Time Frame</mat-label>
+        <mat-select [(ngModel)]="selectedTimeFrame">
+          @for (tf of timeFrames; track tf) {
+            <mat-option [value]="tf">{{ tf }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <div class="high-price">
+        <span class="label">High Today</span>
+        <span class="value">{{ highPriceToday | number: '1.2-2' }}</span>
+      </div>
+      <div class="low-price">
+        <span class="label">Low Today</span>
+        <span class="value">{{ lowPriceToday | number: '1.2-2' }}</span>
+      </div>
     </div>
-    <div class="high-price">
-      <span class="label">High Today</span>
-      <span class="value">{{ highPriceToday | number: '1.2-2' }}</span>
-    </div>
-    <div class="low-price">
-      <span class="label">Low Today</span>
-      <span class="value">{{ lowPriceToday | number: '1.2-2' }}</span>
-    </div>
-  </div>
 
-  <div class="price-history">
-    <!-- placeholder until real chart data/library is integrated -->
-    <p class="chart-placeholder">Price history chart for: {{ selectedTimeFrame }}</p>
-  </div>
-</div>
+    <div class="price-history">
+      <!-- placeholder until real chart data/library is integrated -->
+      <p class="chart-placeholder">Price history chart for: {{ selectedTimeFrame }}</p>
+    </div>
+  </mat-card-content>
+</mat-card>
 
 
 <!-- 
