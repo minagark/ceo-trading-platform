@@ -6,9 +6,11 @@ import { MarketAnalysis } from './market-analysis/market-analysis';
 import { PortfolioPerformance } from './portfolio-performance/portfolio-performance';
 import { PortfolioComposition } from './portfolio-composition/portfolio-composition';
 import { ComponentGallery } from './component-gallery/component-gallery';
+import { StockDisplay } from './stock-display/stock-display';
 
 export const routes: Routes = [
   { path: 'home', component: HomePage },
+  { path: 'stock', component: StockDisplay },
   { path: 'trades', component: Trades },
   { path: 'history', component: TransactionHistory },
   { path: 'portfolio', component: PortfolioPerformance },

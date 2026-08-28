@@ -1,0 +1,66 @@
+.current-price {
+  font-size: 3rem;
+}
+
+.stock-display-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.stock-display-header {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.stock-display-name {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.stock-display-symbol {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.stock-display-prices,
+.stock-display-day-range {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stock-display-prices .label,
+.stock-display-day-range .label {
+  display: block;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.stock-display-prices .value,
+.stock-display-day-range .value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.timeframe-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.price-history {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-width: 700px;
+  padding: 2rem;
+  text-align: center;
+  color: #999;
+  /* align-self: center; */
+}
