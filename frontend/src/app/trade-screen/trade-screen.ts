@@ -2,9 +2,9 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AssetsService } from './assets.service';
-import { TradesService } from './trades.service';
 import { Account } from '../accounts-list/accounts-list';
 import { AccountsService } from '../accounts-list/accounts.service';
+import { PreviewPage } from '../preview-page/preview-page';
 
 export interface Asset {
   abbrName: string;
@@ -30,15 +30,16 @@ export interface Trade {
   date: string;
 }
 
+export type TradeRequest = Omit<Trade, 'id' | 'date'>;
+
 @Component({
-  imports: [CurrencyPipe, FormsModule],
+  imports: [CurrencyPipe, FormsModule, PreviewPage],
   selector: 'app-trades-screen',
   styleUrl: './trade-screen.css',
   templateUrl: './trade-screen.html',
 })
 export class Trades {
   private assetsService = inject(AssetsService);
-  private tradesService = inject(TradesService);
   private accountsService = inject(AccountsService);
 
   // Mock data for now — read with `stock()`, same as any other signal.
@@ -53,8 +54,7 @@ export class Trades {
   orderType = signal<'market' | 'limit'>('market');
   timeInForce = signal<'day' | 'gtc'>('day');
 
-  submitting = signal(false);
-  submitError = signal<string | null>(null);
+  showPreview = signal(false);
 
   estimatedCost = computed(() => {
     const stock = this.stock();
@@ -62,42 +62,36 @@ export class Trades {
     return unitPrice * this.quantity();
   });
 
+  currentDraft = computed<TradeRequest | null>(() => {
+    const account = this.selectedAccount();
+    if (!account) return null;
+    return {
+      type: this.side(),
+      account: account.id,
+      cashAvailable: account.balance,
+      stock: this.stock(),
+      amountType: this.quantityType(),
+      amount: this.quantity(),
+      orderType: this.orderType(),
+      timeInForce: this.timeInForce(),
+    };
+  });
+
   onAccountIdChange(id: string) {
     this.selectedAccount.set(this.accounts().find((a) => a.id === id) ?? null);
   }
 
-  placeOrder() {
-    const account = this.selectedAccount();
-    if (!account) return;
-    this.submitTrade(account.id, account.balance);
+  reviewOrder() {
+    if (!this.selectedAccount() || this.quantity() <= 0) return;
+    this.showPreview.set(true);
   }
 
-  submitTrade(account: string, cashAvailable: number) {
-    if (this.quantity() <= 0) return;
+  cancelPreview() {
+    this.showPreview.set(false);
+  }
 
-    this.submitting.set(true);
-    this.submitError.set(null);
-
-    this.tradesService
-      .placeTrade({
-        type: this.side(),
-        account,
-        cashAvailable,
-        stock: this.stock(),
-        amountType: this.quantityType(),
-        amount: this.quantity(),
-        orderType: this.orderType(),
-        timeInForce: this.timeInForce(),
-      })
-      .subscribe({
-        next: () => {
-          this.submitting.set(false);
-          this.quantity.set(0);
-        },
-        error: (err) => {
-          this.submitting.set(false);
-          this.submitError.set(err.message ?? 'Failed to place trade');
-        },
-      });
+  onTradeConfirmed() {
+    this.showPreview.set(false);
+    this.quantity.set(0);
   }
 }

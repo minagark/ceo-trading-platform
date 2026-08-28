@@ -1,5 +1,13 @@
 <div class="trade-screen">
   <section class="order-panel">
+    @if (showPreview() && selectedAccount() && currentDraft()) {
+      <app-preview-page
+        [draft]="currentDraft()!"
+        [account]="selectedAccount()!"
+        (back)="cancelPreview()"
+        (confirmed)="onTradeConfirmed()"
+      />
+    } @else {
     <h2>{{ stock().abbrName }} <small>{{ stock().fullName }}</small></h2>
 
     <div class="side-toggle">
@@ -52,17 +60,14 @@
       Estimated {{ side() === 'buy' ? 'cost' : 'proceeds' }}: <strong>{{ estimatedCost() | currency }}</strong>
     </p>
 
-    @if (submitError()) {
-      <p class="order-error">{{ submitError() }}</p>
-    }
-
     <button
       type="button"
       class="order-submit"
-      [disabled]="submitting() || !selectedAccount() || quantity() <= 0"
-      (click)="placeOrder()"
+      [disabled]="!selectedAccount() || quantity() <= 0"
+      (click)="reviewOrder()"
     >
-      {{ submitting() ? 'Placing order…' : (side() === 'buy' ? 'Buy' : 'Sell') + ' ' + stock().abbrName }}
+      Preview Order
     </button>
+    }
   </section>
 </div>
