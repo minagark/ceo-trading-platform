@@ -1,0 +1,68 @@
+<div class="trade-screen">
+  <section class="order-panel">
+    <h2>{{ stock().abbrName }} <small>{{ stock().fullName }}</small></h2>
+
+    <div class="side-toggle">
+      <button type="button" [class.active]="side() === 'buy'" (click)="side.set('buy')">Buy</button>
+      <button type="button" [class.active]="side() === 'sell'" (click)="side.set('sell')">Sell</button>
+    </div>
+
+    <label class="order-field">
+      Account
+      <select [ngModel]="selectedAccount()?.id ?? ''" (ngModelChange)="onAccountIdChange($event)">
+        <option value="" disabled>Select account</option>
+        @for (account of accounts(); track account.id) {
+          <option [value]="account.id">{{ account.name }} ({{ account.balance | currency }})</option>
+        }
+      </select>
+    </label>
+
+    <div class="side-toggle amount-row">
+      <label class="order-field amount-field">
+        Amount
+        <input type="number" min="0" step="1" [ngModel]="quantity()" (ngModelChange)="quantity.set($event)" />
+      </label>
+
+      <label class="order-field">
+        Amount type
+        <select [ngModel]="quantityType()" (ngModelChange)="quantityType.set($event)">
+          <option value="shares">Shares</option>
+          <option value="cash">Cash ($)</option>
+        </select>
+      </label>
+    </div>
+
+    <label class="order-field">
+      Order type
+      <select [ngModel]="orderType()" (ngModelChange)="orderType.set($event)">
+        <option value="market">Market</option>
+        <option value="limit">Limit</option>
+      </select>
+    </label>
+
+    <label class="order-field">
+      Time in force
+      <select [ngModel]="timeInForce()" (ngModelChange)="timeInForce.set($event)">
+        <option value="day">Day</option>
+        <option value="gtc">Good till canceled</option>
+      </select>
+    </label>
+
+    <p class="order-estimate">
+      Estimated {{ side() === 'buy' ? 'cost' : 'proceeds' }}: <strong>{{ estimatedCost() | currency }}</strong>
+    </p>
+
+    @if (submitError()) {
+      <p class="order-error">{{ submitError() }}</p>
+    }
+
+    <button
+      type="button"
+      class="order-submit"
+      [disabled]="submitting() || !selectedAccount() || quantity() <= 0"
+      (click)="placeOrder()"
+    >
+      {{ submitting() ? 'Placing order…' : (side() === 'buy' ? 'Buy' : 'Sell') + ' ' + stock().abbrName }}
+    </button>
+  </section>
+</div>
