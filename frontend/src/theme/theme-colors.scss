@@ -146,6 +146,13 @@ html {
     ),
     typography: Roboto,
     density: 0,
+  ), $overrides: (
+    corner-extra-small: 0px,
+    corner-small: 0px,
+    corner-medium: 0px,
+    corner-large: 0px,
+    corner-extra-large: 0px,
+    corner-full: 0px,
   ));
 }
 
