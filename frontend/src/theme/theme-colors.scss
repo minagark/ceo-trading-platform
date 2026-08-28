@@ -135,3 +135,21 @@ $_rest: (
 
 $primary-palette: map.merge(map.get($_palettes, primary), $_rest);
 $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
+
+html {
+  @include mat.core();
+  @include mat.theme((
+    color: (
+      primary: $primary-palette, 
+      tertiary: $tertiary-palette,
+      theme-type: dark,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  background: var(--mat-sys-on-surface);
+  color: var(--mat-sys-on-surface);
+}
