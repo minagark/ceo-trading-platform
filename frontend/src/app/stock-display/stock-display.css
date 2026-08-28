@@ -2,7 +2,7 @@
   font-size: 3rem;
 }
 
-.trade-page {
+.stock-display-page {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -11,39 +11,39 @@
   padding: 1rem;
 }
 
-.trade-header {
+.stock-display-header {
   display: flex;
   justify-content: center;
   align-items: baseline;
   gap: 0.5rem;
 }
 
-.trade-name {
+.stock-display-name {
   margin: 0;
   font-size: 1.5rem;
 }
 
-.trade-symbol {
+.stock-display-symbol {
   font-size: 1.1rem;
   color: #666;
 }
 
-.trade-prices,
-.trade-day-range {
+.stock-display-prices,
+.stock-display-day-range {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.trade-prices .label,
-.trade-day-range .label {
+.stock-display-prices .label,
+.stock-display-day-range .label {
   display: block;
   font-size: 0.85rem;
   color: #888;
 }
 
-.trade-prices .value,
-.trade-day-range .value {
+.stock-display-prices .value,
+.stock-display-day-range .value {
   display: block;
   font-size: 1.2rem;
   font-weight: 600;

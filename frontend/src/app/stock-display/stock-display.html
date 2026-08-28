@@ -1,10 +1,10 @@
-<div class="trade-page">;
-  <div class="trade-header">
-    <h1 class="trade-name">{{ name }}</h1>
-    <span class="trade-symbol">{{ symbol }}</span>
+<div class="stock-display-page">;
+  <div class="stock-display-header">
+    <h1 class="stock-display-name">{{ name }}</h1>
+    <span class="stock-display-symbol">{{ symbol }}</span>
   </div>
 
-  <div class="trade-prices">
+  <div class="stock-display-prices">
     <div class="current-price">
       <span class="label">Current Price</span>
       <span class="value" [ngStyle]="{ 'font-size': '3rem', 'color': currentPrice > previousClose ? 'green' : 'red' }">
@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <div class="trade-day-range">
+  <div class="stock-display-day-range">
     <div class="timeframe-select">
       <label for="timeframe">Time Frame</label>
       <select id="timeframe" [(ngModel)]="selectedTimeFrame">

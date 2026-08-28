@@ -9,11 +9,11 @@ interface PriceHistoryPoint {
 
 @Component({
   imports: [CommonModule, FormsModule, DecimalPipe],
-  selector: 'app-trades',
-  styleUrl: './trades.css',
-  templateUrl: './trades.html',
+  selector: 'app-stock-display',
+  styleUrl: './stock-display.css',
+  templateUrl: './stock-display.html',
 })
-export class Trades {
+export class StockDisplay {
 
   // Example data, all of this comes from backend/db
   name = 'Example Corp';
