@@ -147,6 +147,8 @@ html {
     typography: Roboto,
     density: 0,
   ), $overrides: (
+    // *** This removes all border radius by default on Material components. 
+    // *** Change this at some point if desired.
     corner-extra-small: 0px,
     corner-small: 0px,
     corner-medium: 0px,
