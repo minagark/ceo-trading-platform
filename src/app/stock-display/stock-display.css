@@ -61,14 +61,21 @@
   color: red;
 }
 
-.timeframe-select {
-  /* width: 8rem; */
-}
-
 .price-history {
   border: 1px solid #ddd;
   border-radius: 0px;
   padding: 2rem;
   text-align: center;
   color: #999;
+}
+
+.trade-button {
+  border: solid;
+  /* color: var(--mat-sys-on-tertiary);
+  border-color: var(--mat-sys-tertiary);
+  background-color: var(--mat-sys-on-tertiary); */
+  border-width: 1px;
+
+  --mat-button-filled-container-color: var(--mat-sys-tertiary);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
 }
