@@ -1,0 +1,20 @@
+<mat-card appearance="outlined" class="confirmation-card">
+  <div class="result-icon" [class.result-icon--success]="success()" [class.result-icon--failure]="!success()">
+    <mat-icon>{{ success() ? 'check_circle' : 'cancel' }}</mat-icon>
+  </div>
+
+  <h2 class="result-title">{{ success() ? 'Order placed' : 'Order failed' }}</h2>
+
+  @if (success() && trade(); as placedTrade) {
+    <p class="result-detail">
+      {{ placedTrade.type === 'buy' ? 'Bought' : 'Sold' }} <strong>{{ placedTrade.stock.abbrName }}</strong>
+      &middot; {{ placedTrade.orderType === 'market' ? 'Market order' : 'Limit order' }}
+    </p>
+  } @else if (!success()) {
+    <p class="result-detail">{{ message() ?? 'Something went wrong placing your order.' }}</p>
+  }
+
+  <button mat-flat-button class="result-done" (click)="done.emit()">
+    {{ success() ? 'New order' : 'Try again' }}
+  </button>
+</mat-card>

@@ -7,7 +7,8 @@ import { PortfolioPerformance } from '../portfolio-performance/portfolio-perform
 import { MarketAnalysis } from '../market-analysis/market-analysis';
 import { AccountsList, Account } from '../accounts-list/accounts-list';
 import { PreviewPage } from '../preview-page/preview-page';
-import { TradeRequest } from '../trade-screen/trade-screen';
+import { Trade, TradeRequest } from '../trade-screen/trade-screen';
+import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
 
 interface GalleryEntry {
   name: string;
@@ -42,6 +43,12 @@ const mockPreviewAccount: Account = {
   balance: 5000,
 };
 
+const mockConfirmedTrade: Trade = {
+  ...mockPreviewDraft,
+  id: 'mock-trade-1',
+  date: new Date().toISOString(),
+};
+
 @Component({
   selector: 'app-component-gallery',
   imports: [NgComponentOutlet],
@@ -62,6 +69,11 @@ export class ComponentGallery {
       name: 'Preview Page',
       component: PreviewPage,
       inputs: { draft: mockPreviewDraft, account: mockPreviewAccount },
+    },
+    {
+      name: 'Trade Confirmation',
+      component: TradeConfirmation,
+      inputs: { success: true, trade: mockConfirmedTrade },
     },
   ];
 }

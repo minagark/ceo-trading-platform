@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 
 import { Account } from '../accounts-list/accounts-list';
-import { TradeRequest } from '../trade-screen/trade-screen';
+import { Trade, TradeRequest } from '../trade-screen/trade-screen';
 import { PreviewService } from './preview-page.service';
 
 @Component({
@@ -20,10 +20,10 @@ export class PreviewPage {
   account = input.required<Account>();
 
   back = output<void>();
-  confirmed = output<void>();
+  confirmed = output<Trade>();
+  failed = output<string>();
 
   submitting = signal(false);
-  submitError = signal<string | null>(null);
 
   previewTime = new Date();
 
@@ -46,16 +46,15 @@ export class PreviewPage {
 
   confirm() {
     this.submitting.set(true);
-    this.submitError.set(null);
 
     this.previewService.placeTrade(this.draft()).subscribe({
-      next: () => {
+      next: (trade) => {
         this.submitting.set(false);
-        this.confirmed.emit();
+        this.confirmed.emit(trade);
       },
       error: (err) => {
         this.submitting.set(false);
-        this.submitError.set(err.message ?? 'Failed to place trade');
+        this.failed.emit(err.message ?? 'Failed to place trade');
       },
     });
   }
