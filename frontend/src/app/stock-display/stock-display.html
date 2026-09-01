@@ -41,6 +41,11 @@
       <!-- placeholder until real chart data/library is integrated -->
       <p class="chart-placeholder">Price history chart for: {{ selectedTimeFrame }}</p>
     </div>
+    
+    <button matButton class="trade-button" (click)="handleTrade()">
+      Trade
+    </button>
+    
   </mat-card-content>
 </mat-card>
 
