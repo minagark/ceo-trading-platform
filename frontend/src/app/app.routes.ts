@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { LoginPage } from './login-page/login-page';
 import { HomePage } from './home-page/home-page';
 import { Trades } from './trade-screen/trade-screen';
 import { TransactionHistory } from './transaction-history/transaction-history';
@@ -7,14 +8,17 @@ import { PortfolioPerformance } from './portfolio-performance/portfolio-performa
 import { PortfolioComposition } from './portfolio-composition/portfolio-composition';
 import { ComponentGallery } from './component-gallery/component-gallery';
 import { StockDisplay } from './stock-display/stock-display';
+import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
-  { path: 'home', component: HomePage },
-  { path: 'stock', component: StockDisplay },
-  { path: 'trades', component: Trades },
-  { path: 'history', component: TransactionHistory },
-  { path: 'portfolio', component: PortfolioPerformance },
-  { path: 'composition', component: PortfolioComposition },
-  { path: 'analysis', component: MarketAnalysis },
-  { path: 'components', component: ComponentGallery },
+  { path: 'login', component: LoginPage },
+  { path: 'home', component: HomePage, canActivate: [authGuard] },
+  { path: 'stock', component: StockDisplay, canActivate: [authGuard] },
+  { path: 'trades', component: Trades, canActivate: [authGuard] },
+  { path: 'history', component: TransactionHistory, canActivate: [authGuard] },
+  { path: 'portfolio', component: PortfolioPerformance, canActivate: [authGuard] },
+  { path: 'composition', component: PortfolioComposition, canActivate: [authGuard] },
+  { path: 'analysis', component: MarketAnalysis, canActivate: [authGuard] },
+  { path: 'components', component: ComponentGallery, canActivate: [authGuard] },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
 ];

@@ -31,3 +31,10 @@
   background: var(--color-accent-soft);
   color: var(--color-accent);
 }
+
+.app-nav__logout {
+  font: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
