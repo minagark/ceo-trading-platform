@@ -33,12 +33,13 @@ ModuleRegistry.registerModules([
 
 @Component({
   imports: [AgCharts, AgFinancialCharts],
-  selector: 'app-portfolio-performance',
+  selector: 'performance-chart',
   styleUrl: './portfolio-performance.css',
   templateUrl: './portfolio-performance.html',
 })
 export class PortfolioPerformance {
   // functional code
+  /* TODO: replace with real data handling */
   accounts: Account[] = [
     {id: 1, name: 'Account 1', balance: 1500, holdings: [{symbol: "AAPL", quantity: 10}, {symbol: "MSFT", quantity: 10}], history: [1000, 2000, 1500, 3000, 2750, 2800, 1100, 1500]},
     {id: 2, name: 'Account 2', balance: 2000, holdings: [{symbol: "AAPL", quantity: 20}, {symbol: "MSFT", quantity: 20}], history: [1000, 2000, 1500]},

@@ -4,6 +4,7 @@ import { DecimalPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { PortfolioPerformance } from '../portfolio-performance/portfolio-performance';
 
 interface PriceHistoryPoint {
   time: string;
@@ -11,7 +12,7 @@ interface PriceHistoryPoint {
 }
 
 @Component({
-  imports: [FormsModule, DecimalPipe, MatCardModule, MatFormFieldModule, MatSelectModule],
+  imports: [FormsModule, DecimalPipe, MatCardModule, MatFormFieldModule, MatSelectModule, PortfolioPerformance],
   selector: 'app-stock-display',
   styleUrl: './stock-display.css',
   templateUrl: './stock-display.html',
