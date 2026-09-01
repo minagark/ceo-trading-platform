@@ -65,9 +65,9 @@ export class PortfolioPerformance {
 
   constructor() {
     this.options = {
-      title: {
-        text: this.accounts[0].name,
-      },
+      // title: {
+      //   text: this.accounts[0].name,
+      // },
       // data: this.accounts[0].history.map((balance, index) => ({ date: index, balance })),
       data : [
        { date: "d1",
@@ -99,15 +99,19 @@ export class PortfolioPerformance {
           stroke: "green" //red or green
         }
       ],
+      background: {
+        fill: 'var(--mat-sys-surface)'
+      },
       axes: {
         x: {
-          type: 'time',
+          type: 'category', // changes this to time once get real time stamp (or leave as category depending on parsing)
           gridLine: {
             enabled: false
           },
           label: {
-            enabled: false
-          }
+            enabled: true,
+            color: "var(--mat-sys-on-surface)"
+          },
         },
         y: {
           type: 'number',
@@ -115,7 +119,8 @@ export class PortfolioPerformance {
             enabled: false
           },
           label: {
-            enabled: false
+            enabled: true,
+            color: "var(--mat-sys-on-surface)"
           }
         }
       }

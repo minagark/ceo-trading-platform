@@ -1,68 +1,77 @@
 <div class="trade-screen">
-  <section class="order-panel">
+  <mat-card appearance="outlined" class="order-panel">
+    @if (showPreview() && selectedAccount() && currentDraft()) {
+      <app-preview-page
+        [draft]="currentDraft()!"
+        [account]="selectedAccount()!"
+        (back)="cancelPreview()"
+        (confirmed)="onTradeConfirmed()"
+      />
+    } @else {
     <h2>{{ stock().abbrName }} <small>{{ stock().fullName }}</small></h2>
 
-    <div class="side-toggle">
-      <button type="button" [class.active]="side() === 'buy'" (click)="side.set('buy')">Buy</button>
-      <button type="button" [class.active]="side() === 'sell'" (click)="side.set('sell')">Sell</button>
-    </div>
+    <mat-button-toggle-group
+      class="side-toggle"
+      [value]="side()"
+      (valueChange)="side.set($event)"
+      hideSingleSelectionIndicator
+    >
+      <mat-button-toggle value="buy">Buy</mat-button-toggle>
+      <mat-button-toggle value="sell">Sell</mat-button-toggle>
+    </mat-button-toggle-group>
 
-    <label class="order-field">
-      Account
-      <select [ngModel]="selectedAccount()?.id ?? ''" (ngModelChange)="onAccountIdChange($event)">
-        <option value="" disabled>Select account</option>
+    <mat-form-field appearance="outline" class="order-field">
+      <mat-label>Account</mat-label>
+      <mat-select [ngModel]="selectedAccount()?.id ?? ''" (ngModelChange)="onAccountIdChange($event)">
         @for (account of accounts(); track account.id) {
-          <option [value]="account.id">{{ account.name }} ({{ account.balance | currency }})</option>
+          <mat-option [value]="account.id">{{ account.name }} ({{ account.balance | currency }})</mat-option>
         }
-      </select>
-    </label>
+      </mat-select>
+    </mat-form-field>
 
-    <div class="side-toggle amount-row">
-      <label class="order-field amount-field">
-        Amount
-        <input type="number" min="0" step="1" [ngModel]="quantity()" (ngModelChange)="quantity.set($event)" />
-      </label>
+    <div class="amount-row">
+      <mat-form-field appearance="outline" class="order-field amount-field">
+        <mat-label>Amount</mat-label>
+        <input matInput type="number" min="0" step="1" [ngModel]="quantity()" (ngModelChange)="quantity.set($event)" />
+      </mat-form-field>
 
-      <label class="order-field">
-        Amount type
-        <select [ngModel]="quantityType()" (ngModelChange)="quantityType.set($event)">
-          <option value="shares">Shares</option>
-          <option value="cash">Cash ($)</option>
-        </select>
-      </label>
+      <mat-form-field appearance="outline" class="order-field">
+        <mat-label>Amount type</mat-label>
+        <mat-select [ngModel]="quantityType()" (ngModelChange)="quantityType.set($event)">
+          <mat-option value="shares">Shares</mat-option>
+          <mat-option value="cash">Cash ($)</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
 
-    <label class="order-field">
-      Order type
-      <select [ngModel]="orderType()" (ngModelChange)="orderType.set($event)">
-        <option value="market">Market</option>
-        <option value="limit">Limit</option>
-      </select>
-    </label>
+    <mat-form-field appearance="outline" class="order-field">
+      <mat-label>Order type</mat-label>
+      <mat-select [ngModel]="orderType()" (ngModelChange)="orderType.set($event)">
+        <mat-option value="market">Market</mat-option>
+        <mat-option value="limit">Limit</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-    <label class="order-field">
-      Time in force
-      <select [ngModel]="timeInForce()" (ngModelChange)="timeInForce.set($event)">
-        <option value="day">Day</option>
-        <option value="gtc">Good till canceled</option>
-      </select>
-    </label>
+    <mat-form-field appearance="outline" class="order-field">
+      <mat-label>Time in force</mat-label>
+      <mat-select [ngModel]="timeInForce()" (ngModelChange)="timeInForce.set($event)">
+        <mat-option value="day">Day</mat-option>
+        <mat-option value="gtc">Good till canceled</mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <p class="order-estimate">
       Estimated {{ side() === 'buy' ? 'cost' : 'proceeds' }}: <strong>{{ estimatedCost() | currency }}</strong>
     </p>
 
-    @if (submitError()) {
-      <p class="order-error">{{ submitError() }}</p>
-    }
-
     <button
-      type="button"
+      mat-flat-button
       class="order-submit"
-      [disabled]="submitting() || !selectedAccount() || quantity() <= 0"
-      (click)="placeOrder()"
+      [disabled]="!selectedAccount() || quantity() <= 0"
+      (click)="reviewOrder()"
     >
-      {{ submitting() ? 'Placing order…' : (side() === 'buy' ? 'Buy' : 'Sell') + ' ' + stock().abbrName }}
+      Preview Order
     </button>
-  </section>
+    }
+  </mat-card>
 </div>
