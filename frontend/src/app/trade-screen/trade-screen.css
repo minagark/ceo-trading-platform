@@ -7,12 +7,9 @@
 }
 
 .order-panel {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
   flex: 1 1 320px;
   max-width: 420px;
+  padding: 1rem 1.25rem;
 }
 
 h2 {
@@ -29,57 +26,34 @@ h2 small {
 
 .side-toggle {
   display: flex;
-  gap: 0.5rem;
+  width: 100%;
   margin-bottom: 1rem;
+  --mat-button-toggle-selected-state-background-color: var(--color-accent-soft);
+  --mat-button-toggle-selected-state-text-color: var(--mat-sys-tertiary);
 }
 
-.side-toggle button {
+.side-toggle mat-button-toggle {
   flex: 1;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-surface-raised);
-  color: var(--color-text);
-  font: inherit;
-  cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
-}
-
-.side-toggle button.active {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  text-align: center;
 }
 
 .order-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
+  display: block;
+  width: 100%;
 }
 
 .amount-row {
+  display: flex;
   align-items: flex-start;
+  gap: 0.5rem;
 }
 
+/* Inside the flex row, override the block full-width sizing above —
+   otherwise the "auto"-basis sibling claims 100% and starves the other
+   field to zero width. Both fields share the row equally instead. */
 .amount-row .order-field {
-  margin-bottom: 0;
-}
-
-.amount-field {
+  width: auto;
   flex: 1;
-}
-
-.order-field select,
-.order-field input {
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  padding: 0.5rem;
-  color: var(--color-text);
-  font: inherit;
 }
 
 .order-estimate {
@@ -95,90 +69,8 @@ h2 small {
 
 .order-submit {
   width: 100%;
-  padding: 0.65rem;
-  border: none;
-  border-radius: 6px;
-  background: var(--color-accent);
-  color: var(--color-accent-text);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 150ms ease;
-}
-
-.order-submit:hover:not(:disabled) {
-  background: var(--color-accent-hover);
-}
-
-.order-submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* --- Carried over from trades.css (price-detail page, unused for now) --- */
-
-.current-price {
-  font-size: 3rem;
-}
-
-.trade-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-.trade-header {
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
-.trade-name {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.trade-symbol {
-  font-size: 1.1rem;
-  color: var(--color-text);
-}
-
-.trade-prices,
-.trade-day-range {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.trade-prices .label,
-.trade-day-range .label {
-  display: block;
-  font-size: 0.85rem;
-  color: --color-text;
-}
-
-.trade-prices .value,
-.trade-day-range .value {
-  display: block;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.timeframe-select {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.price-history {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  max-width: 700px;
-  padding: 2rem;
-  text-align: center;
-  color: --color-accent;
+  /* mat-button's `color` input has no effect under M3 theming — the fill
+     color has to be set via these tokens instead. */
+  --mat-button-filled-container-color: var(--mat-sys-tertiary);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
 }

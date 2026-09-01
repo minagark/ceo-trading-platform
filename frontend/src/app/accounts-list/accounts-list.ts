@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal, output } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { MatListModule } from '@angular/material/list';
 import { AccountsService } from './accounts.service';
 
 export interface Account {
@@ -11,7 +12,7 @@ export interface Account {
 
 @Component({
   selector: 'app-accounts-list',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, MatListModule],
   templateUrl: './accounts-list.html',
   styleUrl: './accounts-list.css',
 })

@@ -1,0 +1,32 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Review order</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="preview-summary">
+      <p class="preview-summary-text">
+        {{ draft().type === 'buy' ? 'Buy' : 'Sell' }}
+        <strong>{{ shares() | number: '1.0-4' }} {{ shares() === 1 ? 'share' : 'shares' }}</strong>
+        of <strong>{{ draft().stock.abbrName }}</strong>
+        for <strong>{{ estimatedTotal() | currency }}</strong>
+      </p>
+      <p class="preview-summary-time">
+        At {{ previewTime | date: 'shortTime' }} &middot; {{ draft().orderType === 'market' ? 'Market order' : 'Limit order' }}
+        &middot; {{ draft().timeInForce === 'day' ? 'Day' : 'Good till canceled' }}
+      </p>
+      <p class="preview-summary-account">{{ account().name }} &middot; {{ account().balance | currency }} available</p>
+    </div>
+
+    @if (submitError()) {
+      <p class="preview-error">{{ submitError() }}</p>
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="preview-actions">
+    <button mat-stroked-button class="preview-back" [disabled]="submitting()" (click)="back.emit()">Back</button>
+    <button mat-flat-button class="preview-confirm" [disabled]="submitting()" (click)="confirm()">
+      {{ submitting() ? 'Placing order…' : 'Confirm ' + (draft().type === 'buy' ? 'buy' : 'sell') }}
+    </button>
+  </mat-card-actions>
+</mat-card>
