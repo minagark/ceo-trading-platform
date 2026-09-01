@@ -71,6 +71,7 @@
 
 .trade-button {
   border: solid;
+  color: var(--mat-sys-on-tertiary);
   border-color: var(--mat-sys-tertiary);
   background-color: var(--mat-sys-on-tertiary);
   border-width: 1px;
