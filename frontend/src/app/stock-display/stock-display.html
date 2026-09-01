@@ -1,0 +1,62 @@
+<mat-card class="stock-display-page" appearance="outlined">
+  <div class="stock-display-header">
+    <h1 class="stock-display-name">{{ name }}</h1>
+    <span class="stock-display-symbol">{{ symbol }}</span>
+  </div>
+
+  <mat-card-content>
+    <div class="stock-display-prices">
+      <div class="current-price">
+        <span class="label">Current Price</span>
+        <span class="value current-price-value" [class.positive]="currentPrice > previousClose" [class.negative]="currentPrice <= previousClose">
+          {{ currentPrice | number: '1.2-2' }}
+        </span>
+      </div>
+      <div class="previous-close">
+        <span class="label">Previous Close</span>
+        <span class="value">{{ previousClose | number: '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="stock-display-day-range">
+      <mat-form-field class="timeframe-select" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Time Frame</mat-label>
+        <mat-select [(ngModel)]="selectedTimeFrame">
+          @for (tf of timeFrames; track tf) {
+            <mat-option [value]="tf">{{ tf }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <div class="high-price">
+        <span class="label">High Today</span>
+        <span class="value">{{ highPriceToday | number: '1.2-2' }}</span>
+      </div>
+      <div class="low-price">
+        <span class="label">Low Today</span>
+        <span class="value">{{ lowPriceToday | number: '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="price-history" style="border-color: var(--mat-sys-tertiary);">
+      <!-- placeholder until real chart data/library is integrated -->
+      <p class="chart-placeholder">Price history chart for: {{ selectedTimeFrame }}</p>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+
+<!-- 
+Information needed:
+top row:
+Name (top middle)
+Symbol (top middle, after name)
+second row:
+Current Price (left)
+Previous close (right)
+third row:
+Time frame dropdown (left)
+High Price today (middle)
+Low Price today (right)
+last section:
+Price history graph (depending on time frame dropdown; for now, just do a placeholder which just says the time frame)
+-->
