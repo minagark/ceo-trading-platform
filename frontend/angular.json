@@ -25,7 +25,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/theme/theme.scss", "src/styles.css"]
+            "styles": ["src/theme/theme-colors.scss", "src/styles.css"]
           },
           "configurations": {
             "production": {
