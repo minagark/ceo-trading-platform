@@ -40,6 +40,7 @@
     <div class="price-history" style="border-color: var(--mat-sys-tertiary);">
       <!-- placeholder until real chart data/library is integrated -->
       <p class="chart-placeholder">Price history chart for: {{ selectedTimeFrame }}</p>
+      <performance-chart></performance-chart>
     </div>
     
     <button matButton="filled" class="trade-button" (click)="handleTrade()">
