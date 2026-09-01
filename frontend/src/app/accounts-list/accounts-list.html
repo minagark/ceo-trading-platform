@@ -1,5 +1,7 @@
 <!--
-  Accounts list sidebar.
+  Accounts list sidebar, built on Angular Material's mat-action-list —
+  a list of clickable actions (as opposed to mat-nav-list, which is for
+  routed links).
 
   Angular templating cheatsheet for what's below:
     - `@for (item of items(); track item.id) { ... }` loops over a signal's
@@ -14,39 +16,31 @@
   <header class="accounts-list__header">
     <h2>Accounts</h2>
   </header>
-  
-  <ul class="accounts-list__items">
-    <li
+
+  <mat-action-list class="accounts-list__items">
+    <button
+      mat-list-item
       class="accounts-list__item"
       [class.accounts-list__item--selected]="selectedAccountId() === null"
       (click)="selectAllAccounts()"
-      (keydown.enter)="selectAllAccounts()"
-      (keydown.space)="$event.preventDefault(); selectAllAccounts()"
-      tabindex="0"
-      role="button"
     >
-      <span class="accounts-list__name">All Accounts</span>
-      <span class="accounts-list__total">{{ totalBalance() | currency }}</span>
-    </li>
+      <span matListItemTitle>All Accounts</span>
+      <span matListItemMeta>{{ totalBalance() | currency }}</span>
+    </button>
     @for (account of accounts(); track account.id) {
-      <li
+      <button
+        mat-list-item
         class="accounts-list__item"
         [class.accounts-list__item--selected]="account.id === selectedAccountId()"
         (click)="selectAccount(account)"
-        (keydown.enter)="selectAccount(account)"
-        (keydown.space)="$event.preventDefault(); selectAccount(account)"
-        tabindex="0"
-        role="button"
       >
-        <span class="accounts-list__row">
-          <span class="accounts-list__name">{{ account.name }}</span>
-          <span class="accounts-list__type">{{ account.type }}</span>
-        </span>
-        <span class="accounts-list__balance">{{account.balance | currency}}</span>
-      </li>
+        <span matListItemTitle>{{ account.name }}</span>
+        <span matListItemLine class="accounts-list__type">{{ account.type }}</span>
+        <span matListItemMeta>{{ account.balance | currency }}</span>
+      </button>
     } @empty {
       <!-- Shown automatically when accounts() is an empty array. -->
-      <li class="accounts-list__empty">No accounts yet.</li>
+      <p class="accounts-list__empty">No accounts yet.</p>
     }
-  </ul>
+  </mat-action-list>
 </aside>

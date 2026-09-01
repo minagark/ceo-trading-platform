@@ -1,6 +1,12 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 import { AssetsService } from './assets.service';
 import { Account } from '../accounts-list/accounts-list';
 import { AccountsService } from '../accounts-list/accounts.service';
@@ -33,7 +39,17 @@ export interface Trade {
 export type TradeRequest = Omit<Trade, 'id' | 'date'>;
 
 @Component({
-  imports: [CurrencyPipe, FormsModule, PreviewPage],
+  imports: [
+    CurrencyPipe,
+    FormsModule,
+    PreviewPage,
+    MatCardModule,
+    MatButtonToggleModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
   selector: 'app-trades-screen',
   styleUrl: './trade-screen.css',
   templateUrl: './trade-screen.html',

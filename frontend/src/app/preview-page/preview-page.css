@@ -3,17 +3,10 @@
   max-width: 420px;
 }
 
-h2 {
-  margin: 0 0 0.85rem;
-  font-size: 1rem;
-}
-
 .preview-summary {
   background: var(--color-accent-soft);
   border: 1px solid var(--color-accent);
-  border-radius: 8px;
   padding: 0.85rem 1rem;
-  margin: 0 0 1rem;
   text-align: center;
 }
 
@@ -44,7 +37,7 @@ h2 {
 .preview-error {
   color: var(--color-danger);
   font-size: 0.85rem;
-  margin: 0 0 0.75rem;
+  margin: 0.75rem 0 0;
 }
 
 .preview-actions {
@@ -55,32 +48,11 @@ h2 {
 .preview-back,
 .preview-confirm {
   flex: 1;
-  padding: 0.65rem;
-  border-radius: 6px;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 150ms ease;
-}
-
-.preview-back {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface-raised);
-  color: var(--color-text);
 }
 
 .preview-confirm {
-  border: none;
-  background: var(--color-accent);
-  color: var(--color-accent-text);
-}
-
-.preview-confirm:hover:not(:disabled) {
-  background: var(--color-accent-hover);
-}
-
-.preview-back:disabled,
-.preview-confirm:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  /* mat-button's `color` input has no effect under M3 theming — the fill
+     color has to be set via these tokens instead. */
+  --mat-button-filled-container-color: var(--mat-sys-tertiary);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
 }

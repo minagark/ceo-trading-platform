@@ -1,12 +1,14 @@
 import { Component, inject, input, output, computed, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 import { Account } from '../accounts-list/accounts-list';
 import { TradeRequest } from '../trade-screen/trade-screen';
 import { PreviewService } from './preview-page.service';
 
 @Component({
-  imports: [CurrencyPipe, DatePipe, DecimalPipe],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, MatCardModule, MatButtonModule],
   selector: 'app-preview-page',
   styleUrl: './preview-page.css',
   templateUrl: './preview-page.html',
