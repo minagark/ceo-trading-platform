@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { PortfolioPerformance } from '../portfolio-performance/portfolio-performance';
+import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 
 interface PriceHistoryPoint {
   time: string;
@@ -12,12 +14,13 @@ interface PriceHistoryPoint {
 }
 
 @Component({
-  imports: [FormsModule, DecimalPipe, MatCardModule, MatFormFieldModule, MatSelectModule, PortfolioPerformance],
+  imports: [FormsModule, DecimalPipe, MatCardModule, MatFormFieldModule, MatSelectModule, MatButtonModule, PortfolioPerformance],
   selector: 'app-stock-display',
   styleUrl: './stock-display.css',
   templateUrl: './stock-display.html',
 })
 export class StockDisplay {
+  private router: Router = inject(Router);
 
   // Example data, all of this comes from backend/db
   name = 'Example Corp';
@@ -39,4 +42,14 @@ export class StockDisplay {
   }
 
   priceHistory: PriceHistoryPoint[] = [];
+
+
+  handleTrade() {
+    console.log("Trading!");
+    // This will likely have to be refactored into a pop-up for trades rather than
+    // a navigation to a full trades page.
+    this.router.navigate(["trades"], {
+      queryParams: { name: this.name, symbol: this.symbol, currentPrice: this.currentPrice }
+    });
+  }
 }

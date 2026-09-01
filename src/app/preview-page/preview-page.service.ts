@@ -1,12 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { of, delay } from 'rxjs';
-import { Trade } from './trade-screen';
-
-export type TradeRequest = Omit<Trade, 'id' | 'date'>;
+import { Trade, TradeRequest } from '../trade-screen/trade-screen';
 
 @Injectable({ providedIn: 'root' })
-export class TradesService {
+export class PreviewService {
   private http = inject(HttpClient);
 
   // Real implementation —

@@ -1,0 +1,76 @@
+.trade-screen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  align-items: flex-start;
+}
+
+.order-panel {
+  flex: 1 1 320px;
+  max-width: 420px;
+  padding: 1rem 1.25rem;
+}
+
+h2 {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+}
+
+h2 small {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* --- Order form --- */
+
+.side-toggle {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1rem;
+  --mat-button-toggle-selected-state-background-color: var(--color-accent-soft);
+  --mat-button-toggle-selected-state-text-color: var(--mat-sys-tertiary);
+}
+
+.side-toggle mat-button-toggle {
+  flex: 1;
+  text-align: center;
+}
+
+.order-field {
+  display: block;
+  width: 100%;
+}
+
+.amount-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* Inside the flex row, override the block full-width sizing above —
+   otherwise the "auto"-basis sibling claims 100% and starves the other
+   field to zero width. Both fields share the row equally instead. */
+.amount-row .order-field {
+  width: auto;
+  flex: 1;
+}
+
+.order-estimate {
+  font-variant-numeric: tabular-nums;
+  margin: 0.85rem 0;
+}
+
+.order-error {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.order-submit {
+  width: 100%;
+  /* mat-button's `color` input has no effect under M3 theming — the fill
+     color has to be set via these tokens instead. */
+  --mat-button-filled-container-color: var(--mat-sys-tertiary);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
+}
