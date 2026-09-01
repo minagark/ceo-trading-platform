@@ -1,11 +1,19 @@
 <div class="trade-screen">
   <mat-card appearance="outlined" class="order-panel">
-    @if (showPreview() && selectedAccount() && currentDraft()) {
+    @if (screen() === 'preview' && selectedAccount() && currentDraft()) {
       <app-preview-page
         [draft]="currentDraft()!"
         [account]="selectedAccount()!"
         (back)="cancelPreview()"
-        (confirmed)="onTradeConfirmed()"
+        (confirmed)="onTradeConfirmed($event)"
+        (failed)="onTradeFailed($event)"
+      />
+    } @else if (screen() === 'confirmation') {
+      <app-trade-confirmation
+        [success]="confirmationResult().success"
+        [trade]="confirmationResult().trade"
+        [message]="confirmationResult().message"
+        (done)="finishConfirmation()"
       />
     } @else {
     <h2>{{ stock().abbrName }} <small>{{ stock().fullName }}</small></h2>

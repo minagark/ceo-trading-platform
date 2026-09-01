@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  max-width: 420px;
+}
+
+.confirmation-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  gap: 0.5rem;
+}
+
+.result-icon mat-icon {
+  width: 5rem;
+  height: 5rem;
+  font-size: 5rem;
+}
+
+.result-icon--success mat-icon {
+  color: var(--color-success);
+}
+
+.result-icon--failure mat-icon {
+  color: var(--color-danger);
+}
+
+.result-title {
+  margin: 0.5rem 0 0;
+  font-size: 1.3rem;
+}
+
+.result-detail {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+}
+
+.result-done {
+  width: 100%;
+  --mat-button-filled-container-color: var(--mat-sys-tertiary);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
+}

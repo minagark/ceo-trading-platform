@@ -46,6 +46,7 @@
   --color-accent-soft: rgba(227, 181, 60, 0.14);
 
   --color-danger: #e0553f;
+  --color-success: #3fb950;
 
   --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
 }

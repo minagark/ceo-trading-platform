@@ -17,10 +17,6 @@
       </p>
       <p class="preview-summary-account">{{ account().name }} &middot; {{ account().balance | currency }} available</p>
     </div>
-
-    @if (submitError()) {
-      <p class="preview-error">{{ submitError() }}</p>
-    }
   </mat-card-content>
 
   <mat-card-actions class="preview-actions">
