@@ -1,0 +1,69 @@
+<div class="login-page">
+  <div class="welcome-banner" aria-hidden="true">
+    <div class="welcome-flyby">
+      <svg class="welcome-bee" viewBox="0 0 64 64">
+        <ellipse class="bee-wing bee-wing--left" cx="20" cy="26" rx="12" ry="9" />
+        <ellipse class="bee-wing bee-wing--right" cx="44" cy="26" rx="12" ry="9" />
+        <circle class="bee-head" cx="32" cy="14" r="8" />
+        <path
+          class="bee-body"
+          d="M32 20c-10 0-16 8-16 20 0 8 7 14 16 14s16-6 16-14c0-12-6-20-16-20z"
+        />
+        <path class="bee-stripe" d="M17 34h30" />
+        <path class="bee-stripe" d="M18.5 44h27" />
+        <path class="bee-stripe" d="M22 52h20" />
+      </svg>
+      <span class="welcome-text">Welcome to the hive!</span>
+    </div>
+  </div>
+
+  <div class="login-brand">
+    <svg class="login-brand__logo" viewBox="0 0 64 64" aria-hidden="true">
+      <ellipse class="bee-wing bee-wing--left" cx="20" cy="26" rx="12" ry="9" />
+      <ellipse class="bee-wing bee-wing--right" cx="44" cy="26" rx="12" ry="9" />
+      <circle class="bee-head" cx="32" cy="14" r="8" />
+      <path
+        class="bee-body"
+        d="M32 20c-10 0-16 8-16 20 0 8 7 14 16 14s16-6 16-14c0-12-6-20-16-20z"
+      />
+      <path class="bee-stripe" d="M17 34h30" />
+      <path class="bee-stripe" d="M18.5 44h27" />
+      <path class="bee-stripe" d="M22 52h20" />
+    </svg>
+    <h1 class="login-brand__title">MarketHive</h1>
+  </div>
+
+  <form class="login-card" (ngSubmit)="onSubmit()">
+    <label class="login-field">
+      Email
+      <input
+        type="email"
+        name="email"
+        placeholder="Value"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+        autocomplete="email"
+      />
+    </label>
+
+    <label class="login-field">
+      Password
+      <input
+        type="password"
+        name="password"
+        placeholder="Value"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+        autocomplete="current-password"
+      />
+    </label>
+
+    @if (error()) {
+      <p class="login-error">{{ error() }}</p>
+    }
+
+    <button type="submit" class="login-submit">Sign In</button>
+
+    <a class="login-forgot" href="#">Forgot password?</a>
+  </form>
+</div>
