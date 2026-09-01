@@ -40,7 +40,7 @@ export class PortfolioComposition {
       data: this.accounts[0].holdings.map(holding => ({ name: holding.symbol, amount: holding.quantity })),
       title: {
         text: "Portfolio Composition",
-        color: "var(--color-text)"
+        color: "var(--mat-sys-on-surface)"
       },
       series: [
         {
@@ -50,12 +50,12 @@ export class PortfolioComposition {
         }
       ],
       background: {
-        fill: 'var(--color-bg)' 
+        fill: 'var(--mat-sys-surface)'
       },
       legend: {
         item: {
           label: {
-            color: "var(--color-text)"
+            color: "var(--mat-sys-on-surface)"
           }
         }
       }
