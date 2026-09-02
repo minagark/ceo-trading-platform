@@ -2,8 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterOutlet, RouterLink } from '@angular/router';
 import { AuthService } from './auth/auth.service';
 
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+
+
 @Component({
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, RouterLink, MatButtonModule, MatToolbarModule],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

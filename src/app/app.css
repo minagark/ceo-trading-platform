@@ -12,25 +12,6 @@
   gap: 0.25rem;
 }
 
-.app-nav__link {
-  display: inline-block;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  color: var(--color-text-muted);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: background-color 150ms ease, color 150ms ease;
-}
-
-.app-nav__link:visited {
-  color: var(--color-text-muted);
-}
-
-.app-nav__link:hover,
-.app-nav__link:focus-visible {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-}
 
 .app-nav__logout {
   font: inherit;
