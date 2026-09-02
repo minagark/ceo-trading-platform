@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { AgCharts, AgFinancialCharts } from "ag-charts-angular";
 import {
   AgChartOptions,
-  AgFinancialChartOptions,
+  // AgFinancialChartOptions,
   CategoryAxisModule,
   LegendModule,
   LineSeriesModule,
@@ -10,6 +10,7 @@ import {
   NumberAxisModule,
   AllCommunityModule
 } from "ag-charts-community";
+import { TimeFrame } from '../stock-display/stock-display';
 
 
 // mock account data
@@ -32,12 +33,15 @@ ModuleRegistry.registerModules([
 ]);
 
 @Component({
-  imports: [AgCharts, AgFinancialCharts],
+  imports: [AgCharts, /*AgFinancialCharts*/],
   selector: 'performance-chart',
   styleUrl: './portfolio-performance.css',
   templateUrl: './portfolio-performance.html',
 })
 export class PortfolioPerformance {
+
+  selectedTimeFrame = input<TimeFrame>('1D');
+
   // functional code
   /* TODO: replace with real data handling */
   accounts: Account[] = [
