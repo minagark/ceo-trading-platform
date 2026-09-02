@@ -1,0 +1,9 @@
+.portfolio-holdings-page {
+  display: flex;
+  height: 100%;
+}
+
+.portfolio-holdings-page__holdings {
+  flex: 1;
+  min-width: 0;
+}

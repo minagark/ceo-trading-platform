@@ -6,6 +6,7 @@ import { TransactionHistory } from './transaction-history/transaction-history';
 import { MarketAnalysis } from './market-analysis/market-analysis';
 import { PortfolioPerformance } from './portfolio-performance/portfolio-performance';
 import { PortfolioComposition } from './portfolio-composition/portfolio-composition';
+import { PortfolioHoldingsPage } from './portfolio-holdings-page/portfolio-holdings-page';
 import { ComponentGallery } from './component-gallery/component-gallery';
 import { StockDisplay } from './stock-display/stock-display';
 import { authGuard } from './auth/auth.guard';
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'history', component: TransactionHistory, canActivate: [authGuard] },
   { path: 'portfolio', component: PortfolioPerformance, canActivate: [authGuard] },
   { path: 'composition', component: PortfolioComposition, canActivate: [authGuard] },
+  { path: 'holdings', component: PortfolioHoldingsPage, canActivate: [authGuard] },
   { path: 'analysis', component: MarketAnalysis, canActivate: [authGuard] },
   { path: 'components', component: ComponentGallery, canActivate: [authGuard] },
   { path: '', redirectTo: 'home', pathMatch: 'full' },

@@ -1,0 +1,4 @@
+<div class="portfolio-holdings-page">
+  <app-accounts-list (accountSelected)="onAccountSelected($event)" />
+  <app-holdings-list class="portfolio-holdings-page__holdings" [account]="selectedAccount()" />
+</div>

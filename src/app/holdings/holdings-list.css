@@ -1,0 +1,234 @@
+/*
+  Custom flex/grid list rather than mat-list — a holdings row needs several
+  independently-aligned columns (identity, shares/value, price/day-change,
+  total gain) that mat-list's title/line/meta slots don't give us room for.
+*/
+
+.holdings-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.holdings-list__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.holdings-list__title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.holdings-list__subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.holdings-list__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+
+.holdings-list__summary-value {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.holdings-list__summary-change {
+  font-size: 0.85rem;
+}
+
+.holdings-list__col-headers,
+.holdings-list__row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 0.8fr) minmax(0, 0.6fr)
+    minmax(0, 0.9fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+}
+
+.holdings-list__col-headers {
+  padding-top: 0.75rem;
+  padding-bottom: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  overflow: visible;
+}
+
+.holdings-list__col-headers span:not(:first-child) {
+  text-align: right;
+}
+
+/*
+  "Change" itself stays right-aligned in its column, directly above the
+  percentages in the rows below. The period select is pulled out of normal
+  flow and pinned just to the right of it, so it doesn't shift that
+  alignment — it's allowed to overhang into the next column's gutter.
+*/
+.holdings-list__period-header {
+  position: relative;
+}
+
+.holdings-list__period-select {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  margin-left: 0.35rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  font: inherit;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.25rem;
+  cursor: pointer;
+}
+
+.holdings-list__period-select:hover {
+  border-color: var(--color-accent);
+}
+
+.holdings-list__rows {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.holdings-list__row {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.holdings-list__row:hover {
+  background: var(--color-surface-hover);
+}
+
+.holdings-list__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.holdings-list__logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  object-fit: contain;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.holdings-list__logo--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent-text);
+  background: var(--color-accent);
+}
+
+.holdings-list__names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.holdings-list__symbol {
+  font-weight: 600;
+}
+
+.holdings-list__company {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.holdings-list__col {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.holdings-list__price-value {
+  font-weight: 600;
+}
+
+.holdings-list__day-dollar {
+  font-size: 0.8rem;
+}
+
+.holdings-list__period-change,
+.holdings-list__total-change {
+  font-weight: 600;
+  text-align: right;
+}
+
+.holdings-list__quantity,
+.holdings-list__value {
+  text-align: right;
+  font-weight: 600;
+}
+
+.holdings-list__range {
+  align-items: flex-end;
+}
+
+.holdings-list__range-bar {
+  position: relative;
+  width: 100%;
+  max-width: 110px;
+  height: 4px;
+  background: var(--color-border-strong);
+  margin-bottom: 0.3rem;
+}
+
+.holdings-list__range-marker {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 8px;
+  background: var(--color-accent);
+  transform: translateX(-50%);
+}
+
+.holdings-list__range-labels {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.positive {
+  color: var(--color-success);
+}
+
+.negative {
+  color: var(--color-danger);
+}
+
+.holdings-list__empty {
+  padding: 1.5rem;
+  margin: 0;
+  color: var(--color-text-faint);
+  font-style: italic;
+  text-align: center;
+}
