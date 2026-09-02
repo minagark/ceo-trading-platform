@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TransactionHistory } from './transaction-history';
+import { AccountActivity } from './account-activity';
 
-describe('TransactionHistory', () => {
-  let component: TransactionHistory;
-  let fixture: ComponentFixture<TransactionHistory>;
+describe('AccountActivity', () => {
+  let component: AccountActivity;
+  let fixture: ComponentFixture<AccountActivity>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TransactionHistory],
+      imports: [AccountActivity],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TransactionHistory);
+    fixture = TestBed.createComponent(AccountActivity);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -2,7 +2,7 @@ import { Component, Type } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
 import { HomePage } from '../home-page/home-page';
 import { Trades } from '../trade-screen/trade-screen';
-import { TransactionHistory } from '../transaction-history/transaction-history';
+import { AccountActivity } from '../account-activity/account-activity';
 import { PortfolioPerformance } from '../portfolio-performance/portfolio-performance';
 import { MarketAnalysis } from '../market-analysis/market-analysis';
 import { AccountsList, Account } from '../accounts-list/accounts-list';
@@ -72,7 +72,7 @@ export class ComponentGallery {
   entries: GalleryEntry[] = [
     { name: 'Home Page', component: HomePage },
     { name: 'Trades', component: Trades },
-    { name: 'Transaction History', component: TransactionHistory },
+    { name: 'Account Activity', component: AccountActivity },
     { name: 'Portfolio Performance', component: PortfolioPerformance },
     { name: 'Market Analysis', component: MarketAnalysis },
     { name: 'Accounts List', component: AccountsList },
