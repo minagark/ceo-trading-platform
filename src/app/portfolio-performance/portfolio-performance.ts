@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { AgCharts, AgFinancialCharts } from "ag-charts-angular";
 import {
   AgChartOptions,
@@ -10,6 +10,7 @@ import {
   NumberAxisModule,
   AllCommunityModule
 } from "ag-charts-community";
+import { TimeFrame } from '../stock-display/stock-display';
 
 
 // mock account data
@@ -38,6 +39,9 @@ ModuleRegistry.registerModules([
   templateUrl: './portfolio-performance.html',
 })
 export class PortfolioPerformance {
+
+  selectedTimeFrame = input<TimeFrame>('1D');
+
   // functional code
   /* TODO: replace with real data handling */
   accounts: Account[] = [

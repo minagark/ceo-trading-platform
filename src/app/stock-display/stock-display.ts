@@ -25,6 +25,9 @@ interface StockDisplayInfo {
   timeUpdated: Date;
 }
 
+const TIME_FRAMES = ['1D', '1W', '1M', '3M', '1Y', '5Y'] as const;
+export type TimeFrame = typeof TIME_FRAMES[number];
+
 @Component({
   imports: [
     FormsModule, 
@@ -48,8 +51,8 @@ export class StockDisplay {
   }
 
   // Example data, all of this comes from backend/db
-  readonly TIME_FRAMES = ['1D', '1W', '1M', '3M', '1Y', '5Y'];
-  selectedTimeFrame = '1D';
+  readonly TIME_FRAMES = TIME_FRAMES;
+  selectedTimeFrame: TimeFrame = '1D';
   // Example data end
 
   get priceChange(): number {
@@ -63,12 +66,14 @@ export class StockDisplay {
   priceHistory: PriceHistoryPoint[] = [];
 
   fetchStockInfo() {
-    // Replace this with real fetch information
+    // TODO: Replace this with real fetch information
     return {
       name: "Example Corp",
       symbol: "EXC",
       currentPrice: 152.34,
       previousClose: 149.87,
+      highPriceToday: 154.10,
+      lowPriceToday: 147.38,
       timeUpdated: new Date(),
     }
   }
