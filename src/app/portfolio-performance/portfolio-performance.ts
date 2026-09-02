@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { AgCharts, AgFinancialCharts } from "ag-charts-angular";
 import {
   AgChartOptions,
-  AgFinancialChartOptions,
+  // AgFinancialChartOptions,
   CategoryAxisModule,
   LegendModule,
   LineSeriesModule,
@@ -32,7 +32,7 @@ ModuleRegistry.registerModules([
 ]);
 
 @Component({
-  imports: [AgCharts, AgFinancialCharts],
+  imports: [AgCharts, /*AgFinancialCharts*/],
   selector: 'performance-chart',
   styleUrl: './portfolio-performance.css',
   templateUrl: './portfolio-performance.html',
