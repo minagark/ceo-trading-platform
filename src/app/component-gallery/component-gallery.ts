@@ -9,6 +9,8 @@ import { AccountsList, Account } from '../accounts-list/accounts-list';
 import { PreviewPage } from '../preview-page/preview-page';
 import { Trade, TradeRequest } from '../trade-screen/trade-screen';
 import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
+import { HoldingsList } from '../holdings/holdings-list';
+import { PortfolioHoldingsPage } from '../portfolio-holdings-page/portfolio-holdings-page';
 
 interface GalleryEntry {
   name: string;
@@ -49,6 +51,15 @@ const mockConfirmedTrade: Trade = {
   date: new Date().toISOString(),
 };
 
+// id '1' lines up with AccountsService's mock "Brokerage" account, so
+// HoldingsService's mock holdings for that account show up here.
+const mockHoldingsAccount: Account = {
+  id: '1',
+  name: 'Brokerage',
+  type: 'Individual',
+  balance: 24310.55,
+};
+
 @Component({
   selector: 'app-component-gallery',
   imports: [NgComponentOutlet],
@@ -75,5 +86,11 @@ export class ComponentGallery {
       component: TradeConfirmation,
       inputs: { success: true, trade: mockConfirmedTrade },
     },
+    {
+      name: 'Holdings List',
+      component: HoldingsList,
+      inputs: { account: mockHoldingsAccount },
+    },
+    { name: 'Portfolio Holdings Page', component: PortfolioHoldingsPage },
   ];
 }
