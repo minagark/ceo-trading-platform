@@ -1,20 +1,24 @@
 <mat-card class="stock-display-page" appearance="outlined">
   <div class="stock-display-header">
-    <h1 class="stock-display-name">{{ name }}</h1>
-    <span class="stock-display-symbol">{{ symbol }}</span>
+    <h1 class="stock-display-name">{{ stockDisplayInfo.name }}</h1>
+    <span class="stock-display-symbol">{{ stockDisplayInfo.symbol }}</span>
   </div>
 
   <mat-card-content>
     <div class="stock-display-prices">
       <div class="current-price">
         <span class="label">Current Price</span>
-        <span class="value current-price-value" [class.positive]="currentPrice > previousClose" [class.negative]="currentPrice <= previousClose">
-          {{ currentPrice | number: '1.2-2' }}
+        <span 
+          class="value current-price-value" 
+          [class.positive]="stockDisplayInfo.currentPrice > stockDisplayInfo.previousClose" 
+          [class.negative]="stockDisplayInfo.currentPrice <= stockDisplayInfo.previousClose"
+        >
+          {{ stockDisplayInfo.currentPrice | number: '1.2-2' }}
         </span>
       </div>
       <div class="previous-close">
         <span class="label">Previous Close</span>
-        <span class="value">{{ previousClose | number: '1.2-2' }}</span>
+        <span class="value">{{ stockDisplayInfo.previousClose | number: '1.2-2' }}</span>
       </div>
     </div>
 
@@ -22,18 +26,18 @@
       <mat-form-field class="timeframe-select" appearance="outline" subscriptSizing="dynamic">
         <mat-label>Time Frame</mat-label>
         <mat-select [(ngModel)]="selectedTimeFrame">
-          @for (tf of timeFrames; track tf) {
+          @for (tf of TIME_FRAMES; track tf) {
             <mat-option [value]="tf">{{ tf }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <div class="high-price">
         <span class="label">High Today</span>
-        <span class="value">{{ highPriceToday | number: '1.2-2' }}</span>
+        <span class="value">{{ stockDisplayInfo.highPriceToday | number: '1.2-2' }}</span>
       </div>
       <div class="low-price">
         <span class="label">Low Today</span>
-        <span class="value">{{ lowPriceToday | number: '1.2-2' }}</span>
+        <span class="value">{{ stockDisplayInfo.lowPriceToday | number: '1.2-2' }}</span>
       </div>
     </div>
 
