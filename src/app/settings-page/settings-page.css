@@ -1,0 +1,17 @@
+.settings-page {
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+}
+
+.settings-page__title {
+  margin: 0 0 0.5rem;
+  color: var(--color-accent);
+}
+
+.settings-page__body {
+  margin: 0;
+  color: var(--color-text-muted);
+}
