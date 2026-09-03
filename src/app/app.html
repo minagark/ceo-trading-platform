@@ -12,7 +12,7 @@
         <li><a class="app-nav__link" routerLink="/holdings" href="#">Holdings</a></li>
         <li><a class="app-nav__link" routerLink="/analysis" href="#">Market Analysis</a></li>
         <li><a class="app-nav__link" routerLink="/components" href="#">Components</a></li>
-        <li><button class="app-nav__link app-nav__logout" type="button" (click)="onLogout()">Log out</button></li>
+        <li><app-user-profile /></li>
       } @else {
         <li><a class="app-nav__link" routerLink="/login" href="#">Login</a></li>
       }
