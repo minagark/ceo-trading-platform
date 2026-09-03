@@ -1,0 +1,31 @@
+<div class="account-activity-row__cell account-activity-row__time">{{ order().time | date: 'medium' }}</div>
+
+<div class="account-activity-row__cell">
+  <span
+    class="account-activity__action"
+    [class.account-activity__action--buy]="order().action === 'buy'"
+    [class.account-activity__action--sell]="order().action === 'sell'"
+  >
+    {{ order().action | titlecase }}
+  </span>
+</div>
+
+<div class="account-activity-row__cell">{{ order().instrumentType | titlecase }}</div>
+
+<div class="account-activity-row__cell account-activity-row__numeric">
+  {{ order().amount | number: '1.0-4' }}
+</div>
+
+<div class="account-activity-row__cell account-activity-row__numeric">
+  {{ order().quotedPrice | currency }}
+</div>
+
+<div class="account-activity-row__cell account-activity-row__numeric">
+  {{ order().actualPrice === null ? '—' : (order().actualPrice | currency) }}
+</div>
+
+<div class="account-activity-row__cell">
+  <mat-chip-set>
+    <mat-chip [class]="statusClass()" disabled>{{ order().status | titlecase }}</mat-chip>
+  </mat-chip-set>
+</div>

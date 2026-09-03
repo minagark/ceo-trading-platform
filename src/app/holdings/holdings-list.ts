@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe } from '@angular/common';
 import { Account } from '../accounts-list/accounts-list';
 import { ChangePeriod, Holding, HoldingsService } from './holdings.service';
 
@@ -15,7 +15,7 @@ export interface HoldingRow extends Holding {
 
 @Component({
   selector: 'app-holdings-list',
-  imports: [CurrencyPipe, DecimalPipe, PercentPipe],
+  imports: [CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe],
   templateUrl: './holdings-list.html',
   styleUrl: './holdings-list.css',
 })
@@ -32,6 +32,8 @@ export class HoldingsList {
   selectedPeriod = signal<ChangePeriod>('1D');
 
   private allHoldings = this.holdingsService.holdings;
+
+  showLess = input<boolean>(false);
 
   rows = computed<HoldingRow[]>(() => {
     const accountId = this.account()?.id ?? null;

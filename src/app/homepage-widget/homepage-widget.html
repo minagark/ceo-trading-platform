@@ -1,0 +1,18 @@
+<!-- <div class="container mat-elevation-z3">
+    <h3>{{ data().label }}</h3>
+    <ng-container *ngComponentOutlet="data().content"></ng-container>
+</div> -->
+
+<div>
+    <mat-card appearance="outlined">
+        <mat-card-header>
+            <mat-card-title>{{ data().label }}</mat-card-title>
+            @if (data().route) {
+                <a [href]="data().route" class="view-all">View All</a>
+            } 
+        </mat-card-header>
+        <mat-card-content>
+            <ng-container *ngComponentOutlet="data().content; inputs: data().inputs"></ng-container>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -5,3 +5,25 @@
   --color-border, --color-text, etc.) instead of hard-coding colors, so this
   stays consistent with the rest of the app's yellow & black theme.
 */
+
+.home-page-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.homepage-widgets {
+  display: grid; /* flex??? */
+  gap: 20px; /* space between widgets */
+  grid-template-columns: repeat(2, 1fr);/* repeat(auto-fit, minmax(300px, 1fr)); /* responsive columns*/
+  flex: 1;
+  margin: 16px;
+}
+
+.full-width {
+  grid-column: 1 / -1; /* span all columns */
+}
+
+.welcome-msg {
+  padding: 16px;
+}

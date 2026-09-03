@@ -1,0 +1,11 @@
+.container {
+    padding: 16px;
+    outline: 1px solid var(--mat-sys-on-surface);
+}
+
+.view-all {
+    color: var(--mat-sys-on-surface);
+    position: absolute;
+    right: 0;
+    padding-right: 20px;
+}
