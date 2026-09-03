@@ -44,7 +44,7 @@
   }
 
   <div class="holdings-list__rows" role="list">
-    @for (row of rows(); track row.accountId + row.symbol) {
+    @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.accountId + row.symbol) {
       <div class="holdings-list__row" role="listitem">
         <div class="holdings-list__identity">
           @if (!logoFailed(row.symbol)) {

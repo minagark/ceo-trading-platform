@@ -9,6 +9,10 @@
 .homepage-widgets {
   display: grid; /* flex??? */
   gap: 16px; /* space between widgets */
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* responsive columns */
+  grid-template-columns: repeat(2, 1fr);/* repeat(auto-fit, minmax(300px, 1fr)); /* responsive columns*/
 
+}
+
+.full-width {
+  grid-column: 1 / -1; /* span all columns */
 }

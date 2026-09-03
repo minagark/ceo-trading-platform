@@ -39,7 +39,7 @@ ModuleRegistry.registerModules([
 })
 export class PortfolioPerformance {
 
-  selectedTimeFrame = input<TimeFrame>('1D');
+  selectedTimeFrame = input<TimeFrame>('1M');
 
   // functional code
   /* TODO: replace with real data handling */
