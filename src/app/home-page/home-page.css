@@ -5,3 +5,10 @@
   --color-border, --color-text, etc.) instead of hard-coding colors, so this
   stays consistent with the rest of the app's yellow & black theme.
 */
+
+.homepage-widgets {
+  display: grid; /* flex??? */
+  gap: 16px; /* space between widgets */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* responsive columns */
+
+}
