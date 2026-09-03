@@ -6,14 +6,14 @@
     <span class="example-spacer"></span>
     @if (authService.isAuthenticated()) {
       <!-- <a matButton class="app-nav__link" routerLink="/home" href="#">Home</a> -->
-      <a matButton class="app-nav__link" routerLink="/stock" href="#">Stock Display</a>
-      <a matButton class="app-nav__link" routerLink="/trades" href="#">Trades</a>
-      <a matButton class="app-nav__link" routerLink="/history" href="#">Account Activity</a>
-      <a matButton class="app-nav__link" routerLink="/portfolio" href="#">Portfolio Performance</a>
-      <a matButton class="app-nav__link" routerLink="/composition" href="#">Portfolio Composition</a>
-      <a matButton class="app-nav__link" routerLink="/holdings" href="#">Holdings</a>
-      <a matButton class="app-nav__link" routerLink="/analysis" href="#">Market Analysis</a>
-      <a matButton class="app-nav__link" routerLink="/components" href="#">Components</a>
+      <a matButton="text" class="app-nav__link" routerLink="/stock" href="#">Stock Display</a>
+      <a matButton="text" class="app-nav__link" routerLink="/trades" href="#">Trades</a>
+      <a matButton="text" class="app-nav__link" routerLink="/history" href="#">Account Activity</a>
+      <a matButton="text" class="app-nav__link" routerLink="/portfolio" href="#">Portfolio Performance</a>
+      <a matButton="text" class="app-nav__link" routerLink="/composition" href="#">Portfolio Composition</a>
+      <a matButton="text" class="app-nav__link" routerLink="/holdings" href="#">Holdings</a>
+      <a matButton="text" class="app-nav__link" routerLink="/analysis" href="#">Market Analysis</a>
+      <a matButton="text" class="app-nav__link" routerLink="/components" href="#">Components</a>
     } @else {
       <a matButton class="app-nav__link" routerLink="/login" href="#">Login</a>
     }

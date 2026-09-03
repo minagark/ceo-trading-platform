@@ -12,6 +12,10 @@
   gap: 0.25rem;
 }
 
+.app-nav__link {
+  --mat-button-text-state-layer-color: var(--mat-sys-tertiary);
+  --mat-button-text-hover-state-layer-opacity: 30%;
+}
 
 .app-nav__logout {
   font: inherit;

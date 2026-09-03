@@ -8,7 +8,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
 
 @Component({
-  imports: [RouterOutlet, RouterLink, UserProfile, MatButtonModule, MatToolbarModule],
+  imports: [RouterOutlet, RouterLink, MatButtonModule, MatToolbarModule],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
