@@ -2,13 +2,15 @@ import { Component, Type } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
 import { HomePage } from '../home-page/home-page';
 import { Trades } from '../trade-screen/trade-screen';
-import { TransactionHistory } from '../transaction-history/transaction-history';
+import { AccountActivity } from '../account-activity/account-activity';
 import { PortfolioPerformance } from '../portfolio-performance/portfolio-performance';
 import { MarketAnalysis } from '../market-analysis/market-analysis';
 import { AccountsList, Account } from '../accounts-list/accounts-list';
 import { PreviewPage } from '../preview-page/preview-page';
 import { Trade, TradeRequest } from '../trade-screen/trade-screen';
 import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
+import { HoldingsList } from '../holdings/holdings-list';
+import { PortfolioHoldingsPage } from '../portfolio-holdings-page/portfolio-holdings-page';
 
 interface GalleryEntry {
   name: string;
@@ -49,6 +51,15 @@ const mockConfirmedTrade: Trade = {
   date: new Date().toISOString(),
 };
 
+// id '1' lines up with AccountsService's mock "Brokerage" account, so
+// HoldingsService's mock holdings for that account show up here.
+const mockHoldingsAccount: Account = {
+  id: '1',
+  name: 'Brokerage',
+  type: 'Individual',
+  balance: 24310.55,
+};
+
 @Component({
   selector: 'app-component-gallery',
   imports: [NgComponentOutlet],
@@ -61,7 +72,7 @@ export class ComponentGallery {
   entries: GalleryEntry[] = [
     { name: 'Home Page', component: HomePage },
     { name: 'Trades', component: Trades },
-    { name: 'Transaction History', component: TransactionHistory },
+    { name: 'Account Activity', component: AccountActivity },
     { name: 'Portfolio Performance', component: PortfolioPerformance },
     { name: 'Market Analysis', component: MarketAnalysis },
     { name: 'Accounts List', component: AccountsList },
@@ -75,5 +86,11 @@ export class ComponentGallery {
       component: TradeConfirmation,
       inputs: { success: true, trade: mockConfirmedTrade },
     },
+    {
+      name: 'Holdings List',
+      component: HoldingsList,
+      inputs: { account: mockHoldingsAccount },
+    },
+    { name: 'Portfolio Holdings Page', component: PortfolioHoldingsPage },
   ];
 }
