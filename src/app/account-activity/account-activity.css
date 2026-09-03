@@ -1,7 +1,8 @@
 /*
-  Built on Angular Material's mat-card + mat-table, matching the pattern used
-  by StockDisplay / TradeConfirmation (mat-card) and themed with the
-  --mat-sys-* tokens from src/theme/theme-colors.scss.
+  Built on Angular Material's mat-card (matching the pattern used by
+  StockDisplay / TradeConfirmation) with each order rendered by its own
+  AccountActivityRow component — see that component's stylesheet for the
+  per-row grid, hover, and drag-selection styling.
 */
 
 .account-activity {
@@ -10,57 +11,26 @@
   margin: 0 auto;
 }
 
-.account-activity__table {
-  width: 100%;
-  background: transparent;
+.account-activity__col-headers {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.6fr) minmax(0, 0.7fr) minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr)
+    minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0 1rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .account-activity__numeric {
   text-align: right;
 }
 
-.account-activity__action {
-  font-weight: 600;
-}
-
-.account-activity__action--buy {
-  color: var(--color-success);
-}
-
-.account-activity__action--sell {
-  color: var(--color-danger);
-}
-
-.account-activity__status {
-  --mdc-chip-label-text-weight: 600;
-  --mdc-chip-elevated-container-color: var(--color-surface-raised);
-  --mdc-chip-label-text-color: var(--color-text);
-  --mdc-chip-disabled-label-text-color: var(--color-text);
-  opacity: 1;
-}
-
-.account-activity__status--fulfilled {
-  --mdc-chip-elevated-container-color: var(--color-success);
-  --mdc-chip-label-text-color: var(--color-on-success, #000);
-  --mdc-chip-disabled-label-text-color: var(--color-on-success, #000);
-}
-
-.account-activity__status--pending {
-  --mdc-chip-elevated-container-color: var(--mat-sys-tertiary);
-  --mdc-chip-label-text-color: var(--mat-sys-on-tertiary);
-  --mdc-chip-disabled-label-text-color: var(--mat-sys-on-tertiary);
-}
-
-.account-activity__status--cancelled {
-  --mdc-chip-elevated-container-color: var(--color-border-strong);
-  --mdc-chip-label-text-color: var(--color-text);
-  --mdc-chip-disabled-label-text-color: var(--color-text);
-}
-
-.account-activity__status--rejected {
-  --mdc-chip-elevated-container-color: var(--color-danger);
-  --mdc-chip-label-text-color: #fff;
-  --mdc-chip-disabled-label-text-color: #fff;
+.account-activity__rows {
+  display: flex;
+  flex-direction: column;
 }
 
 .account-activity__empty {
@@ -70,3 +40,4 @@
   font-style: italic;
   text-align: center;
 }
+
