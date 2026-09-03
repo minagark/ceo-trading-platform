@@ -19,7 +19,7 @@ export interface Order {
 }
 
 @Injectable({ providedIn: 'root' })
-export class AccountActivityService {
+export class ActivityListService {
   // Real implementation
   // orders = httpResource<Order[]>(() => '/api/orders');
 

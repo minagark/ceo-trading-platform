@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AccountActivityRow } from './account-activity-row';
-import { Order } from './account-activity.service';
+import { Order } from './activity-list.service';
 
 const mockOrder: Order = {
   orderId: 'order-1',
