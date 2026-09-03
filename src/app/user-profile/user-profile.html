@@ -1,0 +1,17 @@
+<!-- [matMenuTriggerFor] opens #profileMenu below when this circle is clicked -->
+<button
+  class="user-profile__avatar"
+  type="button"
+  [matMenuTriggerFor]="profileMenu"
+  aria-label="Open profile menu"
+>
+  {{ initials }}
+</button>
+
+<!-- #profileMenu is a template reference the trigger above points to -->
+<mat-menu #profileMenu="matMenu">
+  <a mat-menu-item routerLink="/account">Account</a>
+  <a mat-menu-item routerLink="/settings">Settings</a>
+  <!-- A button, not a link, because logging out is an action, not a navigation -->
+  <button mat-menu-item type="button" (click)="onLogout()">Log Out</button>
+</mat-menu>

@@ -9,6 +9,8 @@ import { PortfolioComposition } from './portfolio-composition/portfolio-composit
 import { PortfolioHoldingsPage } from './portfolio-holdings-page/portfolio-holdings-page';
 import { ComponentGallery } from './component-gallery/component-gallery';
 import { StockDisplay } from './stock-display/stock-display';
+import { AccountPage } from './account-page/account-page';
+import { SettingsPage } from './settings-page/settings-page';
 import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
@@ -22,5 +24,7 @@ export const routes: Routes = [
   { path: 'holdings', component: PortfolioHoldingsPage, canActivate: [authGuard] },
   { path: 'analysis', component: MarketAnalysis, canActivate: [authGuard] },
   { path: 'components', component: ComponentGallery, canActivate: [authGuard] },
+  { path: 'account', component: AccountPage, canActivate: [authGuard] },
+  { path: 'settings', component: SettingsPage, canActivate: [authGuard] },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
 ];
