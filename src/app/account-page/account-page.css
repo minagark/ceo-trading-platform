@@ -1,0 +1,29 @@
+.account-page {
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+}
+
+.account-page__title {
+  margin: 0 0 0.5rem;
+  color: var(--color-accent);
+}
+
+.account-page__details {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+}
+
+.account-page__details dt {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.account-page__details dd {
+  margin: 0;
+  color: var(--color-text);
+}

@@ -1,0 +1,19 @@
+.user-profile__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.user-profile__avatar:hover,
+.user-profile__avatar:focus-visible {
+  background: var(--color-accent-hover);
+}
