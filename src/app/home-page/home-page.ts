@@ -32,14 +32,16 @@ export class HomePage {
       content: HoldingsList,
       inputs: {
         showLess: true,
-      }
+      },
+      route: "/holdings"
     }, {
       id: "aa",
       label: "Account Activity",
       content: ActivityList,
       inputs: {
         showLess: true,
-      }
+      },
+      route: "/history"
     }]
 
     selectedAccount = signal<Account | null>(null);
