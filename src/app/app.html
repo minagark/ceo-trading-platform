@@ -1,11 +1,11 @@
 
 <main class="main">
   <mat-toolbar class="app-nav">
-    <span>Market Hive</span>
+    <a matButton routerLink="/home" style="font-size: x-large;">Market Hive</a>
     <!-- TODO: Make this spacer -->
     <span class="example-spacer"></span>
     @if (authService.isAuthenticated()) {
-      <a matButton class="app-nav__link" routerLink="/home" href="#">Home</a>
+      <!-- <a matButton class="app-nav__link" routerLink="/home" href="#">Home</a> -->
       <a matButton class="app-nav__link" routerLink="/stock" href="#">Stock Display</a>
       <a matButton class="app-nav__link" routerLink="/trades" href="#">Trades</a>
       <a matButton class="app-nav__link" routerLink="/history" href="#">Account Activity</a>
