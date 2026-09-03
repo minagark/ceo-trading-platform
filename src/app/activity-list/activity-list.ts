@@ -1,15 +1,18 @@
-import { Component, HostListener, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal, input } from '@angular/core';
 import { AccountActivityRow } from './account-activity-row';
 import { ActivityListService, Order } from './activity-list.service';
+import { SlicePipe } from '@angular/common';
+
 
 @Component({
   selector: 'app-activity-list',
-  imports: [AccountActivityRow],
+  imports: [AccountActivityRow, SlicePipe],
   templateUrl: './activity-list.html',
   styleUrl: './activity-list.css',
 })
 export class ActivityList {
   private activityListService = inject(ActivityListService);
+  showLess = input<boolean>(false);
 
   rows = computed<Order[]>(() =>
     [...this.activityListService.orders()].sort(

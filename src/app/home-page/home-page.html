@@ -1,7 +1,12 @@
-<h1>Welcome</h1>
-<div class="homepage-widgets">
-    <app-homepage-widget [data]="data[0]"></app-homepage-widget>
-    <app-homepage-widget [data]="data[1]"></app-homepage-widget>
-    <app-homepage-widget [data]="data[2]" class="full-width"></app-homepage-widget>
-    <app-homepage-widget [data]="data[3]" class="full-width"></app-homepage-widget>
+<h1 class="welcome-msg">Welcome</h1>
+<div class="home-page-container">
+    <aside>
+        <app-accounts-list class="portfolio-sidebar" (accountSelected)="onAccountSelected($event)"/>
+    </aside>
+    <div class="homepage-widgets">
+        <app-homepage-widget [data]="data[0]"></app-homepage-widget>
+        <app-homepage-widget [data]="data[1]"></app-homepage-widget>
+        <app-homepage-widget [data]="data[2]" class="full-width"></app-homepage-widget>
+        <app-homepage-widget [data]="data[3]" class="full-width"></app-homepage-widget>
+    </div>
 </div>

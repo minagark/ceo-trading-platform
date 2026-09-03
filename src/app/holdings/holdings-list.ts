@@ -33,7 +33,7 @@ export class HoldingsList {
 
   private allHoldings = this.holdingsService.holdings;
 
-  showLess = input<boolean>(true);
+  showLess = input<boolean>(false);
 
   rows = computed<HoldingRow[]>(() => {
     const accountId = this.account()?.id ?? null;

@@ -10,7 +10,7 @@
   </div>
 
   <div class="account-activity__rows" role="list">
-    @for (row of rows(); track row.orderId) {
+    @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.orderId) {
       <app-account-activity-row
         role="listitem"
         [order]="row"
