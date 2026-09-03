@@ -1,7 +1,7 @@
 /*
   Each order renders as its own component/host (a CSS grid row) rather than a
   mat-row, so it can track its own drag-to-select state and stay individually
-  hoverable/selectable — see AccountActivity's onRowPointerDown/PointerEnter.
+  hoverable/selectable — see ActivityList's onRowPointerDown/PointerEnter.
 */
 
 :host {

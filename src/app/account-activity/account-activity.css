@@ -1,43 +1,11 @@
 /*
-  Built on Angular Material's mat-card (matching the pattern used by
-  StockDisplay / TradeConfirmation) with each order rendered by its own
-  AccountActivityRow component — see that component's stylesheet for the
-  per-row grid, hover, and drag-selection styling.
+  No card/border chrome here on purpose — ActivityList owns all the info and
+  is rendered borderless; this file just constrains the page's width.
 */
 
 .account-activity {
   display: block;
   max-width: 960px;
   margin: 0 auto;
-}
-
-.account-activity__col-headers {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1.6fr) minmax(0, 0.7fr) minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr)
-    minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0.75rem;
-  padding: 0 1rem 0.5rem;
-  font-size: 0.75rem;
-  color: var(--color-text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.account-activity__numeric {
-  text-align: right;
-}
-
-.account-activity__rows {
-  display: flex;
-  flex-direction: column;
-}
-
-.account-activity__empty {
-  padding: 1.5rem;
-  margin: 0;
-  color: var(--color-text-faint);
-  font-style: italic;
-  text-align: center;
 }
 

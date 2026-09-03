@@ -1,7 +1,7 @@
 import { Component, HostBinding, HostListener, input, output } from '@angular/core';
 import { CurrencyPipe, DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
-import { Order } from './account-activity.service';
+import { Order } from './activity-list.service';
 
 @Component({
   selector: 'app-account-activity-row',
