@@ -36,6 +36,9 @@ export class HomePage {
       id: "aa",
       label: "Account Activity",
       content: AccountActivity,
+      inputs: {
+        showLess: true,
+      }
     }]
 
 }
