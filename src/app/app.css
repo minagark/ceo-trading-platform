@@ -13,23 +13,8 @@
 }
 
 .app-nav__link {
-  display: inline-block;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  color: var(--color-text-muted);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: background-color 150ms ease, color 150ms ease;
-}
-
-.app-nav__link:visited {
-  color: var(--color-text-muted);
-}
-
-.app-nav__link:hover,
-.app-nav__link:focus-visible {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  --mat-button-text-state-layer-color: var(--mat-sys-tertiary);
+  --mat-button-text-hover-state-layer-opacity: 25%;
 }
 
 .app-nav__logout {
@@ -37,4 +22,8 @@
   background: none;
   border: none;
   cursor: pointer;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
 }
