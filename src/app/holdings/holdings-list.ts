@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
+import { AccountSelectionService } from '../accounts-list/account-selection.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe } from '@angular/common';
 import { Account } from '../accounts-list/accounts-list';
 import { ChangePeriod, Holding, HoldingsService } from './holdings.service';
@@ -21,10 +22,15 @@ export interface HoldingRow extends Holding {
 })
 export class HoldingsList {
   private holdingsService = inject(HoldingsService);
+  private accountSelectionService = inject(AccountSelectionService);
 
   // The account to show holdings for. `null` means "All Accounts", matching
   // the semantics of AccountsList's `accountSelected` output.
   account = input<Account | null>(null);
+  // if input^ is provided use it, otherwise use the service to determine actively selected
+  activeAccount = computed(() => {
+    return this.account() ?? this.accountSelectionService.selectedAccount();
+  });
 
   // Period used for the "% Change" column — user-selectable via the column
   // header dropdown. The $ change next to the price is always "today".
@@ -36,7 +42,7 @@ export class HoldingsList {
   showLess = input<boolean>(false);
 
   rows = computed<HoldingRow[]>(() => {
-    const accountId = this.account()?.id ?? null;
+    const accountId = this.activeAccount()?.id ?? null;
     const holdings = accountId
       ? this.allHoldings().filter((h) => h.accountId === accountId)
       : this.allHoldings();

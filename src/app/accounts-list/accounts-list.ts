@@ -2,6 +2,7 @@ import { Component, computed, inject, signal, output } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { AccountsService } from './accounts.service';
+import { AccountSelectionService } from './account-selection.service';
 
 export interface Account {
   id: string;
@@ -18,6 +19,7 @@ export interface Account {
 })
 export class AccountsList {
   private accountsService = inject(AccountsService);
+  private accountSelectionService = inject(AccountSelectionService);
 
   // ---------------------------------------------------------------------
   // STATE
@@ -40,6 +42,7 @@ export class AccountsList {
   selectAccount(account: Account) {
     this.selectedAccountId.set(account.id);
     this.accountSelected.emit(account);
+    this.accountSelectionService.onAccountSelected(account);
   }
 
   selectAllAccounts() {
