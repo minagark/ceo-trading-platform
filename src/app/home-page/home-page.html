@@ -4,9 +4,9 @@
         <app-accounts-list class="portfolio-sidebar" (accountSelected)="onAccountSelected($event)"/>
     </aside>
     <div class="homepage-widgets">
-        <app-homepage-widget [data]="data[0]"></app-homepage-widget>
-        <app-homepage-widget [data]="data[1]"></app-homepage-widget>
-        <app-homepage-widget [data]="data[2]" class="full-width"></app-homepage-widget>
-        <app-homepage-widget [data]="data[3]" class="full-width"></app-homepage-widget>
+        <app-homepage-widget [data]="data()[0]"></app-homepage-widget>
+        <app-homepage-widget [data]="data()[1]"></app-homepage-widget>
+        <app-homepage-widget [data]="data()[2]" class="full-width"></app-homepage-widget>
+        <app-homepage-widget [data]="data()[3]" class="full-width"></app-homepage-widget>
     </div>
 </div>

@@ -17,15 +17,17 @@ import { Account, AccountsList } from '../accounts-list/accounts-list';
 export class HomePage {
 
   // give the data for the widget
-  data: Widget[] = [
+  data = signal<Widget[]>([
     {
       id: "pp",
       label: "Portfolio Performance",
       content: PortfolioPerformance,
+      selectedAccount: null,
     }, {
       id: "pc",
       label: "Portfolio Composition",
       content: PortfolioComposition,
+      selectedAccount: null,
     }, {
       id: "ph",
       label: "Portfolio Holdings",
@@ -33,6 +35,7 @@ export class HomePage {
       inputs: {
         showLess: true,
       },
+      selectedAccount: null,
       route: "/holdings"
     }, {
       id: "aa",
@@ -41,13 +44,23 @@ export class HomePage {
       inputs: {
         showLess: true,
       },
+      selectedAccount: null,
       route: "/history"
-    }]
+    }])
 
     selectedAccount = signal<Account | null>(null);
 
     onAccountSelected(account: Account | null) {
       this.selectedAccount.set(account);
-    }
 
+      // if we want the account to actually update each individual widget,
+      // we need to add it to the `inputs` field, and then accept it in each
+      // individual widget, and make THIS function update `inputs` rather than just selectedAccount
+      this.data.update(widgets => 
+        widgets.map(w => ({ 
+          ...w, 
+          selectedAccount: account 
+        }))
+      );
+    }
 }
