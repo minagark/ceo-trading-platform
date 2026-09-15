@@ -48,5 +48,6 @@ export class AccountsList {
   selectAllAccounts() {
     this.selectedAccountId.set(null);
     this.accountSelected.emit(null);
+    this.accountSelectionService.onAccountSelected(null);
   }
 }
