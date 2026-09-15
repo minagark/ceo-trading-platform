@@ -44,10 +44,4 @@ export class HomePage {
       route: "/history"
     }]
 
-    selectedAccount = signal<Account | null>(null);
-
-    onAccountSelected(account: Account | null) {
-      this.selectedAccount.set(account);
-    }
-
 }

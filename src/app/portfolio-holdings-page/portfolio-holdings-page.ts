@@ -9,10 +9,5 @@ import { HoldingsList } from '../holdings/holdings-list';
   styleUrl: './portfolio-holdings-page.css',
 })
 export class PortfolioHoldingsPage {
-  // null = "All Accounts", same convention AccountsList itself uses.
-  selectedAccount = signal<Account | null>(null);
 
-  onAccountSelected(account: Account | null) {
-    this.selectedAccount.set(account);
-  }
 }

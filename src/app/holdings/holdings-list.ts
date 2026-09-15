@@ -26,7 +26,9 @@ export class HoldingsList {
 
   // The account to show holdings for. `null` means "All Accounts", matching
   // the semantics of AccountsList's `accountSelected` output.
+
   //account = input<Account | null>(null); // NO LONGER USING THIS Since using servic?
+  
   // if input^ is provided use it, otherwise use the service to determine actively selected
   activeAccount = computed(() => {
     return this.accountSelectionService.selectedAccount();
