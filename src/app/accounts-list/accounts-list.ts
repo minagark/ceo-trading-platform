@@ -2,6 +2,7 @@ import { Component, computed, inject, signal, output } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { AccountsService } from './accounts.service';
+import { AccountSelectionService } from './account-selection.service';
 
 export interface Account {
   id: string;
@@ -18,6 +19,7 @@ export interface Account {
 })
 export class AccountsList {
   private accountsService = inject(AccountsService);
+  private accountSelectionService = inject(AccountSelectionService);
 
   // ---------------------------------------------------------------------
   // STATE
@@ -29,21 +31,21 @@ export class AccountsList {
   accounts = this.accountsService.accounts;
 
   // Tracks which account row is highlighted. `null` means "All Accounts" is selected.
-  selectedAccountId = signal<string | null>(null);
+  // selectedAccountId = signal<string | null>(null);
+  selectedAccountId = this.accountSelectionService.selectedAccount()?.id ?? null; // default all
 
   totalBalance = computed(() =>
     this.accounts().reduce((sum, account) => sum + account.balance, 0)
   );
 
-  accountSelected = output<Account | null>();
-
   selectAccount(account: Account) {
-    this.selectedAccountId.set(account.id);
-    this.accountSelected.emit(account);
+    this.accountSelectionService.onAccountSelected(account); // update the service
+    this.selectedAccountId = this.accountSelectionService.selectedAccount()!.id; // defualt read only?
+
   }
 
   selectAllAccounts() {
-    this.selectedAccountId.set(null);
-    this.accountSelected.emit(null);
+    this.accountSelectionService.onAccountSelected(null);
+    this.selectedAccountId = null;
   }
 }
