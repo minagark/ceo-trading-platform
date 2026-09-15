@@ -1,7 +1,7 @@
 <section class="holdings-list">
   <header class="holdings-list__header">
     <div class="holdings-list__heading">
-      <h2 class="holdings-list__title">{{ account()?.name ?? 'All Accounts' }}</h2>
+      <h2 class="holdings-list__title">{{ activeAccount()?.name ?? 'All Accounts' }}</h2>
       <span class="holdings-list__subtitle">
         {{ rows().length }} holding{{ rows().length === 1 ? '' : 's' }}
       </span>
