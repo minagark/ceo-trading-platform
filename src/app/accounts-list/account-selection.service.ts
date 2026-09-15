@@ -13,6 +13,7 @@ import { Account } from './accounts-list';
 @Injectable({ providedIn: 'root' })
 export class AccountSelectionService {
     // the logic of getting the selected account and seeing its changes
+    // this was the logic being reused across multipel components
     selectedAccount = signal<Account | null>(null);
 
     onAccountSelected(account: Account | null) {
