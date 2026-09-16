@@ -9,7 +9,7 @@ import { Account, AccountsList } from '../accounts-list/accounts-list';
 
 
 @Component({
-  imports: [HomepageWidget, AccountsList], // imports to the templae
+  imports: [HomepageWidget, AccountsList], // imports to the template
   selector: 'app-home-page',
   styleUrl: './home-page.css',
   templateUrl: './home-page.html',
