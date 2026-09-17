@@ -1,7 +1,10 @@
-<h1 class="welcome-msg">Welcome</h1>
+
+<h1 class="welcome-msg">Welcome, {{"placeholder"}}</h1>
 <div class="home-page-container">
     <aside>
-         <app-accounts-list class="portfolio-sidebar"/>
+        <app-accounts-list 
+            class="portfolio-sidebar" 
+        />
     </aside>
     <div class="homepage-widgets">
         <app-homepage-widget [data]="data[0]"></app-homepage-widget>
