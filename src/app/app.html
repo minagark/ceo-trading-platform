@@ -1,7 +1,9 @@
 
 <main class="main">
   <mat-toolbar class="app-nav">
-    <a matButton routerLink="/home" style="font-size: x-large;">Market Hive</a>
+    <a class="home-button" routerLink="/home">
+      Market Hive
+    </a>
     <span class="example-spacer"></span>
     @if (authService.isAuthenticated()) {
       <!-- <a matButton class="app-nav__link" routerLink="/home" href="#">Home</a> -->

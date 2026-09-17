@@ -27,3 +27,11 @@
 .example-spacer {
   flex: 1 1 auto;
 }
+
+.home-button {
+  font-size: x-large;
+  text-decoration: none;
+  cursor: pointer;
+  color: var(--mat-sys-primary);
+  font-weight: bold;
+}
