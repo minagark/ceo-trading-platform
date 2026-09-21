@@ -8,7 +8,7 @@
         <mat-card-header>
             <mat-card-title>{{ data().label }}</mat-card-title>
             @if (data().route) {
-                <a [href]="data().route" class="view-all">View All</a>
+                <a [routerLink]="[data().route]" routerLinkActive="active" class="view-all">View All</a>
             } 
         </mat-card-header>
         <mat-card-content>
