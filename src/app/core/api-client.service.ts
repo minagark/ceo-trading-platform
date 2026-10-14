@@ -15,12 +15,27 @@ export class ApiClient {
     });
   }
 
+  getRoot<T>(path: string, params?: QueryParams): Observable<T> {
+    return this.http.get<T>(this.rootUrl(path), {
+      params: this.toHttpParams(params),
+    });
+  }
+
   post<TResponse, TRequest>(path: string, body: TRequest): Observable<TResponse> {
     return this.http.post<TResponse>(this.url(path), body);
   }
 
+  postRoot<TResponse, TRequest>(path: string, body: TRequest): Observable<TResponse> {
+    return this.http.post<TResponse>(this.rootUrl(path), body);
+  }
+
   private url(path: string): string {
     return `${environment.apiBaseUrl}/${path.replace(/^\//, '')}`;
+  }
+
+  private rootUrl(path: string): string {
+    const origin = environment.apiBaseUrl.replace(/\/api\/?$/, '');
+    return `${origin}/${path.replace(/^\//, '')}`;
   }
 
   private toHttpParams(params?: QueryParams): HttpParams | undefined {

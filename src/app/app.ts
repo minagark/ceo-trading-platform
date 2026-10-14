@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
-import { AuthService } from './auth/auth.service';
-import { UserProfile } from './user-profile/user-profile';
+import { AuthService } from './features/auth/auth/auth.service';
+import { UserProfile } from './features/account/user-profile/user-profile';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
