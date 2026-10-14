@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, inject, signal, input } from '@angular/core';
+import { Component, HostListener, computed, effect, inject, signal, input } from '@angular/core';
 import { AccountActivityRow } from './account-activity-row';
 import { ActivityListService, Order } from './activity-list.service';
 import { SlicePipe } from '@angular/common';
@@ -13,6 +13,16 @@ import { SlicePipe } from '@angular/common';
 export class ActivityList {
   private activityListService = inject(ActivityListService);
   showLess = input<boolean>(false);
+  clientId = input<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      const clientId = this.clientId();
+      if (clientId) {
+        this.activityListService.loadForClient(clientId);
+      }
+    });
+  }
 
   rows = computed<Order[]>(() =>
     [...this.activityListService.orders()].sort(

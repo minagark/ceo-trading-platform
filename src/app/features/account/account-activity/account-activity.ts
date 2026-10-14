@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { ActivityList } from '../../trading/activity-list/activity-list';
 
 @Component({
@@ -7,4 +7,6 @@ import { ActivityList } from '../../trading/activity-list/activity-list';
   templateUrl: './account-activity.html',
   styleUrl: './account-activity.css',
 })
-export class AccountActivity {}
+export class AccountActivity {
+  clientId = input<string | null>(null);
+}
