@@ -25,6 +25,7 @@ export const routes: Routes = [
   { path: 'analysis', component: MarketAnalysis, canActivate: [authGuard] },
   { path: 'components', component: ComponentGallery, canActivate: [authGuard] },
   { path: 'account', component: AccountPage, canActivate: [authGuard] },
+  { path: 'account/:userId', component: AccountPage, canActivate: [authGuard] },
   { path: 'settings', component: SettingsPage, canActivate: [authGuard] },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
 ];

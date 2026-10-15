@@ -1,19 +1,36 @@
-import { Injectable, signal } from '@angular/core';
-import { httpResource } from '@angular/common/http';
+import { Injectable, inject, signal } from '@angular/core';
 import { Account } from './accounts-list';
+import { UserApiService } from '../data-access/user-api.service';
+import { Portfolio } from '../../../core/trading.models';
 
 @Injectable({ providedIn: 'root' })
 export class AccountsService {
-  
-  //accounts = httpResource<Account[]>(() => '/api/accounts');
+  private readonly userApi = inject(UserApiService);
 
-  // Mock data — swap for httpResource<Account[]>(() => '/api/accounts')
-  // once the accounts API exists (same pattern as AssetsService).
-  accounts = signal<Account[]>([
-    { id: '1', name: 'Brokerage', type: 'Individual', balance: 24310.55 },
-    { id: '2', name: 'Retirement', type: 'IRA', balance: 118432.02 },
-    { id: '3', name: 'Active Trading', type: 'Margin', balance: 5602.13 },
-  ]);
+  readonly accounts = signal<Account[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+
+  loadForUser(userId: string): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.userApi.getPortfolios(userId).subscribe({
+      next: (portfolios) => this.accounts.set(portfolios.map((portfolio) => this.toAccount(portfolio))),
+      error: () => {
+        this.error.set('Unable to load portfolios.');
+        this.loading.set(false);
+      },
+      complete: () => this.loading.set(false),
+    });
+  }
+
+  private toAccount(portfolio: Portfolio): Account {
+    return {
+      id: portfolio.ID,
+      name: `${portfolio.type} portfolio`,
+      type: portfolio.type,
+      balance: 0,
+    };
+  }
 }
-
-/* TODO: cache account information for quick swithcing ??*/

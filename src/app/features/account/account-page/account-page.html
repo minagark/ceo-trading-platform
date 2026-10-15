@@ -1,14 +1,38 @@
 <section class="account-page">
   <h1 class="account-page__title">Account</h1>
 
-  <dl class="account-page__details">
-    <dt>Email</dt>
-    <dd>{{ email }}</dd>
+  @if (loading()) {
+    <p>Loading account...</p>
+  } @else if (error()) {
+    <p>{{ error() }}</p>
+  } @else if (user(); as account) {
+    <dl class="account-page__details">
+      <dt>Name</dt>
+      <dd>{{ account.fullName }}</dd>
 
-    <dt>Password</dt>
-    <dd>{{ maskedPassword }}</dd>
+      <dt>Email</dt>
+      <dd>{{ account.email }}</dd>
 
-    <dt>Account Created</dt>
-    <dd>{{ dateCreated }}</dd>
-  </dl>
+      <dt>Role</dt>
+      <dd>{{ account.role }}</dd>
+
+      <dt>Account Created</dt>
+      <dd>{{ account.joinDate | date: 'mediumDate' }}</dd>
+    </dl>
+
+    <h2>Portfolios</h2>
+    @if (portfolios().length) {
+      <ul>
+        @for (portfolio of portfolios(); track portfolio.ID) {
+          <li>{{ portfolio.type }}: {{ portfolio.holdingIds.length }} holdings</li>
+        }
+      </ul>
+    } @else {
+      <p>No portfolios found.</p>
+    }
+  } @else {
+    <p>Open an account URL with a user ID to load account data.</p>
+  }
+
+  <app-accounts-list [userId]="userId()" />
 </section>
