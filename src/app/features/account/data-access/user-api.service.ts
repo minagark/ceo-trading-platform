@@ -2,10 +2,21 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../../core/api-client.service';
 import { UserResponse } from '../../../core/user.models';
+import { Portfolio } from '../../../core/trading.models';
 
 @Injectable({ providedIn: 'root' })
 export class UserApiService {
   private readonly api = inject(ApiClient);
+
+  getUser(userId: string): Observable<UserResponse> {
+    return this.api.get<UserResponse>(`users/${encodeURIComponent(userId)}`);
+  }
+
+  getPortfolios(userId: string): Observable<Portfolio[]> {
+    return this.api.get<Portfolio[]>(
+      `users/${encodeURIComponent(userId)}/portfolios`,
+    );
+  }
 
   createUser(request: CreateUserRequest): Observable<UserResponse> {
     return this.api.post<UserResponse, CreateUserRequest>('users', request);

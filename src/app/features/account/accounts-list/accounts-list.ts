@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, output } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { AccountsService } from './accounts.service';
@@ -7,7 +7,7 @@ import { AccountSelectionService } from './account-selection.service';
 export interface Account {
   id: string;
   name: string;
-  type: 'Individual' | 'IRA' | 'Margin';
+  type: 'Individual' | 'IRA' | 'Margin' | 'RETIREMENT' | 'BROKERAGE';
   balance: number;
 }
 
@@ -29,6 +29,16 @@ export class AccountsList {
   // automatically whenever a signal it reads changes.
 
   accounts = this.accountsService.accounts;
+  userId = input<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      const userId = this.userId();
+      if (userId) {
+        this.accountsService.loadForUser(userId);
+      }
+    });
+  }
 
   // Tracks which account row is highlighted. `null` means "All Accounts" is selected.
   // selectedAccountId = signal<string | null>(null);

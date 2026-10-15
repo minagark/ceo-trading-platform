@@ -1,19 +1,46 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { UserResponse } from '../../../core/user.models';
+import { Portfolio } from '../../../core/trading.models';
+import { UserApiService } from '../data-access/user-api.service';
+import { AccountsList } from '../accounts-list/accounts-list';
 
 @Component({
   selector: 'app-account-page',
-  imports: [],
+  imports: [DatePipe, AccountsList],
   templateUrl: './account-page.html',
   styleUrl: './account-page.css',
 })
-// account info (placeholder for now)
 export class AccountPage {
-  email = 'ArjunBhat67@hotmail.com';
-  password = 'ArjunBhat67';
-  dateCreated = '01/01/2000';
+  private readonly route = inject(ActivatedRoute);
+  private readonly userApi = inject(UserApiService);
 
-  //cover up password
-  get maskedPassword(): string {
-    return '•'.repeat(this.password.length);
+  readonly user = signal<UserResponse | null>(null);
+  readonly portfolios = signal<Portfolio[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly userId = signal<string | null>(null);
+
+  constructor() {
+    const userId = this.route.snapshot.paramMap.get('userId');
+    this.userId.set(userId);
+    if (userId) {
+      this.loadAccount(userId);
+    }
+  }
+
+  private loadAccount(userId: string): void {
+    this.loading.set(true);
+    this.userApi.getUser(userId).subscribe({
+      next: (user) => this.user.set(user),
+      error: () => this.error.set('Unable to load account details.'),
+    });
+
+    this.userApi.getPortfolios(userId).subscribe({
+      next: (portfolios) => this.portfolios.set(portfolios),
+      error: () => this.error.set('Unable to load portfolios.'),
+      complete: () => this.loading.set(false),
+    });
   }
 }
