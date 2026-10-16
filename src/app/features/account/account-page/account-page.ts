@@ -5,6 +5,7 @@ import { UserResponse } from '../../../core/user.models';
 import { Portfolio } from '../../../core/trading.models';
 import { UserApiService } from '../data-access/user-api.service';
 import { AccountsList } from '../accounts-list/accounts-list';
+import { AuthService } from '../../auth/auth/auth.service';
 
 @Component({
   selector: 'app-account-page',
@@ -15,6 +16,7 @@ import { AccountsList } from '../accounts-list/accounts-list';
 export class AccountPage {
   private readonly route = inject(ActivatedRoute);
   private readonly userApi = inject(UserApiService);
+  private readonly authService = inject(AuthService);
 
   readonly user = signal<UserResponse | null>(null);
   readonly portfolios = signal<Portfolio[]>([]);
@@ -23,7 +25,8 @@ export class AccountPage {
   readonly userId = signal<string | null>(null);
 
   constructor() {
-    const userId = this.route.snapshot.paramMap.get('userId');
+    const userId =
+      this.route.snapshot.paramMap.get('userId') ?? this.authService.currentUserId();
     this.userId.set(userId);
     if (userId) {
       this.loadAccount(userId);
