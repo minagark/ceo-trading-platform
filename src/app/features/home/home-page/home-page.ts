@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { PortfolioPerformance } from '../../portfolio/portfolio-performance/portfolio-performance';
 import type { Widget } from '../../../shared/models/widget';
 import { HomepageWidget } from '../homepage-widget/homepage-widget';
@@ -6,6 +6,7 @@ import { PortfolioComposition } from '../../portfolio/portfolio-composition/port
 import { HoldingsList } from '../../portfolio/holdings/holdings-list';
 import { ActivityList } from '../../trading/activity-list/activity-list';
 import { Account, AccountsList } from '../../account/accounts-list/accounts-list';
+import { AuthService } from '../../auth/auth/auth.service';
 
 
 @Component({
@@ -15,6 +16,7 @@ import { Account, AccountsList } from '../../account/accounts-list/accounts-list
   templateUrl: './home-page.html',
 })
 export class HomePage {
+  readonly authService = inject(AuthService);
 
   // give the data for the widget
   data: Widget[] = [

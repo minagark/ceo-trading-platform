@@ -4,6 +4,7 @@
     <aside>
         <app-accounts-list 
             class="portfolio-sidebar" 
+            [userId]="authService.currentUserId()"
         />
     </aside>
     <div class="homepage-widgets">
