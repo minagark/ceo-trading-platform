@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +12,9 @@ import { Account } from '../../account/accounts-list/accounts-list';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PreviewPage } from '../preview-page/preview-page';
 import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
+import { InstrumentType, SIDES } from '../../../core/trading.models';
+import { Side } from '../../../core/trading.models';
+import { CurrencyService } from './owned-currency.service';
 
 export interface Asset {
   abbrName: string;
@@ -23,7 +26,6 @@ export interface Asset {
   ask: number;
   bid: number;
 }
-
 export interface Trade {
   id: string;
   type: 'buy' | 'sell';
@@ -39,10 +41,26 @@ export interface Trade {
 
 export type TradeRequest = Omit<Trade, 'id' | 'date'>;
 
+
+const ORDER_TYPES = [
+  { value: 'US_EQUITY', label: 'US Equity' },
+  { value: 'INDIA_EQUITY', label: 'India Equity' },
+  { value: 'CRYPTO', label: 'Cryptocurrency' },
+  { value: 'FOREX', label: 'Foreign Exchange' },
+  { value: 'DEPOSIT', label: 'Deposit' },
+] as const;
+
+type OrderType = typeof ORDER_TYPES[number]["value"];
+
+type Instrument = {
+  type: InstrumentType,
+  symbol: string,
+}
+
 @Component({
   imports: [
     CurrencyPipe,
-    FormsModule,
+    ReactiveFormsModule,
     PreviewPage,
     TradeConfirmation,
     MatCardModule,
@@ -59,6 +77,136 @@ export type TradeRequest = Omit<Trade, 'id' | 'date'>;
 export class Trades {
   private assetsService = inject(AssetsService);
   private accountsService = inject(AccountsService);
+  private currencyService = inject(CurrencyService);
+  private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
+  private readonly IN_CURRENCY_SYMBOL: "INR" = "INR";
+  readonly orderTypes = ORDER_TYPES;
+  readonly sides = SIDES;
+
+  private readonly fb = inject(NonNullableFormBuilder);
+  readonly orderForm = this.fb.group({
+    portfolioId: this.fb.control('', Validators.required),
+    orderType: this.fb.control<OrderType>('US_EQUITY', Validators.required),
+    symbol: this.fb.control('', [
+      Validators.required,
+      Validators.maxLength(20),
+    ]),
+    settlementCurrency: this.fb.control<string | null>(null),
+    quantity: this.fb.control(1, [
+      Validators.required,
+      Validators.min(0.000001),
+    ]),
+    side: this.fb.control<Side>('BUY', Validators.required),
+    changeThreshold: this.fb.control(0, [Validators.min(0), Validators.max(100)]),
+  })
+
+
+  submitOrder() {
+    const orderInfo = this.orderForm.getRawValue();
+    let addInstrument: Instrument; let subInstrument: Instrument;
+
+    if (orderInfo.orderType === "US_EQUITY" || orderInfo.orderType === "INDIA_EQUITY") {
+      ({ addInstrument, subInstrument } = this.parseInstrumentEquityOrder(
+        orderInfo.symbol, 
+        orderInfo.side, 
+        orderInfo.orderType === "US_EQUITY" ? "US" : "IN",
+      ));
+    } else if (orderInfo.orderType === "CRYPTO") {
+      ({ addInstrument, subInstrument } = this.parseInstrumentCryptoOrder(
+        orderInfo.settlementCurrency || this.US_CURRENCY_SYMBOL,
+        orderInfo.symbol, 
+        orderInfo.side, 
+      ));
+    } else if (orderInfo.orderType === "FOREX") {
+      ({ addInstrument, subInstrument } = this.parseInstrumentForexOrder(
+        orderInfo.settlementCurrency || this.US_CURRENCY_SYMBOL,
+        orderInfo.symbol, 
+      ));
+    } else {
+      ({ addInstrument, subInstrument } = this.parseDepositOrder(
+        orderInfo.symbol, 
+      ));
+    }
+    
+    const orderRequestDTO = {
+      clientId: 'TEST ID',
+      clientName: 'TEST NAME',
+      portfolioId: orderInfo.portfolioId,
+      addInstrumentSymbol: addInstrument.symbol, 
+      addInstrumentType: addInstrument.type,
+      subInstrumentSymbol: subInstrument.symbol,
+      subInstrumentType: subInstrument.type,
+      changeThreshold: orderInfo.changeThreshold,
+    }
+    
+    // send(orderRequestDTO);
+
+    return orderRequestDTO;
+  }
+  getSettlementMode() {
+    const { orderType, side } = this.orderForm.getRawValue();
+
+    if (orderType === 'US_EQUITY') {
+      return { visible: false, fixedCurrency: 'USD' as const };
+    }
+    if (orderType === 'INDIA_EQUITY') {
+      return { visible: false, fixedCurrency: 'INR' as const };
+    }
+    if (orderType === 'CRYPTO' && side === 'BUY') {
+      return { visible: true, source: 'owned' as const };
+    }
+    if (orderType === 'CRYPTO' && side === 'SELL') {
+      return { visible: true, source: 'any' as const };
+    }
+    if (orderType === 'FOREX') {
+      return { visible: true, source: 'any' as const };
+    }
+    return { visible: false, fixedCurrency: null };
+  }
+
+  private parseInstrumentEquityOrder(symbol: string, side: Side, country: 'US' | 'IN') {
+    let addInstrument: Instrument; let subInstrument: Instrument;
+    if (side === 'BUY') {
+      addInstrument = { symbol, type: 'EQUITY' };
+      subInstrument = {
+        symbol: country === 'US' ? this.US_CURRENCY_SYMBOL : this.IN_CURRENCY_SYMBOL,
+        type: 'EQUITY',
+      };
+    } else /*if (side === 'SELL')*/ {
+      addInstrument = {
+        symbol: country === 'US' ? this.US_CURRENCY_SYMBOL : this.IN_CURRENCY_SYMBOL,
+        type: 'EQUITY',
+      };
+      subInstrument = { symbol, type: 'EQUITY' };
+    } 
+    return { addInstrument, subInstrument };
+  }
+
+  private parseInstrumentCryptoOrder(settlementCurrencySymbol: string, symbol: string, side: Side) {
+    let addInstrument: Instrument; let subInstrument: Instrument;
+    if (side === 'BUY') {
+      addInstrument = { symbol, type: 'CRYPTO' };
+      subInstrument = { symbol: settlementCurrencySymbol, type: 'CASH' };
+    } else /*if (side === 'SELL')*/ {
+      addInstrument = { symbol: settlementCurrencySymbol, type: 'CASH' };
+      subInstrument = { symbol, type: 'CRYPTO' };
+    }
+    return { addInstrument, subInstrument };
+  }
+
+  private parseInstrumentForexOrder(settlementCurrencySymbol: string, symbol: string) {
+    let addInstrument: Instrument = { symbol, type: 'CASH' }; 
+    let subInstrument: Instrument = { symbol: settlementCurrencySymbol, type: 'CASH' };
+    return { addInstrument, subInstrument };
+  }
+
+  private parseDepositOrder(symbol: string) {
+    return {
+      addInstrument: { symbol, type: 'CASH' } as Instrument,
+      subInstrument: { symbol: 'USD', type: 'CASH' } as Instrument,
+    }
+  }
+
 
   // Mock data for now — read with `stock()`, same as any other signal.
   // Once AssetsService switches to httpResource(), this becomes `.value()`.
@@ -69,16 +217,8 @@ export class Trades {
   quantityType = signal<'cash' | 'shares'>('shares');
   quantity = signal(0);
   side = signal<'buy' | 'sell'>('buy');
-  orderType = signal<'market' | 'limit'>('market');
+  orderTypeOld = signal<'market' | 'limit'>('market');
   timeInForce = signal<'day' | 'gtc'>('day');
-
-  // Real implementation — start on the order form, no result yet.
-  // screen = signal<'form' | 'preview' | 'confirmation'>('form');
-  // confirmationResult = signal<{ success: boolean; trade: Trade | null; message: string | null }>({
-  //   success: false,
-  //   trade: null,
-  //   message: null,
-  // });
 
   // Mock data — jumps straight to the confirmation screen so it can be
   // previewed without clicking through the form/preview flow, ahead of
@@ -128,7 +268,7 @@ export class Trades {
       stock: this.stock(),
       amountType: this.quantityType(),
       amount: this.quantity(),
-      orderType: this.orderType(),
+      orderType: this.orderTypeOld(),
       timeInForce: this.timeInForce(),
     };
   });

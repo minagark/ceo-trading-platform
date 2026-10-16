@@ -7,7 +7,11 @@ import { Portfolio } from '../../../core/trading.models';
 export class AccountsService {
   private readonly userApi = inject(UserApiService);
 
-  readonly accounts = signal<Account[]>([]);
+  readonly accounts = signal<Account[]>([
+    {id: "id1", name: "acc1", type: 'BROKERAGE', balance: 1000000},
+    {id: "id2", name: "acc2", type: 'BROKERAGE', balance: 2000000},
+    {id: "id3", name: "acc3", type: 'BROKERAGE', balance: 3000000},
+  ]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 

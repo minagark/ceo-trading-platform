@@ -1,5 +1,5 @@
 <div class="trade-screen">
-  <mat-card appearance="outlined" class="order-panel">
+  <!-- <mat-card appearance="outlined" class="order-panel">
     @if (screen() === 'preview' && selectedAccount() && currentDraft()) {
       <app-preview-page
         [draft]="currentDraft()!"
@@ -81,5 +81,64 @@
       Preview Order
     </button>
     }
-  </mat-card>
+  </mat-card> -->
+  <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
+
+    <mat-form-field>
+      <mat-label>Portfolio</mat-label>
+      <mat-select required formControlName="portfolioId">
+        @for (account of accounts(); track $index) {
+          <mat-option [value]="account.id">{{account.id}}({{account.type}})</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Order Type</mat-label>
+      <mat-select required formControlName="orderType">
+        @for (type of orderTypes; track $index) {
+          <mat-option [value]="type.value">{{type.label}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Symbol</mat-label>
+      <input matInput type="text" placeholder="symbol" formControlName="symbol"/>
+      <mat-hint>AKA "ticker"</mat-hint>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Side</mat-label>
+      <mat-select required formControlName="side">
+        @for (side of sides; track $index) {
+          <mat-option [value]="side">{{side}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <!-- Settlement Currency (more complex logic) -->
+     
+    <mat-form-field>
+      <mat-label>Quantity</mat-label>
+      <input matInput type="number" placeholder="quantity" formControlName="quantity"/>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Change Threshold (%)</mat-label>
+      <input matInput type="number" placeholder="threshold" formControlName="changeThreshold"/>
+    </mat-form-field>
+  </form>
 </div>
+
+
+<!-- 
+  portfolioId: this.fb.control('', Validators.required),
+  orderType: this.fb.control<OrderType>('US_EQUITY', Validators.required),
+  symbol: this.fb.control('', [
+    Validators.required,
+    Validators.maxLength(20),
+  ]),
+  settlementCurrency: this.fb.control<string | null>(null),
+  quantity: this.fb.control(1, [
+    Validators.required,
+    Validators.min(0.000001),
+  ]),
+  side: this.fb.control<Side>('BUY', Validators.required),
+  changeThreshold: this.fb.control(0, Validators.min(0.000001)),
+-->
