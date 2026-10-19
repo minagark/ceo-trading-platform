@@ -8,6 +8,9 @@ export interface Holding {
   holdingId: string;
   dateCreated: string;
   instrumentId: string;
+  instrumentSymbol: string;
+  instrumentName: string;
+  instrumentType: InstrumentType;
   orderId: string;
   purchasedPrice: number;
   quantity: number;
