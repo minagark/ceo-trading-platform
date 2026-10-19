@@ -3,7 +3,6 @@ import { Account } from './accounts-list';
 import { UserApiService } from '../data-access/user-api.service';
 import { Portfolio } from '../../../core/trading.models';
 import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.service';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { finalize, forkJoin, map, switchMap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
