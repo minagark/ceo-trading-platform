@@ -32,8 +32,8 @@ export interface OrderRequest {
   portfolioId: string;
   addInstrumentSymbol: string;
   addInstrumentType: string;
-  subInstrumentSymbol: string;
-  subInstrumentType: string;
+  subtractInstrumentSymbol: string;
+  subtractInstrumentType: string;
   quantity: number;
   quotedPrice: number;
   side: Side;

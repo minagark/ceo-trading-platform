@@ -85,7 +85,9 @@ export class Trades {
   private orderApiService = inject(OrderApiService);
   private marketApiService = inject(MarketApiService);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
+  private readonly US_TIMEZONE_STRING = "America/New_York";
   private readonly IN_CURRENCY_SYMBOL: "INR" = "INR";
+  private readonly IN_TIMEZONE_STRING = "Asia/Kolkata";
   readonly orderTypes = ORDER_TYPES;
   readonly sides = SIDES;
 
@@ -164,7 +166,8 @@ export class Trades {
       ));
     }
     
-    this.marketApiService.getQuote(orderInfo.symbol).pipe(
+    // TODO: CHANGE THE GET QUOTE TO THE CORRECT INSTRUMENT
+    this.marketApiService.getQuote(addInstrument.symbol, addInstrument.type).pipe(
       switchMap(quote => {
         const quotedPrice =
           orderInfo.side === 'BUY'
@@ -177,13 +180,17 @@ export class Trades {
           portfolioId: orderInfo.portfolioId,
           addInstrumentSymbol: addInstrument.symbol,
           addInstrumentType: addInstrument.type,
-          subInstrumentSymbol: subInstrument.symbol,
-          subInstrumentType: subInstrument.type,
+          subtractInstrumentSymbol: subInstrument.symbol,
+          subtractInstrumentType: subInstrument.type,
           changeThreshold: orderInfo.changeThreshold,
           quantity: orderInfo.quantity,
           side: orderInfo.side,
           quotedPrice,
+          market: orderInfo.orderType === "INDIA_EQUITY" ? 
+                  this.IN_TIMEZONE_STRING : 
+                  this.US_TIMEZONE_STRING,
         };
+        console.log(orderRequest);
 
         return this.orderApiService.submitOrder(orderRequest);
       }),
@@ -294,6 +301,7 @@ export class Trades {
   }
 
   private parseInstrumentForexOrder(settlementCurrencySymbol: string, symbol: string) {
+    console.log('parse instrument forex');
     let addInstrument: Instrument = { symbol, type: 'CASH' }; 
     let subInstrument: Instrument = { symbol: settlementCurrencySymbol, type: 'CASH' };
     return { addInstrument, subInstrument };
