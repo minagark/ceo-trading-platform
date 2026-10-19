@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AssetsService } from './assets.service';
 import { Account } from '../../account/accounts-list/accounts-list';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
@@ -14,7 +15,8 @@ import { PreviewPage } from '../preview-page/preview-page';
 import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
 import { InstrumentType, SIDES } from '../../../core/trading.models';
 import { Side } from '../../../core/trading.models';
-import { CurrencyService } from './owned-currency.service';
+import { CurrencyService, OwnedCurrency } from './owned-currency.service';
+import { merge, startWith } from 'rxjs';
 
 export interface Asset {
   abbrName: string;
@@ -98,7 +100,33 @@ export class Trades {
     ]),
     side: this.fb.control<Side>('BUY', Validators.required),
     changeThreshold: this.fb.control(0, [Validators.min(0), Validators.max(100)]),
-  })
+  });
+
+  private readonly formState = toSignal(
+    this.orderForm.valueChanges.pipe(
+      startWith(this.orderForm.getRawValue()),
+    ),
+    {
+      initialValue: this.orderForm.getRawValue(),
+    },
+  );
+
+  constructor() {
+    merge(
+      this.orderForm.controls.orderType.valueChanges,
+      this.orderForm.controls.side.valueChanges,
+      this.orderForm.controls.portfolioId.valueChanges,
+    ).subscribe(() => {
+      this.updateSettlementCurrencyState();
+
+      const portfolioId = this.orderForm.controls.portfolioId.value;
+      if (portfolioId) {
+        this.updateOwnedCurrencies();
+      }
+    });
+
+    this.updateSettlementCurrencyState();
+  }
 
 
   submitOrder() {
@@ -129,8 +157,8 @@ export class Trades {
     }
     
     const orderRequestDTO = {
-      clientId: 'TEST ID',
-      clientName: 'TEST NAME',
+      clientId: '2c522b92-7151-4daa-92db-81a2253c772a',
+      clientName: 'John Doe',
       portfolioId: orderInfo.portfolioId,
       addInstrumentSymbol: addInstrument.symbol, 
       addInstrumentType: addInstrument.type,
@@ -139,12 +167,13 @@ export class Trades {
       changeThreshold: orderInfo.changeThreshold,
     }
     
+    console.log("Submitting: ", orderRequestDTO);
     // send(orderRequestDTO);
 
     return orderRequestDTO;
   }
-  getSettlementMode() {
-    const { orderType, side } = this.orderForm.getRawValue();
+  settlementMode = computed(() => {
+    const { orderType, side } = this.formState();
 
     if (orderType === 'US_EQUITY') {
       return { visible: false, fixedCurrency: 'USD' as const };
@@ -162,6 +191,47 @@ export class Trades {
       return { visible: true, source: 'any' as const };
     }
     return { visible: false, fixedCurrency: null };
+  })
+
+  sideActive = computed(() => {
+    const { orderType } = this.formState();
+    return orderType !== "FOREX";
+  })
+
+  ownedCurrencies = signal<OwnedCurrency[]>([]);
+  private updateOwnedCurrencies() {
+    const portfolioId = this.orderForm.value.portfolioId || "";
+    this.currencyService.currenciesOwnedByPortfolio(portfolioId).subscribe({
+      next: currencies => this.ownedCurrencies.set(currencies),
+      error: error => {
+        this.ownedCurrencies.set([]);
+        console.error('Unable to load owned currencies', error);
+      }
+    });
+  }
+
+  private updateSettlementCurrencyState(): void {
+    const control = this.orderForm.controls.settlementCurrency;
+    const { orderType } = this.orderForm.getRawValue();
+
+    if (orderType === 'US_EQUITY') {
+      control.setValue('USD');
+      control.clearValidators();
+      control.disable({ emitEvent: false });
+    } else if (orderType === 'INDIA_EQUITY') {
+      control.setValue('INR');
+      control.clearValidators();
+      control.disable({ emitEvent: false });
+    } else if (orderType === 'CRYPTO' || orderType === 'FOREX') {
+      control.enable({ emitEvent: false });
+      control.setValidators(Validators.required);
+    } else {
+      control.reset(null, { emitEvent: false });
+      control.clearValidators();
+      control.disable({ emitEvent: false });
+    }
+
+    control.updateValueAndValidity({ emitEvent: false });
   }
 
   private parseInstrumentEquityOrder(symbol: string, side: Side, country: 'US' | 'IN') {

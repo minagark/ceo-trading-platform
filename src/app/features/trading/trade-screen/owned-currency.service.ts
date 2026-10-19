@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.service';
 
-interface OwnedCurrency {
+export interface OwnedCurrency {
   id: string;
   symbol: string;
   name: string;

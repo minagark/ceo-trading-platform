@@ -8,7 +8,7 @@ export class AccountsService {
   private readonly userApi = inject(UserApiService);
 
   readonly accounts = signal<Account[]>([
-    {id: "id1", name: "acc1", type: 'BROKERAGE', balance: 1000000},
+    {id: "edda8da3-fab9-4b3c-b792-c833abe8e146", name: "acc1", type: 'BROKERAGE', balance: 1000000},
     {id: "id2", name: "acc2", type: 'BROKERAGE', balance: 2000000},
     {id: "id3", name: "acc3", type: 'BROKERAGE', balance: 3000000},
   ]);

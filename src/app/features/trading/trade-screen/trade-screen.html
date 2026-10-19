@@ -102,43 +102,51 @@
     </mat-form-field>
     <mat-form-field>
       <mat-label>Symbol</mat-label>
-      <input matInput type="text" placeholder="symbol" formControlName="symbol"/>
+      <input matInput type="text" placeholder="e.g. USD" formControlName="symbol"/>
       <mat-hint>AKA "ticker"</mat-hint>
     </mat-form-field>
-    <mat-form-field>
-      <mat-label>Side</mat-label>
-      <mat-select required formControlName="side">
-        @for (side of sides; track $index) {
-          <mat-option [value]="side">{{side}}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+    <br/>
+    @if (sideActive()) {
+      <mat-form-field>
+        <mat-label>Side</mat-label>
+        <mat-select required formControlName="side">
+          @for (side of sides; track $index) {
+            <mat-option [value]="side">{{side}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
     <!-- Settlement Currency (more complex logic) -->
      
+    @if (settlementMode().visible) {
+      <mat-form-field>
+        <mat-label>Settlement Currency (Symbol)</mat-label>
+        @if (settlementMode().source === 'owned') {
+          <mat-select required formControlName="settlementCurrency">
+            @for (currency of ownedCurrencies(); track currency.id) {
+              <mat-option [value]="currency.symbol">{{ currency.symbol }}</mat-option>
+            }
+          </mat-select>
+        } @else {
+          <input matInput type="text" placeholder="e.g. INR" formControlName="settlementCurrency" [defaultValue]="' '"/>
+        }
+        @if (orderForm.controls.settlementCurrency.hasError('required')) {
+          <mat-error>Settlement currency is required</mat-error>
+        }
+      </mat-form-field>
+    }
+
     <mat-form-field>
       <mat-label>Quantity</mat-label>
       <input matInput type="number" placeholder="quantity" formControlName="quantity"/>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Change Threshold (%)</mat-label>
-      <input matInput type="number" placeholder="threshold" formControlName="changeThreshold"/>
+      <input matInput type="number" formControlName="changeThreshold"/>
     </mat-form-field>
+
+    <button matButton type="submit">
+      Submit Trade
+    </button>
   </form>
 </div>
-
-
-<!-- 
-  portfolioId: this.fb.control('', Validators.required),
-  orderType: this.fb.control<OrderType>('US_EQUITY', Validators.required),
-  symbol: this.fb.control('', [
-    Validators.required,
-    Validators.maxLength(20),
-  ]),
-  settlementCurrency: this.fb.control<string | null>(null),
-  quantity: this.fb.control(1, [
-    Validators.required,
-    Validators.min(0.000001),
-  ]),
-  side: this.fb.control<Side>('BUY', Validators.required),
-  changeThreshold: this.fb.control(0, Validators.min(0.000001)),
--->
