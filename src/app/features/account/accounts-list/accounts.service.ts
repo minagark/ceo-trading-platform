@@ -15,20 +15,6 @@ export class AccountsService {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
-  // loadForUser(userId: string): void {
-  //   this.loading.set(true);
-  //   this.error.set(null);
-
-  //   this.userApi.getPortfolios(userId).subscribe({
-  //     next: (portfolios) => this.accounts.set(portfolios.map((portfolio) => this.toAccount(portfolio))),
-  //     error: () => {
-  //       this.error.set('Unable to load portfolios.');
-  //       this.loading.set(false);
-  //     },
-  //     complete: () => this.loading.set(false),
-  //   });
-  // }
-
   loadForUser(userId: string): void {
     this.loading.set(true);
     this.error.set(null);
