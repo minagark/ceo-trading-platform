@@ -13,10 +13,12 @@ import { Account } from '../../account/accounts-list/accounts-list';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PreviewPage } from '../preview-page/preview-page';
 import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
-import { InstrumentType, SIDES } from '../../../core/trading.models';
+import { InstrumentType, OrderRequest, SIDES } from '../../../core/trading.models';
 import { Side } from '../../../core/trading.models';
 import { CurrencyService, OwnedCurrency } from './owned-currency.service';
-import { merge, startWith } from 'rxjs';
+import { merge, startWith, switchMap } from 'rxjs';
+import { OrderApiService } from '../data-access/order-api.service';
+import { MarketApiService } from '../../market/data-access/market-api.service';
 
 export interface Asset {
   abbrName: string;
@@ -80,6 +82,8 @@ export class Trades {
   private assetsService = inject(AssetsService);
   private accountsService = inject(AccountsService);
   private currencyService = inject(CurrencyService);
+  private orderApiService = inject(OrderApiService);
+  private marketApiService = inject(MarketApiService);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
   private readonly IN_CURRENCY_SYMBOL: "INR" = "INR";
   readonly orderTypes = ORDER_TYPES;
@@ -130,6 +134,10 @@ export class Trades {
 
 
   submitOrder() {
+    if (this.orderForm.invalid) {
+      this.orderForm.markAllAsTouched();
+      return;
+    }
     const orderInfo = this.orderForm.getRawValue();
     let addInstrument: Instrument; let subInstrument: Instrument;
 
@@ -156,21 +164,42 @@ export class Trades {
       ));
     }
     
-    const orderRequestDTO = {
-      clientId: '2c522b92-7151-4daa-92db-81a2253c772a',
-      clientName: 'John Doe',
-      portfolioId: orderInfo.portfolioId,
-      addInstrumentSymbol: addInstrument.symbol, 
-      addInstrumentType: addInstrument.type,
-      subInstrumentSymbol: subInstrument.symbol,
-      subInstrumentType: subInstrument.type,
-      changeThreshold: orderInfo.changeThreshold,
-    }
-    
-    console.log("Submitting: ", orderRequestDTO);
-    // send(orderRequestDTO);
+    this.marketApiService.getQuote(orderInfo.symbol).pipe(
+      switchMap(quote => {
+        const quotedPrice =
+          orderInfo.side === 'BUY'
+            ? quote.ask
+            : quote.bid;
 
-    return orderRequestDTO;
+        const orderRequest: OrderRequest = {
+          clientId: '2c522b92-7151-4daa-92db-81a2253c772a',
+          clientName: 'John Doe',
+          portfolioId: orderInfo.portfolioId,
+          addInstrumentSymbol: addInstrument.symbol,
+          addInstrumentType: addInstrument.type,
+          subInstrumentSymbol: subInstrument.symbol,
+          subInstrumentType: subInstrument.type,
+          changeThreshold: orderInfo.changeThreshold,
+          quantity: orderInfo.quantity,
+          side: orderInfo.side,
+          quotedPrice,
+        };
+
+        return this.orderApiService.submitOrder(orderRequest);
+      }),
+    ).subscribe({
+      next: response => {
+        console.log('Order submitted:', response);
+      },
+      error: error => {
+        console.error('Unable to get quote or submit order:', error);
+      },
+    });
+
+    // console.log("Submitting: ", orderRequestDTO);
+    // this.orderApiService.submitOrder(orderRequestDTO);
+    
+    // return orderRequestDTO;
   }
   settlementMode = computed(() => {
     const { orderType, side } = this.formState();
