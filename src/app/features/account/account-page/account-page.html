@@ -21,10 +21,19 @@
     </dl>
 
     <h2>Portfolios</h2>
-    @if (portfolios().length) {
+    @if (portfolioSummaries().length) {
       <ul>
-        @for (portfolio of portfolios(); track portfolio.ID) {
-          <li>{{ portfolio.type }}: {{ portfolio.holdingIds.length }} holdings</li>
+        @for (portfolio of portfolioSummaries(); track portfolio.ID) {
+          <li>
+            {{ portfolio.type }}: {{ portfolio.holdings.length }} holdings
+            @if (portfolio.holdings.length) {
+              <ul>
+                @for (holding of portfolio.holdings; track holding) {
+                  <li>{{ holding }}</li>
+                }
+              </ul>
+            }
+          </li>
         }
       </ul>
     } @else {

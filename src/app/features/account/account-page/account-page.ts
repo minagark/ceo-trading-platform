@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { UserResponse } from '../../../core/user.models';
@@ -6,6 +6,11 @@ import { Portfolio } from '../../../core/trading.models';
 import { UserApiService } from '../data-access/user-api.service';
 import { AccountsList } from '../accounts-list/accounts-list';
 import { AuthService } from '../../auth/auth/auth.service';
+import { HoldingsService } from '../../portfolio/holdings/holdings.service';
+
+interface PortfolioSummary extends Portfolio {
+  holdings: string[];
+}
 
 @Component({
   selector: 'app-account-page',
@@ -17,12 +22,22 @@ export class AccountPage {
   private readonly route = inject(ActivatedRoute);
   private readonly userApi = inject(UserApiService);
   private readonly authService = inject(AuthService);
+  private readonly holdingsService = inject(HoldingsService);
 
   readonly user = signal<UserResponse | null>(null);
   readonly portfolios = signal<Portfolio[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly userId = signal<string | null>(null);
+  readonly portfolioSummaries = computed<PortfolioSummary[]>(() => {
+    const holdings = this.holdingsService.holdings();
+    return this.portfolios().map((portfolio) => ({
+      ...portfolio,
+      holdings: holdings
+        .filter((holding) => holding.portfolioId === portfolio.ID)
+        .map((holding) => `${holding.symbol} (${holding.shares} shares)`),
+    }));
+  });
 
   constructor() {
     const userId =

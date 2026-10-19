@@ -1,7 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe } from '@angular/common';
-import { Account } from '../../account/accounts-list/accounts-list';
 import { ChangePeriod, Holding, HoldingsService } from './holdings.service';
 
 export interface HoldingRow extends Holding {
@@ -24,9 +23,9 @@ export class HoldingsList {
   private holdingsService = inject(HoldingsService);
   private accountSelectionService = inject(AccountSelectionService);
 
-  // The account to show holdings for. `null` means "All Accounts", matching
-  // the semantics of AccountsList's `accountSelected` output.
-  activeAccount = computed(() => {
+  // The portfolio to show holdings for. `null` means "All Portfolios", matching
+  // the semantics of AccountsList's shared selection output.
+  activePortfolio = computed(() => {
     return this.accountSelectionService.selectedAccount();
   });
 
@@ -40,9 +39,9 @@ export class HoldingsList {
   showLess = input<boolean>(false);
 
   rows = computed<HoldingRow[]>(() => {
-    const accountId = this.activeAccount()?.id ?? null;
-    const holdings = accountId
-      ? this.allHoldings().filter((h) => h.accountId === accountId)
+    const portfolioId = this.activePortfolio()?.id ?? null;
+    const holdings = portfolioId
+      ? this.allHoldings().filter((h) => h.portfolioId === portfolioId)
       : this.allHoldings();
     const period = this.selectedPeriod();
 
