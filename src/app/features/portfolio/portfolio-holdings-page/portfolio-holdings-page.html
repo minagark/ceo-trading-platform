@@ -1,5 +1,5 @@
 <div class="portfolio-holdings-page">
-  <app-accounts-list/>
+  <app-accounts-list [userId]="authService.currentUserId()" />
   <app-holdings-list class="portfolio-holdings-page__holdings" [showLess]="false"/>
 
 </div>

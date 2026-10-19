@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
-import { AccountsList, Account } from '../../account/accounts-list/accounts-list';
+import { Component, inject } from '@angular/core';
+import { AccountsList } from '../../account/accounts-list/accounts-list';
 import { HoldingsList } from '../holdings/holdings-list';
+import { AuthService } from '../../auth/auth/auth.service';
 
 @Component({
   selector: 'app-portfolio-holdings-page',
@@ -9,5 +10,5 @@ import { HoldingsList } from '../holdings/holdings-list';
   styleUrl: './portfolio-holdings-page.css',
 })
 export class PortfolioHoldingsPage {
-
+  readonly authService = inject(AuthService);
 }
