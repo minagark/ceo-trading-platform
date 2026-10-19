@@ -8,22 +8,26 @@ export class OrderApiService {
   private readonly api = inject(ApiClient);
 
   getAllOrders(): Observable<OrderResponse[]> {
-    return this.api.getRoot<OrderResponse[]>('order');
+    return this.api.getRoot<OrderResponse[]>(
+      '/api/order'
+    );
   }
 
   getClientOrders(clientId: string): Observable<OrderResponse[]> {
     return this.api.getRoot<OrderResponse[]>(
-      `order/by_client/${encodeURIComponent(clientId)}`,
+      `/api/order/by_client/${encodeURIComponent(clientId)}`,
     );
   }
 
   getOrder(orderId: string): Observable<OrderResponse> {
     return this.api.getRoot<OrderResponse>(
-      `order/${encodeURIComponent(orderId)}`,
+      `/api/order/${encodeURIComponent(orderId)}`,
     );
   }
 
   submitOrder(request: OrderRequest): Observable<OrderResponse> {
-    return this.api.postRoot<OrderResponse, OrderRequest>('order/new', request);
+    return this.api.postRoot<OrderResponse, OrderRequest>(
+      '/api/order/new', request
+    );
   }
 }
