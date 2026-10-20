@@ -1,76 +1,87 @@
 .trade-screen {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  padding: 1.5rem;
-  align-items: flex-start;
+  justify-content: center;
+  min-height: 100%;
+  padding: clamp(1.5rem, 5vw, 4rem) 1.5rem;
+  background:
+    radial-gradient(circle at 50% 0, color-mix(in srgb, var(--mat-sys-tertiary) 9%, transparent), transparent 34rem),
+    var(--mat-sys-background);
 }
 
 .order-panel {
-  flex: 1 1 320px;
-  max-width: 420px;
-  padding: 1rem 1.25rem;
+  width: min(100%, 34rem);
+  overflow: hidden;
+  border-color: var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+  box-shadow: 0 1rem 3rem color-mix(in srgb, var(--mat-sys-shadow) 22%, transparent);
 }
 
-h2 {
-  margin: 0 0 0.85rem;
-  font-size: 1rem;
+.order-panel__header {
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 
-h2 small {
-  font-weight: 400;
-  color: var(--color-text-muted);
+.order-panel__header mat-card-title {
+  color: var(--mat-sys-on-surface);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-/* --- Order form --- */
+.order-panel__header mat-card-subtitle {
+  margin-top: 0.35rem;
+  color: var(--mat-sys-on-surface-variant);
+}
 
-.side-toggle {
+.order-panel__content {
   display: flex;
-  width: 100%;
-  margin-bottom: 1rem;
-  --mat-button-toggle-selected-state-background-color: var(--color-accent-soft);
-  --mat-button-toggle-selected-state-text-color: var(--mat-sys-tertiary);
+  flex-direction: column;
+  padding: 1.5rem 1.5rem 0.5rem;
 }
 
-.side-toggle mat-button-toggle {
-  flex: 1;
-  text-align: center;
+.order-panel__section-title {
+  margin: 0 0 0.85rem;
+  color: var(--mat-sys-tertiary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.order-panel__section-title--spaced {
+  margin-top: 0.55rem;
+}
+
+.order-panel__field-row {
+  display: flex;
+  gap: 0.75rem;
 }
 
 .order-field {
-  display: block;
   width: 100%;
 }
 
-.amount-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-/* Inside the flex row, override the block full-width sizing above —
-   otherwise the "auto"-basis sibling claims 100% and starves the other
-   field to zero width. Both fields share the row equally instead. */
-.amount-row .order-field {
-  width: auto;
+.order-panel__field-row .order-field {
   flex: 1;
+  min-width: 0;
 }
 
-.order-estimate {
-  font-variant-numeric: tabular-nums;
-  margin: 0.85rem 0;
-}
-
-.order-error {
-  color: var(--color-danger);
-  font-size: 0.85rem;
-  margin: 0 0 0.75rem;
+.order-panel__actions {
+  padding: 0.75rem 1.5rem 1.5rem;
 }
 
 .order-submit {
   width: 100%;
-  /* mat-button's `color` input has no effect under M3 theming — the fill
-     color has to be set via these tokens instead. */
   --mat-button-filled-container-color: var(--mat-sys-tertiary);
   --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
+  --mat-button-filled-container-height: 3rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 30rem) {
+  .order-panel__field-row {
+    flex-direction: column;
+    gap: 0;
+  }
 }
