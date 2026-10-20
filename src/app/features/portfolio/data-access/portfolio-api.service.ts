@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../../core/api-client.service';
-import { Holding, Portfolio } from '../../../core/trading.models';
+import { Portfolio } from '../../../core/trading.models';
+import { HoldingSummaryResponse } from '../../../core/portfolio-holdings.models';
 
 @Injectable({ providedIn: 'root' })
 export class PortfolioApiService {
@@ -25,9 +26,10 @@ export class PortfolioApiService {
     );
   }
 
-  getHoldings(portfolioId: string): Observable<Holding[]> {
-    return this.api.get<Holding[]>(
+  getHoldings(portfolioId: string): Observable<HoldingSummaryResponse[]> {
+    return this.api.get<HoldingSummaryResponse[]>(
       `portfolio/${encodeURIComponent(portfolioId)}/holdings`,
     );
   }
+
 }

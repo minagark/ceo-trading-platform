@@ -1,9 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AccountsList } from './accounts-list';
+import { AccountsService } from './accounts.service';
+import { AccountSelectionService } from './account-selection.service';
 
 describe('AccountsList', () => {
   let component: AccountsList;
   let fixture: ComponentFixture<AccountsList>;
+  let accountsService: AccountsService;
+  let accountSelectionService: AccountSelectionService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -12,6 +16,13 @@ describe('AccountsList', () => {
 
     fixture = TestBed.createComponent(AccountsList);
     component = fixture.componentInstance;
+    accountsService = TestBed.inject(AccountsService);
+    accountSelectionService = TestBed.inject(AccountSelectionService);
+    accountsService.accounts.set([
+      { id: '1', name: 'Brokerage portfolio', type: 'BROKERAGE', balance: 1000 },
+      { id: '2', name: 'Retirement portfolio', type: 'RETIREMENT', balance: 2000 },
+    ]);
+    accountSelectionService.onAccountSelected(null);
     await fixture.whenStable();
   });
 

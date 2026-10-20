@@ -1,7 +1,7 @@
 <section class="holdings-list">
   <header class="holdings-list__header">
     <div class="holdings-list__heading">
-      <h2 class="holdings-list__title">{{ activeAccount()?.name ?? 'All Accounts' }}</h2>
+    <h2 class="holdings-list__title">{{ activePortfolio()?.name ?? 'All Portfolios' }}</h2>
       <span class="holdings-list__subtitle">
         {{ rows().length }} holding{{ rows().length === 1 ? '' : 's' }}
       </span>
@@ -44,7 +44,7 @@
   }
 
   <div class="holdings-list__rows" role="list">
-    @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.accountId + row.symbol) {
+    @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.portfolioId + row.symbol) {
       <div class="holdings-list__row" role="listitem">
         <div class="holdings-list__identity">
           @if (!logoFailed(row.symbol)) {
@@ -65,8 +65,12 @@
 
         <!-- Current price + today's $ change -->
         <div class="holdings-list__col holdings-list__price">
-          <span class="holdings-list__price-value">{{ row.currentPrice | currency }}</span>
-          <span
+        @if (row.instrumentType === 'CASH') {
+          <span>Cash</span>
+        } @else {
+          <span>{{ row.currentPrice | currency }}</span>
+        } 
+         <span
             class="holdings-list__day-dollar"
             [class.positive]="row.dayChangeValue >= 0"
             [class.negative]="row.dayChangeValue < 0"
@@ -115,7 +119,7 @@
         </div>
       </div>
     } @empty {
-      <p class="holdings-list__empty">No holdings in this account yet.</p>
+      <p class="holdings-list__empty">No holdings in this portfolio yet.</p>
     }
   </div>
 </section>
