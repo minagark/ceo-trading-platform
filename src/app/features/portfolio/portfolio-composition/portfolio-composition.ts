@@ -8,7 +8,7 @@ import {
   PieSeriesModule,
 } from "ag-charts-community";
 import { AccountsService } from '../../account/accounts-list/accounts.service';
-import { finalize, forkJoin, map, switchMap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
 
 ModuleRegistry.registerModules([LegendModule, PieSeriesModule]);
@@ -74,6 +74,12 @@ export class PortfolioComposition {
     effect(() => {
       const selectedAccount = this.accountSelectionService.selectedAccount();
       const accounts = this.accountService.accounts();
+      const accountsLoaded = this.accountService.loaded();
+
+      if (!accountsLoaded) {
+        return;
+      }
+
       const chartedAccount = selectedAccount ? accounts.filter((account) => account.id === selectedAccount.id) : accounts;
       
       if (chartedAccount.length === 0) {
@@ -98,45 +104,42 @@ export class PortfolioComposition {
       //     this.loading.set(false);
       //   }
       // })
-        forkJoin(
-  chartedAccount.map((account) =>
-    this.portfolioApi.getHoldings(account.id)
-  )
-).subscribe({
-  next: (holdingsByAccount) => {
-    console.log('Holdings response:', holdingsByAccount);
+      forkJoin(
+        chartedAccount.map((account) =>
+          this.portfolioApi.getHoldings(account.id)
+        )
+      ).subscribe({
+        next: (holdingsByAccount) => {
 
-    const totals = new Map<string, number>();
+          const totals = new Map<string, number>();
 
-    for (const holdings of holdingsByAccount) {
-      for (const holding of holdings) {
-        console.log('Holding:', holding);
+          for (const holdings of holdingsByAccount) {
+            for (const holding of holdings) {
 
-        if (holding.instrumentType !=='CASH') { // do we want to show cash as part of composition?
-          const currentQuantity = totals.get(holding.instrumentSymbol) ?? 0;
-          totals.set(
-            holding.instrumentSymbol,
-            currentQuantity + Number(holding.quantity)
-          );
-        }
-      }
-    }
+              if (holding.instrumentType !== 'CASH') {
+                const currentQuantity = totals.get(holding.instrumentSymbol) ?? 0;
+                totals.set(
+                  holding.instrumentSymbol,
+                  currentQuantity + Number(holding.quantity)
+                );
+              }
+            }
+          }
 
-    const data = Array.from(totals.entries())
-    .filter(([, quantity]) => Number.isFinite(quantity) && quantity > 0)
-    .map(([name, quantity]) => ({ name, quantity }));
+          const data = Array.from(totals.entries())
+            .filter(([, quantity]) => Number.isFinite(quantity) && quantity > 0)
+            .map(([name, quantity]) => ({ name, quantity }));
 
-    console.log('Chart data:', data);
-    this.updateChart(data);
-    this.loading.set(false);
-  },
+          this.updateChart(data);
+          this.loading.set(false);
+        },
 
-  error: (error) => {
-    console.error('Unable to load holdings:', error);
-    this.updateChart([]);
-    this.loading.set(false);
-  },
-});
+        error: (error) => {
+          console.error('Unable to load holdings:', error);
+          this.updateChart([]);
+          this.loading.set(false);
+        },
+      });
     
     })
 
