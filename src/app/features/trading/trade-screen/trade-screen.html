@@ -82,6 +82,7 @@
     </button>
     }
   </mat-card> -->
+  
   <mat-card appearance="outlined" class="order-panel">
     <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
       <mat-form-field>
@@ -105,11 +106,11 @@
         <input matInput type="text" placeholder="e.g. USD" formControlName="symbol"/>
         <mat-hint>AKA "ticker"</mat-hint>
       </mat-form-field>
-      @if (sideActive()) {
+      @if (activeSides().length > 0) {
         <mat-form-field>
           <mat-label>Side</mat-label>
           <mat-select required formControlName="side">
-            @for (side of sides; track $index) {
+            @for (side of activeSides(); track $index) {
               <mat-option [value]="side">{{side}}</mat-option>
             }
           </mat-select>

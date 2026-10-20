@@ -167,7 +167,7 @@ export class Trades {
         orderInfo.symbol, 
       ));
     }
-    
+
     // TODO: CHANGE THE GET QUOTE TO THE CORRECT INSTRUMENT
     this.marketApiService.getQuote(addInstrument.symbol, addInstrument.type).pipe(
       switchMap(quote => {
@@ -204,11 +204,6 @@ export class Trades {
         console.error('Unable to get quote or submit order:', error);
       },
     });
-
-    // console.log("Submitting: ", orderRequestDTO);
-    // this.orderApiService.submitOrder(orderRequestDTO);
-    
-    // return orderRequestDTO;
   }
   settlementMode = computed(() => {
     const { orderType, side } = this.formState();
@@ -231,9 +226,15 @@ export class Trades {
     return { visible: false, fixedCurrency: null };
   })
 
-  sideActive = computed(() => {
+  activeSides = computed<Side[]>(() => {
     const { orderType } = this.formState();
-    return orderType !== "FOREX";
+    if (orderType === "DEPOSIT") {
+      return ["DEPOSIT"];
+    } else if (orderType === "FOREX") {
+      return [];
+    } else {
+      return ["BUY", "SELL"]
+    }
   })
 
   ownedCurrencies = signal<OwnedCurrency[]>([]);
