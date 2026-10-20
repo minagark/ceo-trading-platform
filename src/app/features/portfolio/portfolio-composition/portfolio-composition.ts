@@ -114,10 +114,10 @@ export class PortfolioComposition {
             for (const holding of holdings) {
 
               if (holding.instrumentType !== 'CASH') {
-                const currentQuantity = totals.get(holding.instrumentSymbol) ?? 0;
+                const currentQuantity = totals.get(holding.symbol) ?? 0;
                 totals.set(
-                  holding.instrumentSymbol,
-                  currentQuantity + Number(holding.quantity)
+                  holding.symbol,
+                  currentQuantity + Number(holding.shares)
                 );
               }
             }
