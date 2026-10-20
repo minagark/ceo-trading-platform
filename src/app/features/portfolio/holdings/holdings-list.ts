@@ -1,8 +1,10 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
+import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe } from '@angular/common';
 import { ChangePeriod, Holding, HoldingsService } from './holdings.service';
 import { PortfolioApiService } from '../data-access/portfolio-api.service';
+import { forkJoin, Subscription } from 'rxjs';
 
 export interface HoldingRow extends Holding {
   marketValue: number;
@@ -22,8 +24,10 @@ export interface HoldingRow extends Holding {
 })
 export class HoldingsList {
   private holdingsService = inject(HoldingsService);
+  private accountsService = inject(AccountsService);
   private accountSelectionService = inject(AccountSelectionService);
   private readonly portfolioApi = inject(PortfolioApiService);
+  private totalValueSubscription: Subscription | null = null;
   
 
   // The portfolio to show holdings for. `null` means "All Portfolios", matching
@@ -67,9 +71,36 @@ export class HoldingsList {
     });
   });
 
-  totalMarketValue = computed(() => this.rows().reduce((sum, r) => sum + r.marketValue, 0));
-  // if activeportfolio id is null then all accounts
-  // totalMarketValue = this.portfolioApi.getTotalValue(this.activePortfolio()?.id ?? null); // if null then total of all accounts
+  totalMarketValue = signal(0);
+
+  constructor() {
+    effect(() => {
+      const selectedPortfolio = this.activePortfolio();
+      const accounts = this.accountsService.accounts();
+      const portfolioIds = selectedPortfolio
+        ? [selectedPortfolio.id]
+        : accounts.map((account) => account.id);
+
+      this.totalValueSubscription?.unsubscribe();
+
+      if (portfolioIds.length === 0) {
+        this.totalMarketValue.set(0);
+        return;
+      }
+
+      this.totalValueSubscription = forkJoin(
+        portfolioIds.map((portfolioId) =>
+          this.portfolioApi.getTotalValue(portfolioId)
+        )
+      ).subscribe({
+        next: (values) => this.totalMarketValue.set(
+          values.reduce((total, value) => total + value, 0)
+        ),
+        error: () => this.totalMarketValue.set(0),
+      });
+    });
+  }
+
   
   totalDayChange = computed(() => this.rows().reduce((sum, r) => sum + r.dayChangeTotal, 0));
   totalDayChangePct = computed(() => {
