@@ -5,6 +5,7 @@ export interface HoldingSummaryResponse {
   portfolioId: string;
   symbol: string;
   companyName: string;
+  instrumentType: string;
   shares: number;
   avgCost: number;
   currentPrice: number;

@@ -65,8 +65,12 @@
 
         <!-- Current price + today's $ change -->
         <div class="holdings-list__col holdings-list__price">
-          <span class="holdings-list__price-value">{{ row.currentPrice | currency }}</span>
-          <span
+        @if (row.instrumentType === 'CASH') {
+          <span>Cash</span>
+        } @else {
+          <span>{{ row.currentPrice | currency }}</span>
+        } 
+         <span
             class="holdings-list__day-dollar"
             [class.positive]="row.dayChangeValue >= 0"
             [class.negative]="row.dayChangeValue < 0"

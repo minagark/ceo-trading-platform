@@ -2,6 +2,7 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe } from '@angular/common';
 import { ChangePeriod, Holding, HoldingsService } from './holdings.service';
+import { PortfolioApiService } from '../data-access/portfolio-api.service';
 
 export interface HoldingRow extends Holding {
   marketValue: number;
@@ -22,6 +23,8 @@ export interface HoldingRow extends Holding {
 export class HoldingsList {
   private holdingsService = inject(HoldingsService);
   private accountSelectionService = inject(AccountSelectionService);
+  private readonly portfolioApi = inject(PortfolioApiService);
+  
 
   // The portfolio to show holdings for. `null` means "All Portfolios", matching
   // the semantics of AccountsList's shared selection output.
@@ -46,23 +49,28 @@ export class HoldingsList {
     const period = this.selectedPeriod();
 
     return holdings.map((h) => {
+      const isCash = h.instrumentType == "CASH";
+      // const marketValue = isCash ? h.currentPrice : h.shares * h.currentPrice;
       const marketValue = h.shares * h.currentPrice;
-      const dayChangeTotal = h.shares * h.dayChangeValue;
-      const totalGainPct = (h.currentPrice - h.avgCost) / h.avgCost;
+      const dayChangeTotal = isCash ? h.dayChangeValue : h.shares * h.dayChangeValue;
+      const totalGainPct = isCash ? 0 : (h.currentPrice - h.avgCost) / h.avgCost;
       const range = h.weekHigh52 - h.weekLow52;
-      const rawPosition = range === 0 ? 50 : ((h.currentPrice - h.weekLow52) / range) * 100;
+      const rawPosition = isCash || range === 0 ? 50 : ((h.currentPrice - h.weekLow52) / range) * 100;
       return {
         ...h,
         marketValue,
         dayChangeTotal,
         totalGainPct,
-        selectedPeriodChangePct: h.percentChange[period],
+        selectedPeriodChangePct: isCash ? 0 : h.percentChange[period],
         weekRangePosition: Math.min(100, Math.max(0, rawPosition)),
       };
     });
   });
 
   totalMarketValue = computed(() => this.rows().reduce((sum, r) => sum + r.marketValue, 0));
+  // if activeportfolio id is null then all accounts
+  // totalMarketValue = this.portfolioApi.getTotalValue(this.activePortfolio()?.id ?? null); // if null then total of all accounts
+  
   totalDayChange = computed(() => this.rows().reduce((sum, r) => sum + r.dayChangeTotal, 0));
   totalDayChangePct = computed(() => {
     const previousValue = this.totalMarketValue() - this.totalDayChange();
