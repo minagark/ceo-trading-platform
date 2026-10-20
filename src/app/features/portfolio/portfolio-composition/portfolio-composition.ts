@@ -42,10 +42,7 @@ export class PortfolioComposition {
   readonly items = signal<ChartItem[]>([]);
 
   public options = signal<AgChartOptions>({
-      data: [
-  { name: 'USD', quantity: 9 },
-  { name: 'AAPL', quantity: 10 },
-],
+      data: [],
       title: {
         text: "Portfolio Composition",
         color: "var(--mat-sys-on-surface)"
