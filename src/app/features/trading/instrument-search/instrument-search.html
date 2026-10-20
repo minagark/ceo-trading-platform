@@ -1,0 +1,22 @@
+
+<div>
+    <form [formGroup]="instrumentSearchForm" (ngSubmit)="submit()">
+        <mat-form-field>
+            <mat-label>Order Type</mat-label>
+            <mat-select formControlName="orderType">
+                @for (orderType of NON_DEPOSIT_ORDER_TYPES.map(item => item.value); track $index) {
+                    <mat-option [value]="orderType">
+                        {{ orderType }}
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>{{ searchDisplay() }}</mat-label>
+            <input matInput formControlName="symbol"/>
+        </mat-form-field>
+        <button matButton type="submit">
+            Submit
+        </button>
+    </form>
+</div>

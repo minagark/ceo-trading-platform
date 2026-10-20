@@ -13,12 +13,13 @@ import { Account } from '../../account/accounts-list/accounts-list';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PreviewPage } from '../preview-page/preview-page';
 import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
-import { InstrumentType, OrderRequest, SIDES } from '../../../core/trading.models';
+import { InstrumentType, isInstrumentType, isNonDepositOrderType, ORDER_TYPES, OrderRequest, OrderType, SIDES } from '../../../core/trading.models';
 import { Side } from '../../../core/trading.models';
 import { CurrencyService, OwnedCurrency } from './owned-currency.service';
 import { merge, startWith, switchMap } from 'rxjs';
 import { OrderApiService } from '../data-access/order-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
+import { ActivatedRoute } from '@angular/router';
 
 export interface Asset {
   abbrName: string;
@@ -46,16 +47,6 @@ export interface Trade {
 export type TradeRequest = Omit<Trade, 'id' | 'date'>;
 
 
-const ORDER_TYPES = [
-  { value: 'US_EQUITY', label: 'US Equity' },
-  { value: 'INDIA_EQUITY', label: 'India Equity' },
-  { value: 'CRYPTO', label: 'Cryptocurrency' },
-  { value: 'FOREX', label: 'Foreign Exchange' },
-  { value: 'DEPOSIT', label: 'Deposit' },
-] as const;
-
-type OrderType = typeof ORDER_TYPES[number]["value"];
-
 type Instrument = {
   type: InstrumentType,
   symbol: string,
@@ -63,10 +54,10 @@ type Instrument = {
 
 @Component({
   imports: [
-    CurrencyPipe,
+    // CurrencyPipe,
     ReactiveFormsModule,
-    PreviewPage,
-    TradeConfirmation,
+    // PreviewPage,
+    // TradeConfirmation,
     MatCardModule,
     MatButtonToggleModule,
     MatFormFieldModule,
@@ -84,6 +75,7 @@ export class Trades {
   private currencyService = inject(CurrencyService);
   private orderApiService = inject(OrderApiService);
   private marketApiService = inject(MarketApiService);
+  private readonly route = inject(ActivatedRoute);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
   private readonly US_TIMEZONE_STRING = "America/New_York";
   private readonly IN_CURRENCY_SYMBOL: "INR" = "INR";
@@ -130,7 +122,17 @@ export class Trades {
         this.updateOwnedCurrencies();
       }
     });
-
+    this.route.queryParamMap.subscribe(params => {
+      const symbol = params.get('symbol');
+      const type = params.get('type');
+      if (symbol) {
+        this.orderForm.controls.symbol.setValue(symbol);
+      }
+      if (isNonDepositOrderType(type)) {
+        this.orderForm.controls.orderType.setValue(type);
+      }
+    })
+    
     this.updateSettlementCurrencyState();
   }
 

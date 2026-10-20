@@ -7,10 +7,11 @@ import { HoldingsList } from '../../portfolio/holdings/holdings-list';
 import { ActivityList } from '../../trading/activity-list/activity-list';
 import { Account, AccountsList } from '../../account/accounts-list/accounts-list';
 import { AuthService } from '../../auth/auth/auth.service';
+import { InstrumentSearch } from '../../trading/instrument-search/instrument-search';
 
 
 @Component({
-  imports: [HomepageWidget, AccountsList], // imports to the template
+  imports: [HomepageWidget, AccountsList, InstrumentSearch], // imports to the template
   selector: 'app-home-page',
   styleUrl: './home-page.css',
   templateUrl: './home-page.html',
