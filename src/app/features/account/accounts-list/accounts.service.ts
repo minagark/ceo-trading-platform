@@ -12,10 +12,12 @@ export class AccountsService {
 
   readonly accounts = signal<Account[]>([]);
   readonly loading = signal(false);
+  readonly loaded = signal(false);
   readonly error = signal<string | null>(null);
 
   loadForUser(userId: string): void {
     this.loading.set(true);
+    this.loaded.set(false);
     this.error.set(null);
     this.userApi.getPortfolios(userId).pipe(
       switchMap((portfolios) => 
@@ -26,7 +28,10 @@ export class AccountsService {
     ),
     finalize(() => this.loading.set(false))
   ).subscribe({
-    next: (accounts) => this.accounts.set(accounts),
+    next: (accounts) => {
+      this.accounts.set(accounts);
+      this.loaded.set(true);
+    },
     error: () => this.error.set('Unable to load portfolios.')
   });
   }
