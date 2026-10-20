@@ -28,6 +28,7 @@ export interface OrderRequest {
   quotedPrice: number;
   side: Side;
   changeThreshold: number;
+  market: string;
 }
 
 export interface OrderResponse {
