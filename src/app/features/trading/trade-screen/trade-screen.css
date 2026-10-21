@@ -4,7 +4,7 @@
   min-height: 100%;
   padding: clamp(1.5rem, 5vw, 4rem) 1.5rem;
   background:
-    radial-gradient(circle at 50% 0, color-mix(in srgb, var(--mat-sys-tertiary) 9%, transparent), transparent 34rem),
+    /* radial-gradient(circle at 50% 0, color-mix(in srgb, var(--mat-sys-tertiary) 9%, transparent), transparent 34rem), */
     var(--mat-sys-background);
 }
 
@@ -12,7 +12,7 @@
   width: min(100%, 34rem);
   overflow: hidden;
   border-color: var(--mat-sys-outline-variant);
-  background: var(--mat-sys-surface-container);
+  background: var(--mat-sys-surface-container-high);
   box-shadow: 0 1rem 3rem color-mix(in srgb, var(--mat-sys-shadow) 22%, transparent);
 }
 
