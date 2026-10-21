@@ -1,4 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { OrderStatusEvent } from '../../../core/realtime.models';
+import { RealtimeService } from '../../../core/realtime.service';
 import { OrderResponse } from '../../../core/trading.models';
 import { OrderApiService } from '../data-access/order-api.service';
 
@@ -22,6 +25,10 @@ export interface Order {
 @Injectable({ providedIn: 'root' })
 export class ActivityListService {
   private readonly orderApi = inject(OrderApiService);
+  private readonly realtimeService = inject(RealtimeService);
+
+  private orderStatusSubscription: Subscription | null = null;
+  private activeClientId: string | null = null;
 
   readonly orders = signal<Order[]>([]);
   readonly loading = signal(false);
@@ -35,11 +42,52 @@ export class ActivityListService {
       next: (orders) => {
         this.orders.set(orders.map((order) => this.toActivityOrder(order)));
         this.loading.set(false);
+        this.subscribeToLiveOrderStatus(clientId);
       },
       error: () => {
         this.error.set('Unable to load account activity.');
         this.loading.set(false);
       },
+    });
+  }
+
+  private subscribeToLiveOrderStatus(clientId: string): void {
+    if (this.activeClientId === clientId && this.orderStatusSubscription) {
+      return;
+    }
+
+    this.orderStatusSubscription?.unsubscribe();
+    this.activeClientId = clientId;
+
+    this.orderStatusSubscription = this.realtimeService
+      .subscribeToUserOrders(clientId)
+      .subscribe((event) => this.applyOrderStatusEvent(event));
+  }
+
+  private applyOrderStatusEvent(event: OrderStatusEvent): void {
+    this.orders.update((existingOrders) => {
+      const index = existingOrders.findIndex((o) => o.orderId === event.orderId);
+      if (index === -1) {
+        this.orderApi.getOrder(event.orderId).subscribe({
+          next: (order) => {
+            this.orders.update((current) => {
+              if (current.some((existing) => existing.orderId === order.orderId)) {
+                return current;
+              }
+              return [this.toActivityOrder(order), ...current];
+            });
+          },
+        });
+        return existingOrders;
+      }
+
+      const next = [...existingOrders];
+      next[index] = {
+        ...next[index],
+        status: event.status.toLowerCase() as OrderStatus,
+        time: event.statusDate,
+      };
+      return next;
     });
   }
 

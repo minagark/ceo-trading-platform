@@ -31,6 +31,18 @@ export class AccountsService {
   });
   }
 
+  refreshAccountBalance(portfolioId: string): void {
+    this.portfolioApi.getTotalValue(portfolioId).subscribe({
+      next: (balance) => {
+        this.accounts.update((accounts) =>
+          accounts.map((account) =>
+            account.id === portfolioId ? { ...account, balance } : account,
+          ),
+        );
+      },
+    });
+  }
+
   private toAccount(portfolio: Portfolio, balance: number): Account {
     return {
       id: portfolio.ID,

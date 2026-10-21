@@ -1,4 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { RealtimeService } from '../../../core/realtime.service';
+import { InstrumentType } from '../../../core/trading.models';
+import { MarketApiService } from '../data-access/market-api.service';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -42,8 +46,11 @@ export type TimeFrame = typeof TIME_FRAMES[number];
   styleUrl: './stock-display.css',
   templateUrl: './stock-display.html',
 })
-export class StockDisplay {
+export class StockDisplay implements OnInit, OnDestroy {
   private router: Router = inject(Router);
+  private realtime = inject(RealtimeService);
+  private marketApi = inject(MarketApiService);
+  private quoteSubscription: Subscription | null = null;
 
   stockDisplayInfo: StockDisplayInfo;
   constructor() {
@@ -66,16 +73,43 @@ export class StockDisplay {
   priceHistory: PriceHistoryPoint[] = [];
 
   fetchStockInfo() {
-    // TODO: Replace this with real fetch information
     return {
-      name: "Example Corp",
-      symbol: "EXC",
+      name: 'Apple Inc.',
+      symbol: 'AAPL',
       currentPrice: 152.34,
       previousClose: 149.87,
       highPriceToday: 154.10,
       lowPriceToday: 147.38,
       timeUpdated: new Date(),
-    }
+    };
+  }
+
+  ngOnInit(): void {
+    this.marketApi.getQuote(this.stockDisplayInfo.symbol, 'EQUITY' as InstrumentType).subscribe({
+      next: (quote) => {
+        this.stockDisplayInfo = {
+          ...this.stockDisplayInfo,
+          currentPrice: quote.price,
+          previousClose: quote.previousClose,
+          timeUpdated: new Date(quote.asOf),
+        };
+      },
+    });
+
+    this.quoteSubscription = this.realtime
+      .subscribeToQuote(this.stockDisplayInfo.symbol, 'EQUITY' as InstrumentType)
+      .subscribe((quote) => {
+        this.stockDisplayInfo = {
+          ...this.stockDisplayInfo,
+          currentPrice: quote.price,
+          previousClose: quote.previousClose,
+          timeUpdated: new Date(quote.asOf),
+        };
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.quoteSubscription?.unsubscribe();
   }
 
   handleTrade() {
