@@ -53,13 +53,15 @@
   border-radius: 50%;
 }
 
+/* primary is a near-black grey in our theme (src/theme/THEME.md); gold tertiary is the accent */
 .status-step--done .status-step__marker {
-  border-color: var(--mat-sys-primary);
-  background: var(--mat-sys-primary);
+  border-color: var(--mat-sys-tertiary);
+  background: var(--mat-sys-tertiary);
 }
 
 .status-step--current .status-step__marker {
   border: none;
+  --mat-progress-spinner-active-indicator-color: var(--mat-sys-tertiary);
 }
 
 .status-step--failed .status-step__marker {
