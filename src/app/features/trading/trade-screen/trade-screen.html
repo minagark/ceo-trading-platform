@@ -52,7 +52,7 @@
           <mat-label>Settlement currency</mat-label>
           @if (settlementMode().source === 'owned') {
             <mat-select required formControlName="settlementCurrency">
-              @for (currency of ownedCurrencies(); track currency.id) {
+              @for (currency of ownedCurrencies(); track currency.symbol) {
                 <mat-option [value]="currency.symbol">{{ currency.symbol }}</mat-option>
               }
             </mat-select>
