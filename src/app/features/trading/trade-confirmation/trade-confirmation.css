@@ -1,6 +1,6 @@
 :host {
   display: block;
-  max-width: 420px;
+  width: min(100%, 420px);
 }
 
 .confirmation-card {
@@ -12,17 +12,29 @@
   gap: 0.5rem;
 }
 
+.result-icon {
+  display: grid;
+  place-items: center;
+  height: 5rem;
+}
+
 .result-icon mat-icon {
   width: 5rem;
   height: 5rem;
   font-size: 5rem;
 }
 
-.result-icon--success mat-icon {
+.result-icon--processing {
+  --mat-progress-spinner-active-indicator-color: var(--color-accent);
+}
+
+.result-icon--filled mat-icon {
   color: var(--color-success);
 }
 
-.result-icon--failure mat-icon {
+.result-icon--rejected mat-icon,
+.result-icon--cancelled mat-icon,
+.result-icon--failed mat-icon {
   color: var(--color-danger);
 }
 
@@ -32,8 +44,78 @@
 }
 
 .result-detail {
-  margin: 0 0 1rem;
+  margin: 0 0 0.5rem;
   color: var(--color-text-muted);
+}
+
+.status-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+  margin: 0.5rem 0 0;
+  padding: 1rem 0;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  list-style: none;
+  text-align: left;
+}
+
+.status-step {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.status-step__marker {
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--mat-sys-outline);
+  border-radius: 50%;
+}
+
+.status-step--done .status-step__marker {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.status-step--current .status-step__marker {
+  border: none;
+  --mat-progress-spinner-active-indicator-color: var(--color-accent);
+}
+
+.status-step--failed .status-step__marker {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+}
+
+.status-step--done,
+.status-step--current {
+  color: var(--mat-sys-on-surface);
+}
+
+.status-step--failed {
+  color: var(--color-danger);
+}
+
+.status-step__label {
+  font-weight: 500;
+}
+
+.status-step__time {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.875rem;
+}
+
+.result-reason {
+  width: 100%;
+  margin: 0 0 0.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--mat-sys-on-error-container);
+  background: var(--mat-sys-error-container);
 }
 
 .result-done {

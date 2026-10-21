@@ -6,23 +6,32 @@
   <mat-card-content>
     <div class="preview-summary">
       <p class="preview-summary-text">
-        {{ draft().type === 'buy' ? 'Buy' : 'Sell' }}
-        <strong>{{ shares() | number: '1.0-4' }} {{ shares() === 1 ? 'share' : 'shares' }}</strong>
-        of <strong>{{ draft().stock.abbrName }}</strong>
-        for <strong>{{ estimatedTotal() | currency }}</strong>
+        {{ sideLabel() }}
+        <strong>{{ request().quantity | number: '1.0-8' }} {{ assetSymbol() }}</strong>
+        @if (counterSymbol() && request().side !== 'DEPOSIT') {
+          {{ request().side === 'SELL' ? 'for' : 'with' }} <strong>{{ counterSymbol() }}</strong>
+        }
       </p>
+      @if (estimatedTotal() !== null) {
+        <p class="preview-summary-time">
+          ≈ {{ estimatedTotal() | number: '1.2-2' }} {{ counterSymbol() }}
+          at {{ request().quotedPrice | number: '1.2-8' }} each
+        </p>
+      }
       <p class="preview-summary-time">
-        At {{ previewTime | date: 'shortTime' }} &middot; {{ draft().orderType === 'market' ? 'Market order' : 'Limit order' }}
-        &middot; {{ draft().timeInForce === 'day' ? 'Day' : 'Good till canceled' }}
+        Quoted at {{ previewTime | date: 'shortTime' }}
+        &middot; price tolerance {{ request().changeThreshold | percent: '1.0-2' }}
       </p>
-      <p class="preview-summary-account">{{ account().name }} &middot; {{ account().balance | currency }} available</p>
+      @if (portfolioLabel()) {
+        <p class="preview-summary-account">{{ portfolioLabel() }}</p>
+      }
     </div>
   </mat-card-content>
 
   <mat-card-actions class="preview-actions">
     <button mat-stroked-button class="preview-back" [disabled]="submitting()" (click)="back.emit()">Back</button>
     <button mat-flat-button class="preview-confirm" [disabled]="submitting()" (click)="confirm()">
-      {{ submitting() ? 'Placing order…' : 'Confirm ' + (draft().type === 'buy' ? 'buy' : 'sell') }}
+      {{ submitting() ? 'Placing order…' : 'Confirm ' + sideLabel().toLowerCase() }}
     </button>
   </mat-card-actions>
 </mat-card>

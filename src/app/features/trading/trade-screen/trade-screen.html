@@ -1,6 +1,16 @@
 <div class="trade-screen">
-  @if (submittedOrder(); as order) {
-  <app-order-status-panel [order]="order" (done)="submittedOrder.set(null)" />
+  @if (screen() === 'preview' && draft()) {
+  <app-preview-page
+    [request]="draft()!"
+    [portfolioLabel]="draftPortfolioLabel()"
+    (back)="cancelPreview()"
+    (confirmed)="onOrderPlaced($event)"
+    (failed)="onOrderFailed($event)" />
+  } @else if (screen() === 'confirmation') {
+  <app-trade-confirmation
+    [order]="submittedOrder()"
+    [message]="submitError()"
+    (done)="finishConfirmation()" />
   } @else {
   <mat-card appearance="outlined" class="order-panel">
     <mat-card-header class="order-panel__header">
@@ -8,7 +18,7 @@
       <mat-card-subtitle>Build an order across your portfolios</mat-card-subtitle>
     </mat-card-header>
 
-    <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
+    <form [formGroup]="orderForm" (ngSubmit)="reviewOrder()">
       <mat-card-content class="order-panel__content">
         <p class="order-panel__section-title">Order details</p>
 
@@ -89,7 +99,7 @@
 
       <mat-card-actions class="order-panel__actions">
       <button matButton="filled" class="order-submit" type="submit">
-        Submit trade
+        Review order
       </button>
       </mat-card-actions>
     </form>
