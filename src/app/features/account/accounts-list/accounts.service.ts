@@ -10,7 +10,11 @@ export class AccountsService {
   private readonly userApi = inject(UserApiService);
   private readonly portfolioApi = inject(PortfolioApiService);
 
-  readonly accounts = signal<Account[]>([]);
+  readonly accounts = signal<Account[]>([
+    {id: "edda8da3-fab9-4b3c-b792-c833abe8e146", name: "acc1", type: 'BROKERAGE', balance: 1000000},
+    // {id: "id2", name: "acc2", type: 'BROKERAGE', balance: 2000000},
+    // {id: "id3", name: "acc3", type: 'BROKERAGE', balance: 3000000},
+  ]);
   readonly loading = signal(false);
   readonly loaded = signal(false);
   readonly error = signal<string | null>(null);
