@@ -67,9 +67,14 @@
           @if (settlementMode().source === 'owned') {
             <mat-select required formControlName="settlementCurrency">
               @for (currency of ownedCurrencies(); track currency.symbol) {
-                <mat-option [value]="currency.symbol">{{ currency.symbol }}</mat-option>
+                <mat-option [value]="currency.symbol">{{ currency.symbol }} &middot; {{ currency.name }}</mat-option>
+              } @empty {
+                <mat-option disabled>
+                  {{ orderForm.controls.portfolioId.value ? 'This portfolio holds no cash' : 'Choose a portfolio first' }}
+                </mat-option>
               }
             </mat-select>
+            <mat-hint>Cash this portfolio holds</mat-hint>
           } @else {
             <input matInput type="text" placeholder="e.g. INR" formControlName="settlementCurrency" [defaultValue]="' '"/>
           }
