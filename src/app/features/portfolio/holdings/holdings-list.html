@@ -44,22 +44,22 @@
   }
 
   <div class="holdings-list__rows" role="list">
-    @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.portfolioId + row.symbol) {
+    @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.portfolioId + row.instrumentSymbol) {
       <div class="holdings-list__row" role="listitem">
         <div class="holdings-list__identity">
-          @if (!logoFailed(row.symbol)) {
+          @if (!logoFailed(row.instrumentSymbol)) {
             <img
               class="holdings-list__logo"
               [src]="logoUrl(row)"
-              [alt]="row.companyName + ' logo'"
-              (error)="onLogoError(row.symbol)"
+              [alt]="row.instrumentName + ' logo'"
+              (error)="onLogoError(row.instrumentSymbol)"
             />
           } @else {
-            <span class="holdings-list__logo holdings-list__logo--fallback">{{ initials(row.companyName) }}</span>
+            <span class="holdings-list__logo holdings-list__logo--fallback">{{ initials(row.instrumentName) }}</span>
           }
           <div class="holdings-list__names">
-            <span class="holdings-list__symbol">{{ row.symbol }}</span>
-            <span class="holdings-list__company">{{ row.companyName }}</span>
+            <span class="holdings-list__symbol">{{ row.instrumentSymbol }}</span>
+            <span class="holdings-list__company">{{ row.instrumentName }}</span>
           </div>
         </div>
 
@@ -99,7 +99,7 @@
 
         <!-- Quantity -->
         <div class="holdings-list__col holdings-list__quantity">
-          {{ row.shares | number: '1.0-4' }}
+          {{ row.quantity | number: '1.0-4' }}
         </div>
 
         <!-- Current value -->

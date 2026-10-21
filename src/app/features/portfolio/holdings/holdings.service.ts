@@ -59,7 +59,7 @@ export class HoldingsService {
   private toHolding(holding: HoldingSummaryResponse): Holding {
     return {
       ...holding,
-      logoDomain: this.logoDomainFor(holding.symbol),
+      logoDomain: this.logoDomainFor(holding.instrumentSymbol),
     };
   }
 

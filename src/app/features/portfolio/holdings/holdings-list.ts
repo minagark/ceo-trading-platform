@@ -55,8 +55,8 @@ export class HoldingsList {
     return holdings.map((h) => {
       const isCash = h.instrumentType == "CASH";
       // const marketValue = isCash ? h.currentPrice : h.shares * h.currentPrice;
-      const marketValue = h.shares * h.currentPrice;
-      const dayChangeTotal = isCash ? h.dayChangeValue : h.shares * h.dayChangeValue;
+      const marketValue = h.quantity * h.currentPrice;
+      const dayChangeTotal = isCash ? h.dayChangeValue : h.quantity * h.dayChangeValue;
       const totalGainPct = isCash ? 0 : (h.currentPrice - h.avgCost) / h.avgCost;
       const range = h.weekHigh52 - h.weekLow52;
       const rawPosition = isCash || range === 0 ? 50 : ((h.currentPrice - h.weekLow52) / range) * 100;

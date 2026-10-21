@@ -3,10 +3,11 @@ export type ChangePeriod = '1D' | '5D' | '1M' | '6M' | '1Y';
 export interface HoldingSummaryResponse {
   holdingId: string;
   portfolioId: string;
-  symbol: string;
-  companyName: string;
+  instrumentSymbol: string;
+  instrumentId: string;
+  instrumentName: string;
   instrumentType: string;
-  shares: number;
+  quantity: number;
   avgCost: number;
   currentPrice: number;
   dayChangeValue: number;
