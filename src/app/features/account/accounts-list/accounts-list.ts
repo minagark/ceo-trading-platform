@@ -42,20 +42,17 @@ export class AccountsList {
 
   // Tracks which account row is highlighted. `null` means "All Accounts" is selected.
   // selectedAccountId = signal<string | null>(null);
-  selectedAccountId = this.accountSelectionService.selectedAccount()?.id ?? null; // default all
+  selectedAccountId = computed(() => this.accountSelectionService.selectedAccount()?.id ?? null);
 
   totalBalance = computed(() =>
     this.accounts().reduce((sum, account) => sum + account.balance, 0)
   );
 
   selectAccount(account: Account) {
-    this.accountSelectionService.onAccountSelected(account); // update the service
-    this.selectedAccountId = this.accountSelectionService.selectedAccount()!.id; // defualt read only?
-
+    this.accountSelectionService.onAccountSelected(account);
   }
 
   selectAllAccounts() {
     this.accountSelectionService.onAccountSelected(null);
-    this.selectedAccountId = null;
   }
 }
