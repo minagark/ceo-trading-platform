@@ -1,36 +1,74 @@
-<mat-card appearance="outlined">
-  <mat-card-header>
+<mat-card appearance="outlined" class="review-card">
+  <mat-card-header class="review-card__header">
     <mat-card-title>Review order</mat-card-title>
+    <mat-card-subtitle>
+      @if (portfolioLabel()) {
+        {{ portfolioLabel() }} &middot;
+      }
+      quoted at {{ previewTime | date: 'shortTime' }}
+    </mat-card-subtitle>
   </mat-card-header>
 
-  <mat-card-content>
-    <div class="preview-summary">
-      <p class="preview-summary-text">
-        {{ sideLabel() }}
-        <strong>{{ request().quantity | number: '1.0-8' }} {{ assetSymbol() }}</strong>
-        @if (counterSymbol() && request().side !== 'DEPOSIT') {
-          {{ request().side === 'SELL' ? 'for' : 'with' }} <strong>{{ counterSymbol() }}</strong>
-        }
-      </p>
-      @if (estimatedTotal() !== null) {
-        <p class="preview-summary-time">
-          ≈ {{ estimatedTotal() | number: '1.2-2' }} {{ counterSymbol() }}
-          at {{ request().quotedPrice | number: '1.2-8' }} each
-        </p>
+  <mat-card-content class="review-card__content">
+    <div class="legs">
+      @if (pay(); as payLeg) {
+        <div class="leg">
+          <div class="leg__amount">
+            <span class="leg__label">You pay</span>
+            <span class="leg__value">
+              @if (payLeg.amount !== null) {
+                {{ payLeg.estimate ? '≈ ' : '' }}{{ payLeg.amount | number: '1.2-8' }}
+              } @else {
+                At market price
+              }
+            </span>
+          </div>
+          <span class="leg__symbol">{{ payLeg.symbol }}</span>
+        </div>
+
+        <div class="legs__arrow" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"></path></svg>
+        </div>
       }
-      <p class="preview-summary-time">
-        Quoted at {{ previewTime | date: 'shortTime' }}
-        &middot; price tolerance {{ request().changeThreshold | percent: '1.0-2' }}
-      </p>
-      @if (portfolioLabel()) {
-        <p class="preview-summary-account">{{ portfolioLabel() }}</p>
-      }
+
+      <div class="leg leg--get">
+        <div class="leg__amount">
+          <span class="leg__label">You get</span>
+          <span class="leg__value">
+            @if (get().amount !== null) {
+              {{ get().amount | number: '1.0-8' }}
+            } @else {
+              At market price
+            }
+          </span>
+        </div>
+        <span class="leg__symbol leg__symbol--get">{{ get().symbol }}</span>
+      </div>
     </div>
+
+    <dl class="review-details">
+      @if (request().side === 'BUY') {
+        <div class="review-details__row">
+          <dt>Rate</dt>
+          <dd>1 {{ request().addInstrumentSymbol }} = {{ request().quotedPrice | number: '1.2-8' }} {{ request().subtractInstrumentSymbol }}</dd>
+        </div>
+      }
+      <div class="review-details__row">
+        <dt>Price tolerance</dt>
+        <dd>
+          &plusmn; {{ request().changeThreshold | percent: '1.0-2' }}
+          @if (maxPrice() !== null) {
+            (max {{ maxPrice() | number: '1.2-8' }})
+          }
+        </dd>
+      </div>
+    </dl>
   </mat-card-content>
 
-  <mat-card-actions class="preview-actions">
-    <button mat-stroked-button class="preview-back" [disabled]="submitting()" (click)="back.emit()">Back</button>
-    <button mat-flat-button class="preview-confirm" [disabled]="submitting()" (click)="confirm()">
+  <mat-card-actions class="review-card__actions">
+    <button matButton="outlined" class="review-back" type="button" [disabled]="submitting()" (click)="back.emit()">Back</button>
+    <button matButton="filled" class="review-confirm" type="button" [disabled]="submitting()" (click)="confirm()">
       {{ submitting() ? 'Placing order…' : 'Confirm ' + sideLabel().toLowerCase() }}
     </button>
   </mat-card-actions>

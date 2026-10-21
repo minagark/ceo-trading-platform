@@ -6,7 +6,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { OrderRequest, OrderResponse } from '../../../core/trading.models';
 import { OrderApiService } from '../data-access/order-api.service';
 
-// "Review order" step: shows the order built from the trade form and submits it on confirm
+interface Leg {
+  symbol: string;
+  // null when we can't estimate it (see estimatedTotal)
+  amount: number | null;
+  estimate: boolean;
+}
+
+// "Review order" step: shows the order built from the trade form as "you pay / you get" and submits it on confirm
 @Component({
   imports: [DatePipe, DecimalPipe, PercentPipe, MatCardModule, MatButtonModule],
   selector: 'app-preview-page',
@@ -32,21 +39,35 @@ export class PreviewPage {
     return side === 'BUY' ? 'Buy' : side === 'SELL' ? 'Sell' : 'Deposit';
   });
 
-  // a SELL gives up the subtract instrument; everything else gains the add instrument
-  assetSymbol = computed(() => {
-    const request = this.request();
-    return request.side === 'SELL' ? request.subtractInstrumentSymbol : request.addInstrumentSymbol;
-  });
-
-  counterSymbol = computed(() => {
-    const request = this.request();
-    return request.side === 'SELL' ? request.addInstrumentSymbol : request.subtractInstrumentSymbol;
-  });
-
   // the quote is fetched for the add instrument, so it is only the asset's price on a BUY
   estimatedTotal = computed(() => {
     const request = this.request();
     return request.side === 'BUY' ? request.quantity * request.quotedPrice : null;
+  });
+
+  // what leaves the portfolio; a deposit has nothing to pay
+  pay = computed<Leg | null>(() => {
+    const request = this.request();
+    if (request.side === 'DEPOSIT') return null;
+    if (request.side === 'SELL') {
+      return { symbol: request.subtractInstrumentSymbol, amount: request.quantity, estimate: false };
+    }
+    return { symbol: request.subtractInstrumentSymbol, amount: this.estimatedTotal(), estimate: true };
+  });
+
+  // what arrives in the portfolio
+  get = computed<Leg>(() => {
+    const request = this.request();
+    if (request.side === 'SELL') {
+      return { symbol: request.addInstrumentSymbol, amount: null, estimate: true };
+    }
+    return { symbol: request.addInstrumentSymbol, amount: request.quantity, estimate: false };
+  });
+
+  // highest price a BUY will accept before it is rejected for moving past the tolerance
+  maxPrice = computed(() => {
+    const request = this.request();
+    return request.side === 'BUY' ? request.quotedPrice * (1 + request.changeThreshold) : null;
   });
 
   confirm() {

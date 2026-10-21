@@ -1,43 +1,80 @@
 <mat-card appearance="outlined" class="confirmation-card">
-  <div class="result-icon" [class]="'result-icon--' + outcome()">
-    @if (outcome() === 'processing') {
-      <mat-spinner diameter="64" strokeWidth="4" />
-    } @else {
-      <mat-icon>{{ outcome() === 'filled' ? 'check_circle' : 'cancel' }}</mat-icon>
-    }
-  </div>
-
-  <h2 class="result-title">{{ title() }}</h2>
-
-  @if (order(); as placedOrder) {
-    <p class="result-detail">
-      {{ placedOrder.side === 'BUY' ? 'Buy' : placedOrder.side === 'SELL' ? 'Sell' : 'Deposit' }}
-      <strong>{{ placedOrder.quantity | number: '1.0-8' }}
-        {{ placedOrder.side === 'SELL' ? placedOrder.subtractInstrumentSymbol : placedOrder.addInstrumentSymbol }}</strong>
-    </p>
-
-    <ol class="status-steps" aria-live="polite">
-      @for (step of steps(); track step.label) {
-        <li class="status-step" [class]="'status-step--' + step.state">
-          <span class="status-step__marker" aria-hidden="true">
-            @if (step.state === 'current') {
-              <mat-spinner diameter="16" strokeWidth="2" />
-            }
-          </span>
-          <span class="status-step__label">{{ step.label }}</span>
-          @if (step.timestamp) {
-            <span class="status-step__time">{{ step.timestamp | date: 'mediumTime' }}</span>
-          }
-        </li>
+  <mat-card-header class="confirmation-card__header">
+    <div class="confirmation-card__heading">
+      <mat-card-title class="result-title">{{ title() }}</mat-card-title>
+      @if (order(); as placedOrder) {
+        <mat-card-subtitle class="result-detail">
+          {{ sideLabel() }} {{ placedOrder.quantity | number: '1.0-8' }} {{ assetSymbol() }}
+        </mat-card-subtitle>
       }
-    </ol>
-  }
+    </div>
+    <span class="status-badge" [class]="'status-badge--' + outcome()">
+      @if (outcome() === 'processing') {
+        <mat-spinner diameter="12" strokeWidth="2" />
+      } @else if (outcome() === 'filled') {
+        <mat-icon aria-hidden="true">check</mat-icon>
+      } @else {
+        <mat-icon aria-hidden="true">close</mat-icon>
+      }
+      {{ badge() }}
+    </span>
+  </mat-card-header>
 
-  @if (reason(); as reasonText) {
-    <p class="result-reason" role="alert">{{ reasonText }}</p>
-  }
+  <mat-card-content class="confirmation-card__content">
+    @if (order(); as placedOrder) {
+      <ol class="status-steps" aria-live="polite">
+        @for (step of steps(); track step.label) {
+          <li class="status-step" [class]="'status-step--' + step.state">
+            <span class="status-step__marker" aria-hidden="true">
+              @switch (step.state) {
+                @case ('done') { <mat-icon>check</mat-icon> }
+                @case ('failed') { <mat-icon>close</mat-icon> }
+                @case ('current') { <mat-spinner diameter="16" strokeWidth="2" /> }
+              }
+            </span>
+            <span class="status-step__label">{{ step.label }}</span>
+            <span class="status-step__time">{{ step.timestamp ? (step.timestamp | date: 'HH:mm:ss') : '' }}</span>
+          </li>
+        }
+      </ol>
+    }
 
-  <button mat-flat-button class="result-done" (click)="done.emit()">
-    {{ outcome() === 'failed' ? 'Try again' : outcome() === 'processing' ? 'Back to trading' : 'New order' }}
-  </button>
+    @if (reason(); as reasonText) {
+      <p class="result-reason" role="alert">{{ reasonText }}</p>
+    }
+
+    @if (order(); as placedOrder) {
+      <dl class="order-details">
+        <div class="order-details__row">
+          <dt>Quantity</dt>
+          <dd>{{ placedOrder.quantity | number: '1.0-8' }} {{ assetSymbol() }}</dd>
+        </div>
+        @if (placedOrder.side === 'BUY') {
+          <div class="order-details__row">
+            <dt>Quoted price</dt>
+            <dd>{{ placedOrder.quotedPrice | number: '1.2-8' }} {{ placedOrder.subtractInstrumentSymbol }}</dd>
+          </div>
+        }
+        <div class="order-details__row">
+          <dt>Order ID</dt>
+          <dd [attr.title]="placedOrder.orderId">{{ shortOrderId() }}</dd>
+        </div>
+        @if (estimatedTotal() !== null) {
+          <div class="order-details__row order-details__row--total">
+            <dt>Estimated total</dt>
+            <dd>{{ estimatedTotal() | number: '1.2-2' }} {{ placedOrder.subtractInstrumentSymbol }}</dd>
+          </div>
+        }
+      </dl>
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="confirmation-card__actions">
+    @if (order()) {
+      <button matButton="outlined" class="result-activity" type="button" (click)="viewActivity.emit()">View activity</button>
+    }
+    <button matButton="filled" class="result-done" type="button" (click)="done.emit()">
+      {{ outcome() === 'failed' ? 'Try again' : outcome() === 'processing' ? 'Back to trading' : 'New order' }}
+    </button>
+  </mat-card-actions>
 </mat-card>

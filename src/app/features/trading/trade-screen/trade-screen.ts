@@ -18,7 +18,7 @@ import { CurrencyService, OwnedCurrency } from './owned-currency.service';
 import { merge, of, startWith, switchMap } from 'rxjs';
 import { OrderApiService } from '../data-access/order-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 export interface Asset {
   abbrName: string;
@@ -61,6 +61,7 @@ export class Trades {
   private orderApiService = inject(OrderApiService);
   private marketApiService = inject(MarketApiService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
   private readonly US_TIMEZONE_STRING = "America/New_York";
   private readonly IN_CURRENCY_SYMBOL: "INR" = "INR";
@@ -360,6 +361,10 @@ export class Trades {
     this.submittedOrder.set(null);
     this.submitError.set(message);
     this.screen.set('confirmation');
+  }
+
+  viewActivity() {
+    void this.router.navigate(['/history']);
   }
 
   finishConfirmation() {

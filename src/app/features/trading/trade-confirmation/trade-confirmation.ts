@@ -33,6 +33,7 @@ export class TradeConfirmation {
   message = input<string | null>(null);
 
   done = output<void>();
+  viewActivity = output<void>();
 
   // every status update received so far, keyed by status
   private readonly updates = toSignal(
@@ -70,6 +71,37 @@ export class TradeConfirmation {
     cancelled: 'Order cancelled',
     failed: 'Order failed',
   })[this.outcome()]);
+
+  badge = computed(() => ({
+    processing: 'Processing',
+    filled: 'Filled',
+    rejected: 'Rejected',
+    cancelled: 'Cancelled',
+    failed: 'Not placed',
+  })[this.outcome()]);
+
+  sideLabel = computed(() => {
+    const side = this.order()?.side;
+    return side === 'BUY' ? 'Buy' : side === 'SELL' ? 'Sell' : 'Deposit';
+  });
+
+  assetSymbol = computed(() => {
+    const order = this.order();
+    if (!order) return '';
+    return order.side === 'SELL' ? order.subtractInstrumentSymbol : order.addInstrumentSymbol;
+  });
+
+  // the backend doesn't report the fill price, so this is the quote the order was placed at;
+  // the quote is for the add instrument, so it is only the asset's price on a BUY
+  estimatedTotal = computed(() => {
+    const order = this.order();
+    return order?.side === 'BUY' ? order.quantity * order.quotedPrice : null;
+  });
+
+  shortOrderId = computed(() => {
+    const id = this.order()?.orderId ?? '';
+    return id.length > 13 ? `${id.slice(0, 8)}…${id.slice(-4)}` : id;
+  });
 
   reason = computed(() => {
     if (this.outcome() === 'failed') {

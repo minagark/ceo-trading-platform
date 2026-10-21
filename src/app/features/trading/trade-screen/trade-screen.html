@@ -10,7 +10,8 @@
   <app-trade-confirmation
     [order]="submittedOrder()"
     [message]="submitError()"
-    (done)="finishConfirmation()" />
+    (done)="finishConfirmation()"
+    (viewActivity)="viewActivity()" />
   } @else {
   <mat-card appearance="outlined" class="order-panel">
     <mat-card-header class="order-panel__header">
