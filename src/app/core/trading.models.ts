@@ -86,3 +86,12 @@ export interface OrderResponse {
   resolvedDate: string;
   currentStatus: OrderStatus;
 }
+
+// pushed by the backend on /topic/orders/{orderId} (STOMP over WebSocket)
+export interface OrderStatusUpdate {
+  orderId: string;
+  status: OrderStatus;
+  message: string;
+  timestamp: string;
+  terminal: boolean;
+}

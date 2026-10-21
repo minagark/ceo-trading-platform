@@ -1,0 +1,44 @@
+<mat-card appearance="outlined" class="status-panel">
+  <mat-card-header class="status-panel__header">
+    <mat-card-title>
+      {{ order().side }} {{ order().quantity }} {{ order().addInstrumentSymbol }}
+    </mat-card-title>
+    <mat-card-subtitle>
+      @if (status() === 'FULFILLED') {
+        Order filled
+      } @else if (finished()) {
+        Order {{ status() === 'CANCELLED' ? 'cancelled' : 'rejected' }}
+      } @else {
+        Processing your order…
+      }
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content class="status-panel__content">
+    <ol class="status-steps" aria-live="polite">
+      @for (step of steps(); track step.label) {
+        <li class="status-step" [class]="'status-step--' + step.state">
+          <span class="status-step__marker" aria-hidden="true">
+            @if (step.state === 'current') {
+              <mat-spinner diameter="16" strokeWidth="2" />
+            }
+          </span>
+          <span class="status-step__label">{{ step.label }}</span>
+          @if (step.timestamp) {
+            <span class="status-step__time">{{ step.timestamp | date: 'mediumTime' }}</span>
+          }
+        </li>
+      }
+    </ol>
+
+    @if (failureMessage(); as message) {
+      <p class="status-panel__reason" role="alert">{{ message }}</p>
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="status-panel__actions">
+    <button matButton="filled" type="button" (click)="done.emit()">
+      {{ finished() ? 'Place another order' : 'Back to order form' }}
+    </button>
+  </mat-card-actions>
+</mat-card>

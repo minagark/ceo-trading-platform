@@ -1,4 +1,7 @@
 <div class="trade-screen">
+  @if (submittedOrder(); as order) {
+  <app-order-status-panel [order]="order" (done)="submittedOrder.set(null)" />
+  } @else {
   <mat-card appearance="outlined" class="order-panel">
     <mat-card-header class="order-panel__header">
       <mat-card-title>Place a trade</mat-card-title>
@@ -87,4 +90,5 @@
       </mat-card-actions>
     </form>
   </mat-card>
+  }
 </div>

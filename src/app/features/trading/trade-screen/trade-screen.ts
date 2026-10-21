@@ -13,13 +13,14 @@ import { Account } from '../../account/accounts-list/accounts-list';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PreviewPage } from '../preview-page/preview-page';
 import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
-import { InstrumentType, isInstrumentType, isNonDepositOrderType, ORDER_TYPES, OrderRequest, OrderType, SIDES } from '../../../core/trading.models';
+import { InstrumentType, isInstrumentType, isNonDepositOrderType, ORDER_TYPES, OrderRequest, OrderResponse, OrderType, SIDES } from '../../../core/trading.models';
 import { Side } from '../../../core/trading.models';
 import { CurrencyService, OwnedCurrency } from './owned-currency.service';
 import { merge, startWith, switchMap } from 'rxjs';
 import { OrderApiService } from '../data-access/order-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
 import { ActivatedRoute } from '@angular/router';
+import { OrderStatusPanel } from '../order-status-panel/order-status-panel';
 
 export interface Asset {
   abbrName: string;
@@ -64,6 +65,7 @@ type Instrument = {
     MatSelectModule,
     MatInputModule,
     MatButtonModule,
+    OrderStatusPanel,
   ],
   selector: 'app-trades-screen',
   styleUrl: './trade-screen.css',
@@ -137,6 +139,9 @@ export class Trades {
   }
 
 
+  // set once the backend accepts the submission; the status panel then follows it live
+  submittedOrder = signal<OrderResponse | null>(null);
+
   submitOrder() {
     if (this.orderForm.invalid) {
       this.orderForm.markAllAsTouched();
@@ -205,6 +210,7 @@ export class Trades {
     ).subscribe({
       next: response => {
         console.log('Order submitted:', response);
+        this.submittedOrder.set(response);
       },
       error: error => {
         console.error('Unable to get quote or submit order:', error);
