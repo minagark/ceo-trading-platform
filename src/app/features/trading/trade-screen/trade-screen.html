@@ -83,6 +83,10 @@
       </div>
       </mat-card-content>
 
+      @if (formError(); as error) {
+        <p class="order-form-error" role="alert">{{ error }}</p>
+      }
+
       <mat-card-actions class="order-panel__actions">
       <button matButton="filled" class="order-submit" type="submit">
         Submit trade

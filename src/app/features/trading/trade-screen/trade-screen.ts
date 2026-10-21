@@ -136,17 +136,42 @@ export class Trades {
     })
     
     this.updateSettlementCurrencyState();
+
+    // drop the "please fix" message as soon as the form becomes valid
+    this.orderForm.statusChanges.subscribe(status => {
+      if (status === 'VALID') {
+        this.formError.set(null);
+      }
+    });
   }
 
 
   // set once the backend accepts the submission; the status panel then follows it live
   submittedOrder = signal<OrderResponse | null>(null);
 
+  // shown above the submit button when the form is invalid or the submission fails
+  formError = signal<string | null>(null);
+
+  private readonly FIELD_LABELS: Record<string, string> = {
+    portfolioId: 'Portfolio',
+    orderType: 'Order type',
+    side: 'Side',
+    symbol: 'Symbol',
+    settlementCurrency: 'Settlement currency',
+    quantity: 'Quantity',
+    changeThreshold: 'Change threshold',
+  };
+
   submitOrder() {
     if (this.orderForm.invalid) {
       this.orderForm.markAllAsTouched();
+      const invalidFields = Object.entries(this.orderForm.controls)
+        .filter(([, control]) => control.invalid)
+        .map(([name]) => this.FIELD_LABELS[name] ?? name);
+      this.formError.set(`Please fix: ${invalidFields.join(', ')}.`);
       return;
     }
+    this.formError.set(null);
     const orderInfo = this.orderForm.getRawValue();
     let addInstrument: Instrument; let subInstrument: Instrument;
 
@@ -214,6 +239,7 @@ export class Trades {
       },
       error: error => {
         console.error('Unable to get quote or submit order:', error);
+        this.formError.set(`Couldn't place the order: ${error?.error?.message ?? error?.message ?? 'unknown error'}`);
       },
     });
   }
