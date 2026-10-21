@@ -3,8 +3,7 @@ export type ChangePeriod = '1D' | '5D' | '1M' | '6M' | '1Y';
 export interface HoldingSummaryResponse {
   holdingId: string;
   portfolioId: string;
-  instrumentSymbol: string;
-  instrumentId: string;
+  symbol: string;
   instrumentName: string;
   instrumentType: string;
   quantity: number;

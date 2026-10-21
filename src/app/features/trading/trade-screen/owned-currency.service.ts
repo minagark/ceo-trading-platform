@@ -3,7 +3,6 @@ import { Observable, map } from 'rxjs';
 import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.service';
 
 export interface OwnedCurrency {
-  id: string;
   symbol: string;
   name: string;
 }
@@ -17,9 +16,8 @@ export class CurrencyService {
             map(holdings => {
                 const currencies = new Map<string, OwnedCurrency>();
                 for (const holding of holdings) {
-                    currencies.set(holding.instrumentId, {
-                        id: holding.instrumentId,
-                        symbol: holding.instrumentSymbol,
+                    currencies.set(holding.symbol, {
+                        symbol: holding.symbol,
                         name: holding.instrumentName,
                     });
                 }

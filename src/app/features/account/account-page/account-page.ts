@@ -35,7 +35,7 @@ export class AccountPage {
       ...portfolio,
       holdings: holdings
         .filter((holding) => holding.portfolioId === portfolio.ID)
-        .map((holding) => `${holding.instrumentSymbol} (${holding.quantity} shares)`),
+        .map((holding) => `${holding.symbol} (${holding.quantity} shares)`),
     }));
   });
 

@@ -128,8 +128,8 @@ export class HoldingsList {
     this.failedLogos.update((failed) => new Set(failed).add(symbol));
   }
 
-  initials(companyName: string): string {
-    return companyName
+  initials(instrumentName: string | null | undefined): string {
+    return (instrumentName ?? '')
       .split(' ')
       .filter(Boolean)
       .slice(0, 2)
