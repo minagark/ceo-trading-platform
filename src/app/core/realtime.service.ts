@@ -1,28 +1,36 @@
 import { Injectable } from '@angular/core';
-import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
+import { Client, IFrame, IMessage, StompSubscription } from '@stomp/stompjs';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { InstrumentType } from './trading.models';
 import { OrderStatusEvent, QuoteSubscriptionRequest, QuoteUpdateEvent } from './realtime.models';
 
+interface TrackedSubscription {
+  destination: string;
+  onMessage: (message: IMessage) => void;
+  onSubscribed?: () => void;
+  stompSubscription: StompSubscription | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class RealtimeService {
-  private client: Client | null = null;
+  private readonly client: Client;
+  private readonly tracked = new Map<object, TrackedSubscription>();
 
-  private getClient(): Client {
-    if (this.client) {
-      return this.client;
-    }
-
+  constructor() {
     this.client = new Client({
       brokerURL: environment.wsUrl,
       reconnectDelay: 3000,
       heartbeatIncoming: 10000,
       heartbeatOutgoing: 10000,
+      onConnect: () => this.resubscribeAll(),
+      onStompError: (frame: IFrame) =>
+        console.error('Realtime STOMP error:', frame.headers['message'], frame.body),
+      onWebSocketError: (event) => console.error('Realtime WebSocket error:', event),
+      onWebSocketClose: (event) => console.warn('Realtime WebSocket closed:', event.reason),
     });
 
     this.client.activate();
-    return this.client;
   }
 
   subscribeToUserOrders(clientId: string): Observable<OrderStatusEvent> {
@@ -36,60 +44,56 @@ export class RealtimeService {
   subscribeToQuote(symbol: string, type: InstrumentType): Observable<QuoteUpdateEvent> {
     const normalizedSymbol = symbol.trim().toUpperCase();
     const destination = `/topic/quotes/${normalizedSymbol}/${type}`;
+    const request: QuoteSubscriptionRequest = { symbol: normalizedSymbol, type };
 
-    this.publish('/app/quotes/subscribe', {
-      symbol: normalizedSymbol,
-      type,
-    } satisfies QuoteSubscriptionRequest);
-
-    return this.subscribe(destination);
+    return this.subscribe<QuoteUpdateEvent>(destination, () =>
+      this.send('/app/quotes/subscribe', request),
+    );
   }
 
-  private subscribe<T>(destination: string): Observable<T> {
+  private subscribe<T>(destination: string, onSubscribed?: () => void): Observable<T> {
     return new Observable<T>((observer) => {
-      const client = this.getClient();
-      let subscription: StompSubscription | null = null;
-
-      const connectAndSubscribe = () => {
-        subscription = client.subscribe(destination, (message: IMessage) => {
+      const key = {};
+      const entry: TrackedSubscription = {
+        destination,
+        onSubscribed,
+        stompSubscription: null,
+        onMessage: (message) => {
           try {
             observer.next(JSON.parse(message.body) as T);
           } catch {
             observer.error(new Error(`Invalid realtime payload for ${destination}`));
           }
-        });
+        },
       };
 
-      this.whenConnected(connectAndSubscribe);
+      this.tracked.set(key, entry);
+      if (this.client.connected) {
+        this.activate(entry);
+      }
 
       return () => {
-        subscription?.unsubscribe();
+        entry.stompSubscription?.unsubscribe();
+        this.tracked.delete(key);
       };
     });
   }
 
-  private publish(destination: string, body: object): void {
-    const client = this.getClient();
-
-    const doPublish = () => {
-      client.publish({ destination, body: JSON.stringify(body) });
-    };
-
-    this.whenConnected(doPublish);
+  private resubscribeAll(): void {
+    for (const entry of this.tracked.values()) {
+      this.activate(entry);
+    }
   }
 
-  private whenConnected(callback: () => void): void {
-    const client = this.getClient();
-    if (client.connected) {
-      callback();
+  private activate(entry: TrackedSubscription): void {
+    entry.stompSubscription = this.client.subscribe(entry.destination, entry.onMessage);
+    entry.onSubscribed?.();
+  }
+
+  private send(destination: string, body: object): void {
+    if (!this.client.connected) {
       return;
     }
-
-    const timer = setInterval(() => {
-      if (client.connected) {
-        clearInterval(timer);
-        callback();
-      }
-    }, 100);
+    this.client.publish({ destination, body: JSON.stringify(body) });
   }
 }
