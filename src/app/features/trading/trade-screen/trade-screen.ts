@@ -176,6 +176,12 @@ export class Trades {
             ? quote.ask
             : quote.bid;
 
+        let side: Side;
+        if (orderInfo.orderType === "DEPOSIT") {
+          side = "DEPOSIT";
+        } else {
+          side = orderInfo.side
+        }
         const orderRequest: OrderRequest = {
           clientId: '2c522b92-7151-4daa-92db-81a2253c772a',
           clientName: 'John Doe',
@@ -186,7 +192,7 @@ export class Trades {
           subtractInstrumentType: subInstrument.type,
           changeThreshold: orderInfo.changeThreshold,
           quantity: orderInfo.quantity,
-          side: orderInfo.side,
+          side,
           quotedPrice,
           market: orderInfo.orderType === "INDIA_EQUITY" ? 
                   this.IN_TIMEZONE_STRING : 
@@ -228,9 +234,7 @@ export class Trades {
 
   activeSides = computed<Side[]>(() => {
     const { orderType } = this.formState();
-    if (orderType === "DEPOSIT") {
-      return ["DEPOSIT"];
-    } else if (orderType === "FOREX") {
+    if (orderType === "DEPOSIT" || orderType === "FOREX") {
       return [];
     } else {
       return ["BUY", "SELL"]

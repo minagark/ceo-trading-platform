@@ -1,91 +1,15 @@
 <div class="trade-screen">
-  <!-- <mat-card appearance="outlined" class="order-panel">
-    @if (screen() === 'preview' && selectedAccount() && currentDraft()) {
-      <app-preview-page
-        [draft]="currentDraft()!"
-        [account]="selectedAccount()!"
-        (back)="cancelPreview()"
-        (confirmed)="onTradeConfirmed($event)"
-        (failed)="onTradeFailed($event)"
-      />
-    } @else if (screen() === 'confirmation') {
-      <app-trade-confirmation
-        [success]="confirmationResult().success"
-        [trade]="confirmationResult().trade"
-        [message]="confirmationResult().message"
-        (done)="finishConfirmation()"
-      />
-    } @else {
-    <h2>{{ stock().abbrName }} <small>{{ stock().fullName }}</small></h2>
-
-    <mat-button-toggle-group
-      class="side-toggle"
-      [value]="side()"
-      (valueChange)="side.set($event)"
-      hideSingleSelectionIndicator
-    >
-      <mat-button-toggle value="buy">Buy</mat-button-toggle>
-      <mat-button-toggle value="sell">Sell</mat-button-toggle>
-    </mat-button-toggle-group>
-
-    <mat-form-field appearance="outline" class="order-field">
-      <mat-label>Account</mat-label>
-      <mat-select [ngModel]="selectedAccount()?.id ?? ''" (ngModelChange)="onAccountIdChange($event)">
-        @for (account of accounts(); track account.id) {
-          <mat-option [value]="account.id">{{ account.name }} ({{ account.balance | currency }})</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <div class="amount-row">
-      <mat-form-field appearance="outline" class="order-field amount-field">
-        <mat-label>Amount</mat-label>
-        <input matInput type="number" min="0" step="1" [ngModel]="quantity()" (ngModelChange)="quantity.set($event)" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="order-field">
-        <mat-label>Amount type</mat-label>
-        <mat-select [ngModel]="quantityType()" (ngModelChange)="quantityType.set($event)">
-          <mat-option value="shares">Shares</mat-option>
-          <mat-option value="cash">Cash ($)</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <mat-form-field appearance="outline" class="order-field">
-      <mat-label>Order type</mat-label>
-      <mat-select [ngModel]="orderType()" (ngModelChange)="orderType.set($event)">
-        <mat-option value="market">Market</mat-option>
-        <mat-option value="limit">Limit</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="order-field">
-      <mat-label>Time in force</mat-label>
-      <mat-select [ngModel]="timeInForce()" (ngModelChange)="timeInForce.set($event)">
-        <mat-option value="day">Day</mat-option>
-        <mat-option value="gtc">Good till canceled</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <p class="order-estimate">
-      Estimated {{ side() === 'buy' ? 'cost' : 'proceeds' }}: <strong>{{ estimatedCost() | currency }}</strong>
-    </p>
-
-    <button
-      mat-flat-button
-      class="order-submit"
-      [disabled]="!selectedAccount() || quantity() <= 0"
-      (click)="reviewOrder()"
-    >
-      Preview Order
-    </button>
-    }
-  </mat-card> -->
-  
   <mat-card appearance="outlined" class="order-panel">
+    <mat-card-header class="order-panel__header">
+      <mat-card-title>Place a trade</mat-card-title>
+      <mat-card-subtitle>Build an order across your portfolios</mat-card-subtitle>
+    </mat-card-header>
+
     <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
-      <mat-form-field>
+      <mat-card-content class="order-panel__content">
+        <p class="order-panel__section-title">Order details</p>
+
+        <mat-form-field class="order-field">
         <mat-label>Portfolio</mat-label>
         <mat-select required formControlName="portfolioId">
           @for (account of accounts(); track $index) {
@@ -93,34 +17,39 @@
           }
         </mat-select>
       </mat-form-field>
-      <mat-form-field>
-        <mat-label>Order Type</mat-label>
-        <mat-select required formControlName="orderType">
-          @for (type of orderTypes; track $index) {
-            <mat-option [value]="type.value">{{type.label}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field>
+
+      <div class="order-panel__field-row">
+        <mat-form-field class="order-field">
+          <mat-label>Order type</mat-label>
+          <mat-select required formControlName="orderType">
+            @for (type of orderTypes; track $index) {
+              <mat-option [value]="type.value">{{type.label}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (activeSides().length > 0) {
+          <mat-form-field class="order-field">
+            <mat-label>Side</mat-label>
+            <mat-select required formControlName="side">
+              @for (side of activeSides(); track $index) {
+                <mat-option [value]="side">{{side}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+      </div>
+
+      <mat-form-field class="order-field">
         <mat-label>Symbol</mat-label>
         <input matInput type="text" placeholder="e.g. USD" formControlName="symbol"/>
         <mat-hint>AKA "ticker"</mat-hint>
       </mat-form-field>
-      @if (activeSides().length > 0) {
-        <mat-form-field>
-          <mat-label>Side</mat-label>
-          <mat-select required formControlName="side">
-            @for (side of activeSides(); track $index) {
-              <mat-option [value]="side">{{side}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      }
+
       <!-- Settlement Currency (more complex logic) -->
-      
       @if (settlementMode().visible) {
-        <mat-form-field>
-          <mat-label>Settlement Currency (Symbol)</mat-label>
+        <mat-form-field class="order-field">
+          <mat-label>Settlement currency</mat-label>
           @if (settlementMode().source === 'owned') {
             <mat-select required formControlName="settlementCurrency">
               @for (currency of ownedCurrencies(); track currency.id) {
@@ -136,18 +65,26 @@
         </mat-form-field>
       }
 
-      <mat-form-field>
-        <mat-label>Quantity</mat-label>
-        <input matInput type="number" placeholder="quantity" formControlName="quantity"/>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Change Threshold (%)</mat-label>
-        <input matInput type="number" formControlName="changeThreshold"/>
-      </mat-form-field>
+      <p class="order-panel__section-title order-panel__section-title--spaced">Quantity &amp; limits</p>
+      <div class="order-panel__field-row">
+        <mat-form-field class="order-field">
+          <mat-label>Quantity</mat-label>
+          <input matInput type="number" placeholder="Quantity" formControlName="quantity"/>
+        </mat-form-field>
 
-      <button matButton type="submit">
-        Submit Trade
+        <mat-form-field class="order-field">
+          <mat-label>Change threshold</mat-label>
+          <input matInput type="number" formControlName="changeThreshold"/>
+          <mat-hint>Optional percentage</mat-hint>
+        </mat-form-field>
+      </div>
+      </mat-card-content>
+
+      <mat-card-actions class="order-panel__actions">
+      <button matButton="filled" class="order-submit" type="submit">
+        Submit trade
       </button>
+      </mat-card-actions>
     </form>
   </mat-card>
 </div>
