@@ -1,5 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
-import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.service';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { AgCharts } from 'ag-charts-angular';
 import {
   AgChartOptions,
@@ -7,9 +6,8 @@ import {
   ModuleRegistry,
   PieSeriesModule,
 } from "ag-charts-community";
-import { AccountsService } from '../../account/accounts-list/accounts.service';
-import { forkJoin } from 'rxjs';
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
+import { HoldingsService } from '../holdings/holdings.service';
 
 ModuleRegistry.registerModules([LegendModule, PieSeriesModule]);
 
@@ -31,22 +29,14 @@ export class PortfolioComposition {
   //   {id: 2, name: 'Account 2', balance: 2000, holdings: [{symbol: "AAPL", quantity: 20}, {symbol: "MSFT", quantity: 20}], history: [1000, 2000, 1500]},
   //   {id: 3, name: 'Account 3', balance: 3000, holdings: [{symbol: "AAPL", quantity: 30}, {symbol: "MSFT", quantity: 30}], history: [1000, 2000, 1500]}
   // ];
-  readonly accountService = inject(AccountsService);
-  readonly portfolioApi = inject(PortfolioApiService);
+  readonly holdingsService = inject(HoldingsService);
   readonly accountSelectionService = inject(AccountSelectionService);
   readonly loading = signal(false);
 
-
-  readonly portfolios = this.accountService.accounts();
-  readonly selectedPortfolio = this.accountSelectionService.selectedAccount();
   readonly items = signal<ChartItem[]>([]);
 
   public options = signal<AgChartOptions>({
-      data: [],
-      title: {
-        text: "Portfolio Composition",
-        color: "var(--mat-sys-on-surface)"
-      },
+      data:[],
       series: [
         {
           type: 'pie',
@@ -66,80 +56,39 @@ export class PortfolioComposition {
       }
   });
 
+  readonly chartData = computed<ChartItem[]>(() => {
+    const selectedAccount = this.accountSelectionService.selectedAccount();
+    const holdings = this.holdingsService.holdings();
+    const visibleHoldings = selectedAccount
+      ? holdings.filter((holding) => holding.portfolioId === selectedAccount.id)
+      : holdings;
+    const totals = new Map<string, number>();
+
+    for (const holding of visibleHoldings) {
+      if (holding.instrumentType === 'CASH') {
+        continue;
+      }
+
+      const quantity = Number(holding.quantity);
+      if (!Number.isFinite(quantity)) {
+        continue;
+      }
+
+      totals.set(
+        holding.symbol,
+        (totals.get(holding.symbol) ?? 0) + quantity,
+      );
+    }
+
+    return Array.from(totals.entries())
+      .filter(([, quantity]) => quantity > 0)
+      .map(([name, quantity]) => ({ name, quantity }));
+  });
+
   constructor() {
-
     effect(() => {
-      const selectedAccount = this.accountSelectionService.selectedAccount();
-      const accounts = this.accountService.accounts();
-      const accountsLoaded = this.accountService.loaded();
-
-      if (!accountsLoaded) {
-        return;
-      }
-
-      const chartedAccount = selectedAccount ? accounts.filter((account) => account.id === selectedAccount.id) : accounts;
-      
-      if (chartedAccount.length === 0) {
-        this.updateChart([]);
-        return; // dont set anything
-      }
-
-      this.loading.set(true);
-
-      // forkJoin(
-      //   chartedAccount.map((account) => this.portfolioApi.getHoldings(account.id))
-      // ).subscribe({
-      //   next: (holdingsByAccount) => {
-      //     const totals = new Map<string, number>();
-      //     for (const holdings of holdingsByAccount) {
-      //       for (const holding of holdings) {
-      //         const currentAmount = totals.get(holding.instrumentId) ?? 0;
-      //         totals.set(holding.instrumentId, currentAmount + holding.quantity);
-      //       }
-      //     }
-      //     this.updateChart(Array.from(totals.entries()).map(([name, quantity]) => ({ name, quantity })));
-      //     this.loading.set(false);
-      //   }
-      // })
-      forkJoin(
-        chartedAccount.map((account) =>
-          this.portfolioApi.getHoldings(account.id)
-        )
-      ).subscribe({
-        next: (holdingsByAccount) => {
-
-          const totals = new Map<string, number>();
-
-          for (const holdings of holdingsByAccount) {
-            for (const holding of holdings) {
-
-              if (holding.instrumentType !== 'CASH') {
-                const currentQuantity = totals.get(holding.symbol) ?? 0;
-                totals.set(
-                  holding.symbol,
-                  currentQuantity + Number(holding.shares)
-                );
-              }
-            }
-          }
-
-          const data = Array.from(totals.entries())
-            .filter(([, quantity]) => Number.isFinite(quantity) && quantity > 0)
-            .map(([name, quantity]) => ({ name, quantity }));
-
-          this.updateChart(data);
-          this.loading.set(false);
-        },
-
-        error: (error) => {
-          console.error('Unable to load holdings:', error);
-          this.updateChart([]);
-          this.loading.set(false);
-        },
-      });
-    
-    })
-
+      this.updateChart(this.chartData());
+    });
   }
 
   private updateChart(data: ChartItem[]): void {
