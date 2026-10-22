@@ -1,11 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
-import { Observable, catchError, map, takeWhile } from 'rxjs';
+import { EMPTY, Observable, catchError, distinctUntilChanged, exhaustMap, map, takeWhile, timer } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { OrderStatus, OrderStatusUpdate } from '../../../core/trading.models';
 import { OrderApiService } from './order-api.service';
 
 const TERMINAL_STATUSES: readonly OrderStatus[] = ['FULFILLED', 'REJECTED', 'CANCELLED'];
+
+// how often the REST fallback re-reads the order while the socket is unavailable
+const POLL_INTERVAL_MS = 3000;
 
 // statuses only move forward; used to drop a stale snapshot that arrives after a newer live update
 const STATUS_RANK: Record<OrderStatus, number> = {
@@ -39,19 +42,26 @@ export class OrderUpdatesService {
   private readonly watchers = new Set<{ onConnect: () => void; onError: (error: Error) => void }>();
 
   // live status updates for one order; completes once a terminal status arrives.
-  // if the socket can't be used, falls back to a single REST read of the order
+  // if the socket can't be used, falls back to polling the order over REST until it is terminal
   watchOrder(orderId: string): Observable<OrderStatusUpdate> {
     return this.streamOrder(orderId).pipe(
+      catchError(() => this.pollOrder(orderId)),
       takeWhile(update => !update.terminal, true),
-      catchError(() => this.orderApi.getOrder(orderId).pipe(
-        map(order => ({
-          orderId: order.orderId,
-          status: order.currentStatus,
-          message: '',
-          timestamp: order.resolvedDate || order.createdDate,
-          terminal: TERMINAL_STATUSES.includes(order.currentStatus),
-        })),
-      )),
+    );
+  }
+
+  // a failed read is skipped and retried on the next tick; only status changes are emitted
+  private pollOrder(orderId: string): Observable<OrderStatusUpdate> {
+    return timer(0, POLL_INTERVAL_MS).pipe(
+      exhaustMap(() => this.orderApi.getOrder(orderId).pipe(catchError(() => EMPTY))),
+      map(order => ({
+        orderId: order.orderId,
+        status: order.currentStatus,
+        message: '',
+        timestamp: order.resolvedDate || order.createdDate,
+        terminal: TERMINAL_STATUSES.includes(order.currentStatus),
+      })),
+      distinctUntilChanged((previous, current) => previous.status === current.status),
     );
   }
 

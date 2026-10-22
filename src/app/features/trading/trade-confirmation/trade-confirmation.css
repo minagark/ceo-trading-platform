@@ -9,6 +9,8 @@
   border-color: var(--mat-sys-outline-variant);
   background: var(--mat-sys-surface-container-high);
   box-shadow: 0 1rem 3rem color-mix(in srgb, var(--mat-sys-shadow) 22%, transparent);
+  /* both spinners (badge and current step) are tertiary */
+  --mat-progress-spinner-active-indicator-color: var(--mat-sys-tertiary);
 }
 
 .confirmation-card__header {
@@ -53,7 +55,6 @@
 
 .status-badge--processing {
   color: var(--mat-sys-tertiary);
-  --mat-progress-spinner-active-indicator-color: var(--mat-sys-tertiary);
 }
 
 .status-badge--filled {
@@ -135,7 +136,6 @@
 
 .status-step--current .status-step__marker {
   border-color: var(--mat-sys-tertiary);
-  --mat-progress-spinner-active-indicator-color: var(--mat-sys-tertiary);
 }
 
 .status-step--failed .status-step__marker {
@@ -173,8 +173,6 @@
 }
 
 .order-details {
-  display: flex;
-  flex-direction: column;
   margin: 0;
   border-top: 1px solid var(--mat-sys-outline-variant);
 }

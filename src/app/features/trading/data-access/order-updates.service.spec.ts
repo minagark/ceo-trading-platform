@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Client, IFrame, IMessage, messageCallbackType } from '@stomp/stompjs';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { OrderUpdatesService, webSocketUrl } from './order-updates.service';
 import { OrderApiService } from './order-api.service';
 import { OrderResponse, OrderStatusUpdate } from '../../../core/trading.models';
@@ -44,38 +44,71 @@ describe('OrderUpdatesService.watchOrder', () => {
     vi.spyOn(client, 'deactivate').mockResolvedValue();
   });
 
-  it('falls back to a REST read of the order when the socket fails to connect', () => {
-    vi.spyOn(client, 'activate').mockImplementation(() => client.onWebSocketError(new Event('error')));
-    const received: OrderStatusUpdate[] = [];
-    let completed = false;
+  describe('REST fallback', () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
 
-    service.watchOrder('order-1').subscribe({ next: u => received.push(u), complete: () => (completed = true) });
+    it('falls back to a REST read of the order when the socket fails to connect', () => {
+      vi.spyOn(client, 'activate').mockImplementation(() => client.onWebSocketError(new Event('error')));
+      const received: OrderStatusUpdate[] = [];
+      let completed = false;
 
-    expect(orderApi.getOrder).toHaveBeenCalledWith('order-1');
-    expect(received).toEqual([{
-      orderId: 'order-1',
-      status: 'FULFILLED',
-      message: '',
-      timestamp: '2026-10-21T10:00:09Z',
-      terminal: true,
-    }]);
-    expect(completed).toBe(true);
-  });
+      service.watchOrder('order-1').subscribe({ next: u => received.push(u), complete: () => (completed = true) });
+      vi.advanceTimersByTime(0);
 
-  it('falls back to REST on a STOMP error frame, and marks a non-terminal status as such', () => {
-    orderApi.getOrder.mockReturnValue(of({ ...order, currentStatus: 'ACCEPTED', resolvedDate: '' }));
-    vi.spyOn(client, 'activate').mockImplementation(() =>
-      client.onStompError({ headers: { message: 'broker down' } } as unknown as IFrame));
-    const received: OrderStatusUpdate[] = [];
+      expect(orderApi.getOrder).toHaveBeenCalledWith('order-1');
+      expect(received).toEqual([{
+        orderId: 'order-1',
+        status: 'FULFILLED',
+        message: '',
+        timestamp: '2026-10-21T10:00:09Z',
+        terminal: true,
+      }]);
+      expect(completed).toBe(true);
+    });
 
-    service.watchOrder('order-1').subscribe(u => received.push(u));
+    it('falls back to REST on a STOMP error frame, and marks a non-terminal status as such', () => {
+      orderApi.getOrder.mockReturnValue(of({ ...order, currentStatus: 'ACCEPTED', resolvedDate: '' }));
+      vi.spyOn(client, 'activate').mockImplementation(() =>
+        client.onStompError({ headers: { message: 'broker down' } } as unknown as IFrame));
+      const received: OrderStatusUpdate[] = [];
 
-    expect(orderApi.getOrder).toHaveBeenCalledWith('order-1');
-    expect(received).toEqual([expect.objectContaining({
-      status: 'ACCEPTED',
-      timestamp: '2026-10-21T10:00:00Z',
-      terminal: false,
-    })]);
+      const subscription = service.watchOrder('order-1').subscribe(u => received.push(u));
+      vi.advanceTimersByTime(0);
+
+      expect(orderApi.getOrder).toHaveBeenCalledWith('order-1');
+      expect(received).toEqual([expect.objectContaining({
+        status: 'ACCEPTED',
+        timestamp: '2026-10-21T10:00:00Z',
+        terminal: false,
+      })]);
+      subscription.unsubscribe();
+    });
+
+    it('keeps polling until the order is terminal, skipping failed reads and repeated statuses', () => {
+      orderApi.getOrder
+        .mockReturnValueOnce(of({ ...order, currentStatus: 'ACCEPTED', resolvedDate: '' }))
+        .mockReturnValueOnce(throwError(() => new Error('network')))
+        .mockReturnValueOnce(of({ ...order, currentStatus: 'ACCEPTED', resolvedDate: '' }))
+        .mockReturnValueOnce(of(order));
+      vi.spyOn(client, 'activate').mockImplementation(() => client.onWebSocketError(new Event('error')));
+      const received: string[] = [];
+      let completed = false;
+
+      service.watchOrder('order-1').subscribe({ next: u => received.push(u.status), complete: () => (completed = true) });
+      vi.advanceTimersByTime(0);
+      expect(received).toEqual(['ACCEPTED']);
+      expect(completed).toBe(false);
+
+      vi.advanceTimersByTime(9000);
+
+      expect(orderApi.getOrder).toHaveBeenCalledTimes(4);
+      expect(received).toEqual(['ACCEPTED', 'FULFILLED']);
+      expect(completed).toBe(true);
+
+      vi.advanceTimersByTime(9000);
+      expect(orderApi.getOrder).toHaveBeenCalledTimes(4);
+    });
   });
 
   describe('when connected', () => {
