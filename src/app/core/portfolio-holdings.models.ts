@@ -10,7 +10,8 @@ export interface HoldingSummaryResponse {
   avgCost: number;
   currentPrice: number;
   dayChangeValue: number;
-  percentChange: Record<ChangePeriod, number>;
+  // fractions (0.0123 = 1.23%); null when the backend has too little price history for the period
+  percentChange: Record<ChangePeriod, number | null>;
   weekLow52: number;
   weekHigh52: number;
 }
