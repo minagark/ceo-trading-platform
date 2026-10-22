@@ -9,17 +9,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AssetsService } from './assets.service';
-import { Account } from '../../account/accounts-list/accounts-list';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PreviewPage } from '../preview-page/preview-page';
 import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
-import { InstrumentType, isInstrumentType, isNonDepositOrderType, ORDER_TYPES, OrderRequest, OrderType, SIDES } from '../../../core/trading.models';
+import { InstrumentType, isInstrumentType, isNonDepositOrderType, ORDER_TYPES, OrderRequest, OrderResponse, OrderType, SIDES } from '../../../core/trading.models';
 import { Side } from '../../../core/trading.models';
 import { CurrencyService, OwnedCurrency } from './owned-currency.service';
-import { merge, startWith, switchMap } from 'rxjs';
+import { merge, of, startWith, switchMap } from 'rxjs';
 import { OrderApiService } from '../data-access/order-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 export interface Asset {
   abbrName: string;
@@ -31,20 +30,6 @@ export interface Asset {
   ask: number;
   bid: number;
 }
-export interface Trade {
-  id: string;
-  type: 'buy' | 'sell';
-  account: string;
-  cashAvailable: number;
-  stock: Asset;
-  amountType: 'cash' | 'shares';
-  amount: number;
-  orderType: 'market' | 'limit';
-  timeInForce: 'day' | 'gtc';
-  date: string;
-}
-
-export type TradeRequest = Omit<Trade, 'id' | 'date'>;
 
 
 type Instrument = {
@@ -56,8 +41,8 @@ type Instrument = {
   imports: [
     // CurrencyPipe,
     ReactiveFormsModule,
-    // PreviewPage,
-    // TradeConfirmation,
+    PreviewPage,
+    TradeConfirmation,
     MatCardModule,
     MatButtonToggleModule,
     MatFormFieldModule,
@@ -76,6 +61,7 @@ export class Trades {
   private orderApiService = inject(OrderApiService);
   private marketApiService = inject(MarketApiService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
   private readonly US_TIMEZONE_STRING = "America/New_York";
   private readonly IN_CURRENCY_SYMBOL: "INR" = "INR";
@@ -134,14 +120,46 @@ export class Trades {
     })
     
     this.updateSettlementCurrencyState();
+
+    // drop the "please fix" message as soon as the form becomes valid
+    this.orderForm.statusChanges.subscribe(status => {
+      if (status === 'VALID') {
+        this.formError.set(null);
+      }
+    });
   }
 
 
-  submitOrder() {
+  // form -> preview (review the built order) -> confirmation (live order status)
+  screen = signal<'form' | 'preview' | 'confirmation'>('form');
+  draft = signal<OrderRequest | null>(null);
+  draftPortfolioLabel = signal('');
+  submittedOrder = signal<OrderResponse | null>(null);
+  submitError = signal<string | null>(null);
+
+  // shown above the review button when the form is invalid or the quote can't be fetched
+  formError = signal<string | null>(null);
+
+  private readonly FIELD_LABELS: Record<string, string> = {
+    portfolioId: 'Portfolio',
+    orderType: 'Order type',
+    side: 'Side',
+    symbol: 'Symbol',
+    settlementCurrency: 'Settlement currency',
+    quantity: 'Quantity',
+    changeThreshold: 'Change threshold',
+  };
+
+  reviewOrder() {
     if (this.orderForm.invalid) {
       this.orderForm.markAllAsTouched();
+      const invalidFields = Object.entries(this.orderForm.controls)
+        .filter(([, control]) => control.invalid)
+        .map(([name]) => this.FIELD_LABELS[name] ?? name);
+      this.formError.set(`Please fix: ${invalidFields.join(', ')}.`);
       return;
     }
+    this.formError.set(null);
     const orderInfo = this.orderForm.getRawValue();
     let addInstrument: Instrument; let subInstrument: Instrument;
 
@@ -198,16 +216,18 @@ export class Trades {
                   this.IN_TIMEZONE_STRING : 
                   this.US_TIMEZONE_STRING,
         };
-        console.log(orderRequest);
-
-        return this.orderApiService.submitOrder(orderRequest);
+        return of(orderRequest);
       }),
     ).subscribe({
-      next: response => {
-        console.log('Order submitted:', response);
+      next: orderRequest => {
+        const portfolio = this.accounts().find(account => account.id === orderRequest.portfolioId);
+        this.draftPortfolioLabel.set(portfolio ? `${portfolio.id} (${portfolio.type})` : orderRequest.portfolioId);
+        this.draft.set(orderRequest);
+        this.screen.set('preview');
       },
       error: error => {
-        console.error('Unable to get quote or submit order:', error);
+        console.error('Unable to get quote:', error);
+        this.formError.set(`Couldn't get a quote: ${error?.error?.message ?? error?.message ?? 'unknown error'}`);
       },
     });
   }
@@ -327,91 +347,29 @@ export class Trades {
   stock = this.assetsService.asset;
   accounts = this.accountsService.accounts;
 
-  selectedAccount = signal<Account | null>(null);
-  quantityType = signal<'cash' | 'shares'>('shares');
-  quantity = signal(0);
-  side = signal<'buy' | 'sell'>('buy');
-  orderTypeOld = signal<'market' | 'limit'>('market');
-  timeInForce = signal<'day' | 'gtc'>('day');
-
-  // Mock data — jumps straight to the confirmation screen so it can be
-  // previewed without clicking through the form/preview flow, ahead of
-  // the trade API existing. Swap back to the real implementation above
-  // once that's wired up. Flip `success` to `false` (and drop `trade` in
-  // favor of a `message`) to preview the failure state instead.
-  screen = signal<'form' | 'preview' | 'confirmation'>('confirmation');
-  confirmationResult = signal<{ success: boolean; trade: Trade | null; message: string | null }>({
-    success: true,
-    trade: {
-      id: 'mock-trade-1',
-      type: 'buy',
-      account: 'acc-1',
-      cashAvailable: 24310.55,
-      stock: {
-        abbrName: 'AAPL',
-        fullName: 'Apple Inc.',
-        price: 227.52,
-        increaseValue: 1.32,
-        increasePCT: 0.0058,
-        volume: 48213000,
-        ask: 227.55,
-        bid: 227.49,
-      },
-      amountType: 'shares',
-      amount: 10,
-      orderType: 'market',
-      timeInForce: 'day',
-      date: new Date().toISOString(),
-    },
-    message: null,
-  });
-
-  estimatedCost = computed(() => {
-    const stock = this.stock();
-    const unitPrice = this.side() === 'buy' ? stock.ask : stock.bid;
-    return unitPrice * this.quantity();
-  });
-
-  currentDraft = computed<TradeRequest | null>(() => {
-    const account = this.selectedAccount();
-    if (!account) return null;
-    return {
-      type: this.side(),
-      account: account.id,
-      cashAvailable: account.balance,
-      stock: this.stock(),
-      amountType: this.quantityType(),
-      amount: this.quantity(),
-      orderType: this.orderTypeOld(),
-      timeInForce: this.timeInForce(),
-    };
-  });
-
-  onAccountIdChange(id: string) {
-    this.selectedAccount.set(this.accounts().find((a) => a.id === id) ?? null);
-  }
-
-  reviewOrder() {
-    if (!this.selectedAccount() || this.quantity() <= 0) return;
-    this.screen.set('preview');
-  }
-
   cancelPreview() {
     this.screen.set('form');
   }
 
-  onTradeConfirmed(trade: Trade) {
-    this.confirmationResult.set({ success: true, trade, message: null });
+  onOrderPlaced(order: OrderResponse) {
+    this.submittedOrder.set(order);
+    this.submitError.set(null);
     this.screen.set('confirmation');
   }
 
-  onTradeFailed(message: string) {
-    this.confirmationResult.set({ success: false, trade: null, message });
+  onOrderFailed(message: string) {
+    this.submittedOrder.set(null);
+    this.submitError.set(message);
     this.screen.set('confirmation');
+  }
+
+  viewActivity() {
+    void this.router.navigate(['/history']);
   }
 
   finishConfirmation() {
-    this.quantity.set(0);
+    this.submittedOrder.set(null);
+    this.submitError.set(null);
     this.screen.set('form');
   }
 }

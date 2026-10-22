@@ -85,3 +85,11 @@
     gap: 0;
   }
 }
+
+.order-form-error {
+  margin: 0 1.5rem 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: var(--mat-sys-on-error-container);
+  background: var(--mat-sys-error-container);
+}

@@ -1,11 +1,25 @@
 <div class="trade-screen">
+  @if (screen() === 'preview' && draft()) {
+  <app-preview-page
+    [request]="draft()!"
+    [portfolioLabel]="draftPortfolioLabel()"
+    (back)="cancelPreview()"
+    (confirmed)="onOrderPlaced($event)"
+    (failed)="onOrderFailed($event)" />
+  } @else if (screen() === 'confirmation') {
+  <app-trade-confirmation
+    [order]="submittedOrder()"
+    [message]="submitError()"
+    (done)="finishConfirmation()"
+    (viewActivity)="viewActivity()" />
+  } @else {
   <mat-card appearance="outlined" class="order-panel">
     <mat-card-header class="order-panel__header">
       <mat-card-title>Place a trade</mat-card-title>
       <mat-card-subtitle>Build an order across your portfolios</mat-card-subtitle>
     </mat-card-header>
 
-    <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
+    <form [formGroup]="orderForm" (ngSubmit)="reviewOrder()">
       <mat-card-content class="order-panel__content">
         <p class="order-panel__section-title">Order details</p>
 
@@ -53,7 +67,11 @@
           @if (settlementMode().source === 'owned') {
             <mat-select required formControlName="settlementCurrency">
               @for (currency of ownedCurrencies(); track currency.symbol) {
-                <mat-option [value]="currency.symbol">{{ currency.symbol }}</mat-option>
+                <mat-option [value]="currency.symbol">{{ currency.symbol }} &middot; {{ currency.name }}</mat-option>
+              } @empty {
+                <mat-option disabled>
+                  {{ orderForm.controls.portfolioId.value ? 'This portfolio holds no cash' : 'Choose a portfolio first' }}
+                </mat-option>
               }
             </mat-select>
           } @else {
@@ -80,11 +98,16 @@
       </div>
       </mat-card-content>
 
+      @if (formError(); as error) {
+        <p class="order-form-error" role="alert">{{ error }}</p>
+      }
+
       <mat-card-actions class="order-panel__actions">
       <button matButton="filled" class="order-submit" type="submit">
-        Submit trade
+        Review order
       </button>
       </mat-card-actions>
     </form>
   </mat-card>
+  }
 </div>

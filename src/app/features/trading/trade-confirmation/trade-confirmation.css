@@ -1,43 +1,234 @@
+/* matches the trade form's .order-panel card (trade-screen.css) so the flow reads as one */
 :host {
   display: block;
-  max-width: 420px;
+  width: min(100%, 34rem);
 }
 
 .confirmation-card {
+  overflow: hidden;
+  border-color: var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-high);
+  box-shadow: 0 1rem 3rem color-mix(in srgb, var(--mat-sys-shadow) 22%, transparent);
+  /* both spinners (badge and current step) are tertiary */
+  --mat-progress-spinner-active-indicator-color: var(--mat-sys-tertiary);
+}
+
+.confirmation-card__header {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem 1.5rem;
-  gap: 0.5rem;
-}
-
-.result-icon mat-icon {
-  width: 5rem;
-  height: 5rem;
-  font-size: 5rem;
-}
-
-.result-icon--success mat-icon {
-  color: var(--color-success);
-}
-
-.result-icon--failure mat-icon {
-  color: var(--color-danger);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 
 .result-title {
-  margin: 0.5rem 0 0;
-  font-size: 1.3rem;
+  color: var(--mat-sys-on-surface);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .result-detail {
-  margin: 0 0 1rem;
-  color: var(--color-text-muted);
+  margin-top: 0.35rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.status-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-badge mat-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  font-size: 0.9rem;
+}
+
+.status-badge--processing {
+  color: var(--mat-sys-tertiary);
+}
+
+.status-badge--filled {
+  color: var(--color-success);
+}
+
+.status-badge--rejected,
+.status-badge--cancelled,
+.status-badge--failed {
+  color: var(--color-danger);
+}
+
+.confirmation-card__content {
+  padding: 1.75rem 1.5rem 0;
+}
+
+/* horizontal stepper: each step after the first draws the connector back to the previous one */
+.status-steps {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.status-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.status-step:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  top: 11px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--mat-sys-outline-variant);
+}
+
+.status-step--done:not(:first-child)::before,
+.status-step--current:not(:first-child)::before {
+  background: var(--mat-sys-tertiary);
+}
+
+.status-step--failed:not(:first-child)::before {
+  background: var(--color-danger);
+}
+
+.status-step__marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border: 2px solid var(--mat-sys-outline);
+  background: var(--mat-sys-surface-container-high);
+}
+
+.status-step__marker mat-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.status-step--done .status-step__marker {
+  border-color: var(--mat-sys-tertiary);
+  color: var(--mat-sys-on-tertiary);
+  background: var(--mat-sys-tertiary);
+}
+
+.status-step--current .status-step__marker {
+  border-color: var(--mat-sys-tertiary);
+}
+
+.status-step--failed .status-step__marker {
+  border-color: var(--color-danger);
+  color: var(--mat-sys-on-surface);
+  background: var(--color-danger);
+}
+
+.status-step--done,
+.status-step--current {
+  color: var(--mat-sys-on-surface);
+}
+
+.status-step--failed {
+  color: var(--color-danger);
+}
+
+.status-step__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-step__time {
+  min-height: 1rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.result-reason {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  color: var(--mat-sys-on-error-container);
+  background: var(--mat-sys-error-container);
+}
+
+.order-details {
+  margin: 0;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.order-details__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  font-size: 0.875rem;
+}
+
+.order-details__row dt {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.order-details__row dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--mat-sys-on-surface);
+}
+
+.order-details__row--total {
+  align-items: baseline;
+  padding-top: 1rem;
+  border-bottom: none;
+}
+
+.order-details__row--total dt {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+}
+
+.order-details__row--total dd {
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--mat-sys-tertiary);
+}
+
+.confirmation-card__actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.result-activity {
+  flex: 1;
+  --mat-button-outlined-container-height: 3rem;
 }
 
 .result-done {
-  width: 100%;
+  flex: 2;
   --mat-button-filled-container-color: var(--mat-sys-tertiary);
   --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
+  --mat-button-filled-container-height: 3rem;
 }

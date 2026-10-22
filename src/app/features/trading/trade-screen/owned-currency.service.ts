@@ -14,14 +14,23 @@ export class CurrencyService {
     currenciesOwnedByPortfolio(portfolioId: string): Observable<OwnedCurrency[]> {
         return this.api.getHoldings(portfolioId).pipe(
             map(holdings => {
-                const currencies = new Map<string, OwnedCurrency>();
+                // holdings are a ledger (one row per order leg, debits negative), so sum per symbol.
+                // only cash can settle a trade, so skip stocks and crypto the portfolio also holds
+                const currencies = new Map<string, OwnedCurrency & { balance: number }>();
                 for (const holding of holdings) {
+                    if (holding.instrumentType !== 'CASH') {
+                        continue;
+                    }
+                    const existing = currencies.get(holding.symbol);
                     currencies.set(holding.symbol, {
                         symbol: holding.symbol,
                         name: holding.instrumentName,
+                        balance: (existing?.balance ?? 0) + holding.quantity,
                     });
                 }
-                return [...currencies.values()];
+                return [...currencies.values()]
+                    .filter(currency => currency.balance > 0)
+                    .map(({ symbol, name }) => ({ symbol, name }));
             }),
         );
     }

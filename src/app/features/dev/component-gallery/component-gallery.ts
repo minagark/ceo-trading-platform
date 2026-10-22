@@ -7,7 +7,7 @@ import { PortfolioPerformance } from '../../portfolio/portfolio-performance/port
 import { MarketAnalysis } from '../../market/market-analysis/market-analysis';
 import { AccountsList, Account } from '../../account/accounts-list/accounts-list';
 import { PreviewPage } from '../../trading/preview-page/preview-page';
-import { Trade, TradeRequest } from '../../trading/trade-screen/trade-screen';
+import { OrderRequest } from '../../../core/trading.models';
 import { TradeConfirmation } from '../../trading/trade-confirmation/trade-confirmation';
 import { HoldingsList } from '../../portfolio/holdings/holdings-list';
 import { PortfolioHoldingsPage } from '../../portfolio/portfolio-holdings-page/portfolio-holdings-page';
@@ -18,37 +18,19 @@ interface GalleryEntry {
   inputs?: Record<string, unknown>;
 }
 
-const mockPreviewDraft: TradeRequest = {
-  type: 'buy',
-  account: 'acc-1',
-  cashAvailable: 5000,
-  stock: {
-    abbrName: 'AAPL',
-    fullName: 'Apple Inc.',
-    price: 227.52,
-    increaseValue: 1.32,
-    increasePCT: 0.0058,
-    volume: 48213000,
-    ask: 227.55,
-    bid: 227.49,
-  },
-  amountType: 'shares',
-  amount: 10,
-  orderType: 'market',
-  timeInForce: 'day',
-};
-
-const mockPreviewAccount: Account = {
-  id: 'acc-1',
-  name: 'Individual',
-  type: 'Individual',
-  balance: 5000,
-};
-
-const mockConfirmedTrade: Trade = {
-  ...mockPreviewDraft,
-  id: 'mock-trade-1',
-  date: new Date().toISOString(),
+const mockOrderRequest: OrderRequest = {
+  clientId: 'client-1',
+  clientName: 'John Doe',
+  portfolioId: 'portfolio-1',
+  addInstrumentSymbol: 'AAPL',
+  addInstrumentType: 'EQUITY',
+  subtractInstrumentSymbol: 'USD',
+  subtractInstrumentType: 'EQUITY',
+  quantity: 10,
+  quotedPrice: 227.55,
+  side: 'BUY',
+  changeThreshold: 0.02,
+  market: 'America/New_York',
 };
 
 // id '1' lines up with AccountsService's mock "Brokerage" account, so
@@ -79,12 +61,13 @@ export class ComponentGallery {
     {
       name: 'Preview Page',
       component: PreviewPage,
-      inputs: { draft: mockPreviewDraft, account: mockPreviewAccount },
+      inputs: { request: mockOrderRequest, portfolioLabel: 'portfolio-1 (BROKERAGE)' },
     },
     {
       name: 'Trade Confirmation',
       component: TradeConfirmation,
-      inputs: { success: true, trade: mockConfirmedTrade },
+      // the success state follows a real order over the WebSocket, so the gallery shows the failure state
+      inputs: { message: 'Market API returned 429: daily quota exhausted.' },
     },
     {
       name: 'Holdings List',
