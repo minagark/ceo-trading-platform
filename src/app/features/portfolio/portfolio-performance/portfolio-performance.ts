@@ -1,15 +1,18 @@
-import { Component, input } from '@angular/core';
+import { Component, effect, inject, model, signal } from '@angular/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.service';
 import { AgCharts } from "ag-charts-angular";
 import {
   AgChartOptions,
-  CategoryAxisModule,
-  LegendModule,
-  LineSeriesModule,
+  AllCommunityModule,
   ModuleRegistry,
-  NumberAxisModule,
-  AllCommunityModule
 } from "ag-charts-community";
 import { TimeFrame } from '../../market/stock-display/stock-display';
+import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
+import { AccountsService } from '../../account/accounts-list/accounts.service';
+import { HoldingsService } from '../holdings/holdings.service';
+import { forkJoin } from 'rxjs';
 
 
 // mock account data
@@ -23,74 +26,46 @@ interface Account {
   history: number[];
 }
 
+interface GraphItem {
+  date: Date; // is it date... lowkey could be time too depending on time frame
+  balance: number;
+}
+
 
 ModuleRegistry.registerModules([
-  CategoryAxisModule,
-  LegendModule,
-  LineSeriesModule,
-  NumberAxisModule,
+  AllCommunityModule,
 ]);
 
 @Component({
-  imports: [AgCharts],
+  imports: [AgCharts, MatFormFieldModule, MatSelectModule],
   selector: 'performance-chart',
   styleUrl: './portfolio-performance.css',
   templateUrl: './portfolio-performance.html',
 })
 export class PortfolioPerformance {
 
-  selectedTimeFrame = input<TimeFrame>('1M');
+  selectedTimeFrame = model<TimeFrame>('1M'); // model lets stock \display sitll see
 
-  // functional code
-  /* TODO: replace with real data handling */
-  accounts: Account[] = [
-    {id: 1, name: 'Account 1', balance: 1500, holdings: [{symbol: "AAPL", quantity: 10}, {symbol: "MSFT", quantity: 10}], history: [1000, 2000, 1500, 3000, 2750, 2800, 1100, 1500]},
-    {id: 2, name: 'Account 2', balance: 2000, holdings: [{symbol: "AAPL", quantity: 20}, {symbol: "MSFT", quantity: 20}], history: [1000, 2000, 1500]},
-    {id: 3, name: 'Account 3', balance: 3000, holdings: [{symbol: "AAPL", quantity: 30}, {symbol: "MSFT", quantity: 30}], history: [1000, 2000, 1500]}
-  ]
+  readonly accountSelectionService = inject(AccountSelectionService);
+  readonly accountsService = inject(AccountsService);
+  readonly holdingsService = inject(HoldingsService);
+  readonly portfolioApi = inject(PortfolioApiService);
 
-  public options: AgChartOptions;
-  // public finOptions: AgFinancialChartOptions;
-  // constructor() {
-  //   this.finOptions = {
-  //     data: [
-  //       { date: new Date(2024, 0, 1), value: this.accounts[0].history[0] },
-  //       { date: new Date(2024, 0, 2), value: this.accounts[0].history[1] },
-  //       { date: new Date(2024, 0, 3), value: this.accounts[0].history[2] },
-  //       { date: new Date(2024, 0, 4), value: this.accounts[0].history[3] },
-  //       { date: new Date(2024, 0, 5), value: this.accounts[0].history[4] },
-  //       { date: new Date(2024, 0, 6), value: this.accounts[0].history[5] },
-  //       { date: new Date(2024, 0, 7), value: this.accounts[0].history[6] },
-  //       { date: new Date(2024, 0, 8), value: this.accounts[0].history[7] }
-  //     ],
-  //     chartType: 'line',
-  //   };
-  // }
+  readonly items = signal<GraphItem[]>([]);
 
-  constructor() {
-    this.options = {
-      // title: {
+  readonly TIME_FRAMES: TimeFrame[] = ['1W', '1M', '3M', '1Y', '5Y'];
+
+  onTimeFrameChange(timeframe: TimeFrame): void {
+    this.selectedTimeFrame.set(timeframe);
+  }
+
+
+  public options = signal<AgChartOptions>({
+ // title: {
       //   text: this.accounts[0].name,
       // },
       // data: this.accounts[0].history.map((balance, index) => ({ date: index, balance })),
-      data : [
-       { date: "d1",
-        balance: this.accounts[0].history[0]},
-       { date: "d2",
-        balance: this.accounts[0].history[1]},
-       { date: "d3",
-        balance: this.accounts[0].history[2]},
-       { date: "d4",
-        balance: this.accounts[0].history[3]},
-       { date: "d5",
-        balance: this.accounts[0].history[4]},
-       { date: "d6",
-        balance: this.accounts[0].history[5]},
-       { date: "d7",
-        balance: this.accounts[0].history[6]},
-       { date: "d8",
-        balance: this.accounts[0].history[7]}
-      ],
+      data :[],
       series: [
         {
           type: 'line',
@@ -108,14 +83,16 @@ export class PortfolioPerformance {
       },
       axes: {
         x: {
-          type: 'category', // changes this to time once get real time stamp (or leave as category depending on parsing)
+          type: 'time', // changes this to time once get real time stamp (or leave as category depending on parsing)
           gridLine: {
             enabled: false
           },
           label: {
             enabled: true,
-            color: "var(--mat-sys-on-surface)"
+            color: "var(--mat-sys-on-surface)",
+            format: '%b %d',
           },
+          nice: false,
         },
         y: {
           type: 'number',
@@ -128,8 +105,79 @@ export class PortfolioPerformance {
           }
         }
       }
+  });
 
-    }
+  public graphData = signal<GraphItem[]>([]);
+
+  constructor() {
+    effect((onCleanup) => {
+      const selectedAccount = this.accountSelectionService.selectedAccount();
+      const accounts = this.accountsService.accounts();
+      const timeframe = this.selectedTimeFrame();
+      const portfolioIds = selectedAccount
+        ? [selectedAccount.id]
+        : accounts.map((account) => account.id);
+
+      if (portfolioIds.length === 0) {
+        this.graphData.set([]);
+        this.updateChart(this.graphData());
+        return;
+      }
+
+      const request = forkJoin(
+        portfolioIds.map((portfolioId) =>
+          this.portfolioApi.getPerformance(portfolioId, timeframe)
+        )
+      )
+        .subscribe({
+          next: (performanceByPortfolio) => {
+            const balancesByDate = new Map<string, number>();
+
+            for (const performance of performanceByPortfolio) {
+              for (const point of performance) {
+                const date = new Date(point.date);
+                const balance = Number(point.balance);
+
+                if (Number.isNaN(date.getTime()) || !Number.isFinite(balance)) {
+                  continue;
+                }
+
+                const dateKey = date.toISOString();
+                balancesByDate.set(
+                  dateKey,
+                  (balancesByDate.get(dateKey) ?? 0) + balance
+                );
+              }
+            }
+
+            const graphData = Array.from(balancesByDate.entries())
+              .map(([date, balance]) => ({
+                date: new Date(date),
+                balance,
+              }))
+              .sort((left, right) => left.date.getTime() - right.date.getTime());
+
+            this.graphData.set(graphData);
+            this.updateChart(graphData);
+          },
+          error: () => {
+            this.graphData.set([]);
+            this.updateChart(this.graphData());
+          },
+        });
+
+      onCleanup(() => request.unsubscribe());
+    });
+  }
+
+  private updateChart(data: GraphItem[]): void {
+    console.log('Chart data:', data);
+
+    this.items.set(data);
+      this.options.update((options) => ({
+        ...options,
+        data: [...data],
+    }));
   }
 
 

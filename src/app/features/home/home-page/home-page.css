@@ -18,7 +18,11 @@
   flex: 1;
   margin: 16px;
 }
-
+.top-row {
+  grid-column: span 1; /* each top-row widget takes one column */
+  /* have ll the same height */
+  grid-row: span 1; /* each top-row widget takes one row */
+}
 .full-width {
   grid-column: 1 / -1; /* span all columns */
 }

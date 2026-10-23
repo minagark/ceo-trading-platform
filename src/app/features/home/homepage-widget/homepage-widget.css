@@ -1,3 +1,10 @@
+.homepage-widget,
+:host {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
 .container {
     padding: 16px;
     outline: 1px solid var(--mat-sys-on-surface);
@@ -5,7 +12,43 @@
 
 .view-all {
     color: var(--mat-sys-on-surface);
-    position: absolute;
+    position: relative;
     right: 0;
-    padding-right: 20px;
+    padding-right: 20px; 
+    /* position on right*/
+    margin-left: auto;
+    
+}
+
+.widget-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.widget-container > mat-card-header,
+.widget-container > mat-card-content {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.widget-container > mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 0;
+}
+
+.widget-container > mat-card-content > * {
+    display: block;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
 }

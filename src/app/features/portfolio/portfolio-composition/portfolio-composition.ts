@@ -48,6 +48,7 @@ export class PortfolioComposition {
         fill: 'var(--mat-sys-surface)'
       },
       legend: {
+        position: 'bottom',
         item: {
           label: {
             color: "var(--mat-sys-on-surface)"
