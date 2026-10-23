@@ -82,10 +82,14 @@
         <!-- % change for the selected period -->
         <div
           class="holdings-list__col holdings-list__period-change"
-          [class.positive]="row.selectedPeriodChangePct >= 0"
-          [class.negative]="row.selectedPeriodChangePct < 0"
+          [class.positive]="row.selectedPeriodChangePct !== null && row.selectedPeriodChangePct >= 0"
+          [class.negative]="row.selectedPeriodChangePct !== null && row.selectedPeriodChangePct < 0"
         >
-          {{ row.selectedPeriodChangePct >= 0 ? '+' : '' }}{{ row.selectedPeriodChangePct | percent: '1.2-2' }}
+          @if (row.selectedPeriodChangePct === null) {
+            &mdash;
+          } @else {
+            {{ row.selectedPeriodChangePct >= 0 ? '+' : '' }}{{ row.selectedPeriodChangePct | percent: '1.2-2' }}
+          }
         </div>
 
         <!-- Total % change since purchase -->

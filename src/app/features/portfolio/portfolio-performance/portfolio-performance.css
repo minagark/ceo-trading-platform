@@ -1,7 +1,34 @@
-/*
-  TODO: not yet styled.
-  When you build this out, use the theme tokens defined in
-  frontend/src/styles.css (--color-bg, --color-surface, --color-accent,
-  --color-border, --color-text, etc.) instead of hard-coding colors, so this
-  stays consistent with the rest of the app's yellow & black theme.
-*/
+.performance-widget {
+  display: grid;
+  grid-template-rows: auto minmax(220px, 1fr) auto;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 300px;
+  padding: 0.25rem 0.5rem 0.5rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.widget-timeframe-select {
+  width: min(7rem, 100%);
+  justify-self: end;
+  margin: 0;
+}
+
+.performance-chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 220px;
+}
+
+.performance-timeframe {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.75rem;
+  line-height: 1.25;
+  text-align: right;
+}
+

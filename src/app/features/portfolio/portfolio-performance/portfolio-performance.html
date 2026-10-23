@@ -1,4 +1,15 @@
-<div style="display: grid; width: 100%; height: 100%;">
-    <ag-charts [options]="options"></ag-charts>
-    <p>Time Frame: {{selectedTimeFrame()}}</p>
+<div class="performance-widget">
+  <mat-form-field class="widget-timeframe-select" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Time Frame</mat-label>
+        <mat-select
+          [value]="selectedTimeFrame()"
+          (valueChange)="onTimeFrameChange($event)"
+        >
+          @for (tf of TIME_FRAMES; track tf) {
+            <mat-option [value]="tf">{{ tf }}</mat-option>
+          }
+        </mat-select>
+    </mat-form-field>
+    <ag-charts class="performance-chart" [options]="options()"></ag-charts>
+    <p class="performance-timeframe">Time Frame: {{ selectedTimeFrame() }}</p>
 </div>
