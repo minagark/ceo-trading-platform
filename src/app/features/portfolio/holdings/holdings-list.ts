@@ -10,7 +10,7 @@ export interface HoldingRow extends Holding {
   marketValue: number;
   dayChangeTotal: number;
   totalGainPct: number;
-  selectedPeriodChangePct: number;
+  selectedPeriodChangePct: number | null;
   // Where currentPrice sits within [weekLow52, weekHigh52], as a 0-100 %,
   // for positioning the marker on the 52-week range bar.
   weekRangePosition: number;
