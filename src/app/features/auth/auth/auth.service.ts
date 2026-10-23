@@ -1,34 +1,113 @@
+import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
-
-const STORAGE_KEY = 'auth.isAuthenticated';
-const USER_ID_STORAGE_KEY = 'auth.userId';
-
-// Temporary fixture until the real authentication flow provides the user ID.
-export const DEV_USER_ID = '2c522b92-7151-4daa-92db-81a2253c772a';
+import { Observable, catchError, finalize, map, of, shareReplay, tap, throwError } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import {
+  AuthUserResponse,
+  ChangePasswordRequest,
+  CreateUserRequest,
+  LoginResponse,
+} from './auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  isAuthenticated = signal<boolean>(localStorage.getItem(STORAGE_KEY) === 'true');
-  currentUserId = signal<string | null>(
-    localStorage.getItem(USER_ID_STORAGE_KEY) ??
-      (this.isAuthenticated() ? DEV_USER_ID : null),
-  );
+  private readonly http: HttpClient;
+  private refreshRequest$: Observable<LoginResponse> | null = null;
 
-  login(email: string, password: string): boolean {
-    if (!email || !password) {
-      return false;
-    }
-    this.isAuthenticated.set(true);
-    this.currentUserId.set(DEV_USER_ID);
-    localStorage.setItem(STORAGE_KEY, 'true');
-    localStorage.setItem(USER_ID_STORAGE_KEY, DEV_USER_ID);
-    return true;
+  readonly isAuthenticated = signal(false);
+  readonly currentUserId = signal<string | null>(null);
+  readonly currentUserFirstName = signal<string | null>(null);
+  readonly accessToken = signal<string | null>(null);
+  readonly currentUserRole = signal<string | null>(null);
+
+  constructor(backend: HttpBackend) {
+    // Bypass the auth interceptor for auth endpoints to avoid refresh recursion.
+    this.http = new HttpClient(backend);
   }
 
-  logout(): void {
+  signup(request: CreateUserRequest): Observable<AuthUserResponse> {
+    return this.http.post<AuthUserResponse>(`${environment.apiBaseUrl}/users`, request, {
+      withCredentials: true,
+    });
+  }
+
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(
+        `${environment.apiBaseUrl}/auth/login`,
+        { email, password },
+        { withCredentials: true },
+      )
+      .pipe(tap((response) => this.setSession(response)));
+  }
+
+  refreshAccessToken(): Observable<LoginResponse> {
+    if (!this.refreshRequest$) {
+      this.refreshRequest$ = this.http
+        .post<LoginResponse>(`${environment.apiBaseUrl}/auth/refresh`, {}, { withCredentials: true })
+        .pipe(
+          tap((response) => this.setSession(response)),
+          finalize(() => (this.refreshRequest$ = null)),
+          shareReplay({ bufferSize: 1, refCount: false }),
+        );
+    }
+    return this.refreshRequest$;
+  }
+
+  restoreSession(): Observable<boolean> {
+    if (this.accessToken()) {
+      return of(true);
+    }
+    return this.refreshAccessToken().pipe(
+      map(() => true),
+      catchError(() => {
+        this.clearSession();
+        return of(false);
+      }),
+    );
+  }
+
+  logout(): Observable<void> {
+    return this.http
+      .post<void>(`${environment.apiBaseUrl}/auth/logout`, {}, { withCredentials: true })
+      .pipe(finalize(() => this.clearSession()));
+  }
+
+  changePassword(request: ChangePasswordRequest): Observable<unknown> {
+    const token = this.accessToken();
+    return this.http.post(`${environment.apiBaseUrl}/auth/change-password`, request, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      withCredentials: true,
+    });
+  }
+
+  updateCurrentUser(user: AuthUserResponse): void {
+    this.currentUserId.set(user.userId);
+    this.currentUserFirstName.set(user.fullName.trim().split(/\s+/)[0] || null);
+  }
+
+  clearSession(): void {
     this.isAuthenticated.set(false);
     this.currentUserId.set(null);
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(USER_ID_STORAGE_KEY);
+    this.currentUserFirstName.set(null);
+    this.accessToken.set(null);
+    this.currentUserRole.set(null);
+  }
+
+  private setSession(response: LoginResponse): void {
+    this.accessToken.set(response.accessToken);
+    this.currentUserId.set(response.userId);
+    this.currentUserRole.set(response.role);
+    this.isAuthenticated.set(true);
+    this.http
+      .get<AuthUserResponse>(`${environment.apiBaseUrl}/auth/me`, {
+        headers: { Authorization: `Bearer ${response.accessToken}` },
+      })
+      .pipe(catchError(() => of(null)))
+      .subscribe((user) => {
+        if (user?.fullName) {
+          this.updateCurrentUser(user);
+        }
+      });
   }
 }

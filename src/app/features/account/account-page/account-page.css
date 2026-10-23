@@ -1,29 +1,190 @@
 .account-page {
-  padding: 1.5rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
+  width: min(100% - 2rem, 1100px);
+  margin: 2rem auto;
   color: var(--color-text);
 }
 
-.account-page__title {
-  margin: 0 0 0.5rem;
+.account-page__header {
+  margin-bottom: 1.5rem;
+}
+
+.account-page__eyebrow {
+  margin: 0 0 0.45rem;
   color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.account-page__title {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  letter-spacing: -0.04em;
+}
+
+.account-page__subtitle {
+  margin: 0.45rem 0 0;
+  color: var(--color-text-muted);
+}
+
+.account-page__grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+  gap: 1.1rem;
+  align-items: start;
+}
+
+.account-card {
+  min-width: 0;
+  padding: clamp(1rem, 2vw, 1.4rem);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  box-shadow: 0 14px 36px rgb(0 0 0 / 10%);
+}
+
+.account-card--accounts {
+  margin-top: 1.1rem;
+}
+
+.account-card__heading,
+.account-card__title-row,
+.portfolio-item__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.account-card__heading {
+  justify-content: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.account-avatar {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--color-accent-text);
+  background: var(--color-accent);
+  border-radius: 50%;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.account-card__heading h2,
+.account-card__title-row h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.account-card__heading p {
+  margin: 0.3rem 0 0;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.account-card__title-row {
+  margin-bottom: 1rem;
+}
+
+.account-count {
+  display: grid;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.55rem;
+  place-items: center;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .account-page__details {
   margin: 0;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.account-page__details div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .account-page__details dt {
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .account-page__details dd {
   margin: 0;
   color: var(--color-text);
+  font-weight: 600;
+  text-align: right;
+}
+
+.portfolio-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.portfolio-item {
+  padding: 0.95rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+}
+
+.portfolio-item__heading h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.portfolio-item__heading span {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+
+.portfolio-holdings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portfolio-holdings li {
+  padding: 0.35rem 0.55rem;
+  color: var(--color-text-muted);
+  background: var(--color-surface-raised);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.account-page__empty,
+.account-page__state {
+  margin: 0;
+  padding: 1rem;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border-radius: 10px;
+}
+
+.account-page__state--error {
+  color: var(--color-danger);
+}
+
+@media (max-width: 760px) {
+  .account-page {
+    margin-block: 1rem;
+  }
+
+  .account-page__grid {
+    grid-template-columns: 1fr;
+  }
 }

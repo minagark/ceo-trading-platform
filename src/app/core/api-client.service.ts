@@ -29,6 +29,10 @@ export class ApiClient {
     return this.http.post<TResponse>(this.rootUrl(path), body);
   }
 
+  patch<TResponse, TRequest>(path: string, body: TRequest): Observable<TResponse> {
+    return this.http.patch<TResponse>(this.url(path), body);
+  }
+
   private url(path: string): string {
     return `${environment.apiBaseUrl}/${path.replace(/^\//, '')}`;
   }

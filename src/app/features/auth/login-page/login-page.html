@@ -33,37 +33,156 @@
     <h1 class="login-brand__title">MarketHive</h1>
   </div>
 
-  <form class="login-card" (ngSubmit)="onSubmit()">
-    <label class="login-field">
-      Email
-      <input
-        type="email"
-        name="email"
-        placeholder="Value"
-        [ngModel]="email()"
-        (ngModelChange)="email.set($event)"
-        autocomplete="email"
-      />
-    </label>
+  <section class="login-card" [attr.aria-label]="activeView() === 'login' ? 'Sign in' : 'Sign up'">
+    <div class="auth-tabs" role="tablist" aria-label="Account access">
+      <button
+        type="button"
+        class="auth-tab"
+        [class.auth-tab--active]="activeView() === 'login'"
+        [attr.aria-selected]="activeView() === 'login'"
+        role="tab"
+        (click)="showLogin()"
+      >
+        Log in
+      </button>
+      <button
+        type="button"
+        class="auth-tab"
+        [class.auth-tab--active]="activeView() === 'signup'"
+        [attr.aria-selected]="activeView() === 'signup'"
+        role="tab"
+        (click)="showSignup()"
+      >
+        Sign up
+      </button>
+    </div>
 
-    <label class="login-field">
-      Password
-      <input
-        type="password"
-        name="password"
-        placeholder="Value"
-        [ngModel]="password()"
-        (ngModelChange)="password.set($event)"
-        autocomplete="current-password"
-      />
-    </label>
+    @if (activeView() === 'login') {
+      <form class="auth-form" (ngSubmit)="onLoginSubmit()">
+        <h2 class="auth-heading">Welcome back</h2>
+        <label class="login-field">
+          Email
+          <input
+            type="email"
+            name="loginEmail"
+            placeholder="you@example.com"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            autocomplete="email"
+            required
+          />
+        </label>
 
-    @if (error()) {
-      <p class="login-error">{{ error() }}</p>
+        <label class="login-field">
+          Password
+          <input
+            type="password"
+            name="loginPassword"
+            placeholder="Enter your password"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            autocomplete="current-password"
+            required
+          />
+        </label>
+
+        @if (error()) {
+          <p class="login-error" role="alert">{{ error() }}</p>
+        }
+        @if (successMessage()) {
+          <p class="login-success" role="status">{{ successMessage() }}</p>
+        }
+
+        <button type="submit" class="login-submit" [disabled]="submitting()">
+          {{ submitting() ? 'Logging in…' : 'Log in' }}
+        </button>
+        <p class="auth-switch-prompt">
+          Don’t have an account?
+          <button type="button" class="auth-switch-link" (click)="showSignup()">Sign up</button>
+        </p>
+      </form>
+    } @else {
+      <form class="auth-form" (ngSubmit)="onSignupSubmit()">
+        <h2 class="auth-heading">Create your account</h2>
+        <label class="login-field">
+          First name
+          <input
+            type="text"
+            name="firstName"
+            placeholder="First name"
+            [ngModel]="firstName()"
+            (ngModelChange)="firstName.set($event)"
+            autocomplete="given-name"
+            required
+          />
+        </label>
+
+        <label class="login-field">
+          Last name
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Last name"
+            [ngModel]="lastName()"
+            (ngModelChange)="lastName.set($event)"
+            autocomplete="family-name"
+            required
+          />
+        </label>
+
+        <label class="login-field">
+          Email
+          <input
+            type="email"
+            name="signupEmail"
+            placeholder="you@example.com"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            autocomplete="email"
+            required
+          />
+        </label>
+
+        <label class="login-field">
+          Password
+          <input
+            type="password"
+            name="signupPassword"
+            placeholder="At least 8 characters"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          />
+        </label>
+
+        <label class="login-field">
+          Confirm password
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Re-enter your password"
+            [ngModel]="confirmPassword()"
+            (ngModelChange)="confirmPassword.set($event)"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          />
+        </label>
+
+        @if (error()) {
+          <p class="login-error" role="alert">{{ error() }}</p>
+        }
+
+        <button type="submit" class="login-submit" [disabled]="submitting()">
+          {{ submitting() ? 'Creating account…' : 'Create account' }}
+        </button>
+        <p class="auth-switch-prompt">
+          Already have an account?
+          <button type="button" class="auth-switch-link" (click)="showLogin()">Log in</button>
+        </p>
+      </form>
     }
-
-    <button type="submit" class="login-submit">Sign In</button>
-
-    <a class="login-forgot" href="#">Forgot password?</a>
-  </form>
+  </section>
 </div>

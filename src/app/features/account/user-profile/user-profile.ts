@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../auth/auth/auth.service';
@@ -13,13 +13,20 @@ import { AuthService } from '../../auth/auth/auth.service';
 export class UserProfile {
   //hardcoded 
   initials = 'SS';
+  readonly logoutError = signal<string | null>(null);
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   //use the AuthService to logout
   onLogout(): void {
-    this.authService.logout();
-    this.router.navigateByUrl('/login');
+    this.logoutError.set(null);
+    this.authService.logout().subscribe({
+      next: () => this.router.navigateByUrl('/login'),
+      error: () => {
+        this.logoutError.set('Could not contact the server; local session cleared.');
+        this.router.navigateByUrl('/login');
+      },
+    });
   }
 }
