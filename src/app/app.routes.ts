@@ -27,5 +27,5 @@ export const routes: Routes = [
   { path: 'account', component: AccountPage, canActivate: [authGuard] },
   { path: 'account/:userId', component: AccountPage, canActivate: [authGuard] },
   { path: 'settings', component: SettingsPage, canActivate: [authGuard] },
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];

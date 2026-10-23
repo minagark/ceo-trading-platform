@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   gap: 40px;
-  padding: 48px 16px;
+  padding: 16px 16px 128px;
   background: var(--color-bg);
   color: var(--color-text);
 }
@@ -98,14 +98,52 @@
 
 .login-card {
   width: 100%;
-  max-width: 320px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 28px;
+  gap: 0;
+  padding: 12px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: var(--color-bg);
+  border-radius: 9px;
+}
+
+.auth-tab {
+  padding: 10px 12px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.auth-tab--active {
+  color: var(--color-accent-text);
+  background: var(--color-accent);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 12px 12px;
+}
+
+.auth-heading {
+  margin: 0 0 2px;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .login-field {
@@ -141,6 +179,12 @@
   color: var(--color-danger);
 }
 
+.login-success {
+  margin: -8px 0 0;
+  font-size: 0.9rem;
+  color: var(--color-success);
+}
+
 .login-submit {
   padding: 12px;
   font: inherit;
@@ -156,9 +200,35 @@
   background: var(--color-accent-hover);
 }
 
-.login-forgot {
-  align-self: flex-start;
+.auth-switch-prompt {
+  margin: 0;
   font-size: 0.9rem;
   color: var(--color-text-muted);
+  text-align: center;
+}
+
+.auth-switch-link {
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.auth-switch-link:hover {
+  color: var(--color-accent-hover);
   text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    gap: 28px;
+    padding: 48px 16px 112px;
+  }
+
+  .auth-form {
+    padding-inline: 8px;
+  }
 }
