@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../auth/auth/auth.service';
@@ -11,8 +11,17 @@ import { AuthService } from '../../auth/auth/auth.service';
   styleUrl: './user-profile.css',
 })
 export class UserProfile {
-  //hardcoded 
-  initials = 'SS';
+  readonly initials = computed(() => {
+    const fullName = this.authService.currentUserFullName()?.trim();
+    if (!fullName) return 'U';
+
+    return fullName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toLocaleUpperCase())
+      .join('');
+  });
   readonly logoutError = signal<string | null>(null);
 
   private readonly authService = inject(AuthService);

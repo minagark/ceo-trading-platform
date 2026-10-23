@@ -16,6 +16,7 @@ export class AuthService {
 
   readonly isAuthenticated = signal(false);
   readonly currentUserId = signal<string | null>(null);
+  readonly currentUserFullName = signal<string | null>(null);
   readonly currentUserFirstName = signal<string | null>(null);
   readonly accessToken = signal<string | null>(null);
   readonly currentUserRole = signal<string | null>(null);
@@ -83,12 +84,17 @@ export class AuthService {
 
   updateCurrentUser(user: AuthUserResponse): void {
     this.currentUserId.set(user.userId);
-    this.currentUserFirstName.set(user.fullName.trim().split(/\s+/)[0] || null);
+    const firstName = user.fullName.trim().split(/\s+/)[0] ?? '';
+    this.currentUserFullName.set(user.fullName.trim() || null);
+    this.currentUserFirstName.set(
+      firstName ? firstName.charAt(0).toLocaleUpperCase() + firstName.slice(1) : null,
+    );
   }
 
   clearSession(): void {
     this.isAuthenticated.set(false);
     this.currentUserId.set(null);
+    this.currentUserFullName.set(null);
     this.currentUserFirstName.set(null);
     this.accessToken.set(null);
     this.currentUserRole.set(null);

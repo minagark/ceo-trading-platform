@@ -5,7 +5,7 @@
   [matMenuTriggerFor]="profileMenu"
   aria-label="Open profile menu"
 >
-  {{ initials }}
+  {{ initials() }}
 </button>
 @if (logoutError()) {
   <span class="user-profile__error" role="alert">{{ logoutError() }}</span>
