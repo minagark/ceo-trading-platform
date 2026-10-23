@@ -19,6 +19,7 @@ import { merge, of, startWith, switchMap } from 'rxjs';
 import { OrderApiService } from '../data-access/order-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../auth/auth/auth.service';
 
 export interface Asset {
   abbrName: string;
@@ -60,6 +61,7 @@ export class Trades {
   private currencyService = inject(CurrencyService);
   private orderApiService = inject(OrderApiService);
   private marketApiService = inject(MarketApiService);
+  private authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
@@ -204,7 +206,7 @@ export class Trades {
           side = orderInfo.side
         }
         const orderRequest: OrderRequest = {
-          clientId: '2c522b92-7151-4daa-92db-81a2253c772a',
+          clientId: this.authService.currentUserId() || '2c522b92-7151-4daa-92db-81a2253c772a', 
           clientName: 'John Doe',
           portfolioId: orderInfo.portfolioId,
           addInstrumentSymbol: addInstrument.symbol,
