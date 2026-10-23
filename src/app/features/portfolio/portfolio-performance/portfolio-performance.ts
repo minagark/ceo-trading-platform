@@ -92,6 +92,7 @@ export class PortfolioPerformance {
             color: "var(--mat-sys-on-surface)",
             format: '%b %d',
           },
+          nice: false,
         },
         y: {
           type: 'number',
