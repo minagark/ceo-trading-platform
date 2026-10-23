@@ -3,6 +3,8 @@ import { Observable } from 'rxjs';
 import { ApiClient } from '../../../core/api-client.service';
 import { Portfolio } from '../../../core/trading.models';
 import { HoldingSummaryResponse } from '../../../core/portfolio-holdings.models';
+import { TimeFrame } from '../../market/stock-display/stock-display';
+import { PerformanceResponse } from '../../../core/portfolio-performance.models';
 
 @Injectable({ providedIn: 'root' })
 export class PortfolioApiService {
@@ -32,4 +34,9 @@ export class PortfolioApiService {
     );
   }
 
+  getPerformance(portfolioId: string, timeframe: TimeFrame): Observable<PerformanceResponse[]> {
+    return this.api.get<PerformanceResponse[]>(
+      `portfolio/${encodeURIComponent(portfolioId)}/performance/${encodeURIComponent(timeframe)}`
+    );
+  }
 }
