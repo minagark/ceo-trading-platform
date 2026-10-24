@@ -207,7 +207,7 @@ export class Trades {
         }
         const orderRequest: OrderRequest = {
           clientId: this.authService.currentUserId() || '2c522b92-7151-4daa-92db-81a2253c772a', 
-          clientName: 'John Doe',
+          clientName: this.authService.currentUserFullName() || "Unknown user",
           portfolioId: orderInfo.portfolioId,
           addInstrumentSymbol: addInstrument.symbol,
           addInstrumentType: addInstrument.type,
