@@ -1,47 +1,72 @@
 <section class="account-page">
-  <h1 class="account-page__title">Account</h1>
+  <header class="account-page__header">
+    <p class="account-page__eyebrow">YOUR MARKETHIVE PROFILE</p>
+    <h1 class="account-page__title">Account</h1>
+    <p class="account-page__subtitle">Your personal details and investment accounts.</p>
+  </header>
 
   @if (loading()) {
-    <p>Loading account...</p>
+    <p class="account-page__state" role="status">Loading account…</p>
   } @else if (error()) {
-    <p>{{ error() }}</p>
+    <p class="account-page__state account-page__state--error" role="alert">{{ error() }}</p>
   } @else if (user(); as account) {
-    <dl class="account-page__details">
-      <dt>Name</dt>
-      <dd>{{ account.fullName }}</dd>
+    <div class="account-page__grid">
+      <section class="account-card account-card--profile">
+        <div class="account-card__heading">
+          <span class="account-avatar" aria-hidden="true">{{ account.fullName.charAt(0).toUpperCase() }}</span>
+          <div>
+            <h2>{{ account.fullName }}</h2>
+            <p>{{ account.email }}</p>
+          </div>
+        </div>
+        <dl class="account-page__details">
+          <div><dt>Account type</dt><dd>{{ account.role }}</dd></div>
+          <div><dt>Member since</dt><dd>{{ account.joinDate | date: 'mediumDate' }}</dd></div>
+        </dl>
+      </section>
 
-      <dt>Email</dt>
-      <dd>{{ account.email }}</dd>
-
-      <dt>Role</dt>
-      <dd>{{ account.role }}</dd>
-
-      <dt>Account Created</dt>
-      <dd>{{ account.joinDate | date: 'mediumDate' }}</dd>
-    </dl>
-
-    <h2>Portfolios</h2>
-    @if (portfolioSummaries().length) {
-      <ul>
+      <section class="account-card account-card--portfolios">
+        <div class="account-card__title-row">
+          <div>
+            <p class="account-page__eyebrow">OVERVIEW</p>
+            <h2>Portfolios</h2>
+          </div>
+          <span class="account-count">{{ portfolioSummaries().length }}</span>
+        </div>
+        @if (portfolioSummaries().length) {
+          <div class="portfolio-list">
         @for (portfolio of portfolioSummaries(); track portfolio.ID) {
-          <li>
-            {{ portfolio.type }}: {{ portfolio.holdings.length }} holdings
+          <article class="portfolio-item">
+            <div class="portfolio-item__heading">
+              <h3>{{ portfolio.type }}</h3>
+              <span>{{ portfolio.holdings.length }} holdings</span>
+            </div>
             @if (portfolio.holdings.length) {
-              <ul>
+              <ul class="portfolio-holdings">
                 @for (holding of portfolio.holdings; track holding) {
                   <li>{{ holding }}</li>
                 }
               </ul>
             }
-          </li>
+          </article>
         }
-      </ul>
-    } @else {
-      <p>No portfolios found.</p>
-    }
+          </div>
+        } @else {
+          <p class="account-page__empty">No portfolios yet. Your portfolios will appear here when available.</p>
+        }
+      </section>
+    </div>
   } @else {
-    <p>Open an account URL with a user ID to load account data.</p>
+    <p class="account-page__state">Sign in to view your account details.</p>
   }
 
-  <app-accounts-list [userId]="userId()" />
+  <section class="account-card account-card--accounts">
+    <div class="account-card__title-row">
+      <div>
+        <p class="account-page__eyebrow">BALANCES</p>
+        <h2>Accounts</h2>
+      </div>
+    </div>
+    <app-accounts-list [userId]="userId()" />
+  </section>
 </section>

@@ -18,6 +18,13 @@ export class UserApiService {
     );
   }
 
+  updateUser(userId: string, request: UpdateInfoRequest): Observable<UserResponse> {
+    return this.api.patch<UserResponse, UpdateInfoRequest>(
+      `users/${encodeURIComponent(userId)}`,
+      request,
+    );
+  }
+
   createUser(request: CreateUserRequest): Observable<UserResponse> {
     return this.api.post<UserResponse, CreateUserRequest>('users', request);
   }
@@ -42,4 +49,9 @@ export interface CreateUserRequest {
 export interface ChangePasswordRequest {
   oldPassword: string;
   newPassword: string;
+}
+
+export interface UpdateInfoRequest {
+  newName: string;
+  newEmail: string;
 }

@@ -1,4 +1,118 @@
 <section class="settings-page">
-  <h1 class="settings-page__title">Settings</h1>
-  <p class="settings-page__body">Settings controls will go here.</p>
+  <header class="settings-page__header">
+    <p class="settings-page__eyebrow">ACCOUNT PREFERENCES</p>
+    <h1 class="settings-page__title">Settings</h1>
+    <p class="settings-page__body">Manage your profile details and keep your account secure.</p>
+  </header>
+
+  @if (loading()) {
+    <p class="settings-page__loading" role="status">Loading your settings…</p>
+  } @else {
+    <div class="settings-grid">
+      <section class="settings-card" aria-labelledby="profile-heading">
+        <div class="settings-card__header">
+          <span class="settings-card__icon" aria-hidden="true">◎</span>
+          <div>
+            <h2 id="profile-heading">Profile information</h2>
+            <p>Update the name and email on your account.</p>
+          </div>
+        </div>
+
+        <form class="settings-form" (ngSubmit)="saveProfile()">
+          <label class="settings-field">
+            Full name
+            <input
+              type="text"
+              name="fullName"
+              autocomplete="name"
+              [ngModel]="fullName()"
+              (ngModelChange)="fullName.set($event)"
+              required
+            />
+          </label>
+          <label class="settings-field">
+            Email address
+            <input
+              type="email"
+              name="email"
+              autocomplete="email"
+              [ngModel]="email()"
+              (ngModelChange)="email.set($event)"
+              required
+            />
+          </label>
+
+          @if (profileError()) {
+            <p class="settings-message settings-message--error" role="alert">{{ profileError() }}</p>
+          }
+          @if (profileSuccess()) {
+            <p class="settings-message settings-message--success" role="status">{{ profileSuccess() }}</p>
+          }
+
+          <button class="settings-button" type="submit" [disabled]="profileSaving()">
+            {{ profileSaving() ? 'Saving…' : 'Save profile' }}
+          </button>
+        </form>
+      </section>
+
+      <section class="settings-card" aria-labelledby="password-heading">
+        <div class="settings-card__header">
+          <span class="settings-card__icon" aria-hidden="true">⌑</span>
+          <div>
+            <h2 id="password-heading">Change password</h2>
+            <p>Choose a new password with at least 8 characters.</p>
+          </div>
+        </div>
+
+        <form class="settings-form" (ngSubmit)="savePassword()">
+          <label class="settings-field">
+            Current password
+            <input
+              type="password"
+              name="currentPassword"
+              autocomplete="current-password"
+              [ngModel]="currentPassword()"
+              (ngModelChange)="currentPassword.set($event)"
+              required
+            />
+          </label>
+          <label class="settings-field">
+            New password
+            <input
+              type="password"
+              name="newPassword"
+              autocomplete="new-password"
+              [ngModel]="newPassword()"
+              (ngModelChange)="newPassword.set($event)"
+              minlength="8"
+              required
+            />
+          </label>
+          <label class="settings-field">
+            Confirm new password
+            <input
+              type="password"
+              name="confirmNewPassword"
+              autocomplete="new-password"
+              [ngModel]="confirmNewPassword()"
+              (ngModelChange)="confirmNewPassword.set($event)"
+              minlength="8"
+              required
+            />
+          </label>
+
+          @if (passwordError()) {
+            <p class="settings-message settings-message--error" role="alert">{{ passwordError() }}</p>
+          }
+          @if (passwordSuccess()) {
+            <p class="settings-message settings-message--success" role="status">{{ passwordSuccess() }}</p>
+          }
+
+          <button class="settings-button" type="submit" [disabled]="passwordSaving()">
+            {{ passwordSaving() ? 'Updating…' : 'Update password' }}
+          </button>
+        </form>
+      </section>
+    </div>
+  }
 </section>
