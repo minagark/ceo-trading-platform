@@ -1,9 +1,10 @@
 <section class="holdings-list">
   <header class="holdings-list__header">
     <div class="holdings-list__heading">
-    <h2 class="holdings-list__title">{{ activePortfolio()?.name ?? 'All Portfolios' }}</h2>
+      <h2 class="holdings-list__title">{{ activePortfolio()?.name ?? 'All Portfolios' }}</h2>
       <span class="holdings-list__subtitle">
-        {{ rows().length }} holding{{ rows().length === 1 ? '' : 's' }}
+        {{ rows().length }} position{{ rows().length === 1 ? '' : 's' }} &middot;
+        {{ tradeCount() }} trade{{ tradeCount() === 1 ? '' : 's' }}
       </span>
     </div>
     <div class="holdings-list__summary">
@@ -13,8 +14,9 @@
         [class.positive]="totalDayChange() >= 0"
         [class.negative]="totalDayChange() < 0"
       >
-        {{ totalDayChange() >= 0 ? '+' : '' }}{{ totalDayChange() | currency }}
-        ({{ totalDayChangePct() | percent: '1.2-2' }}) today
+        {{ totalDayChange() >= 0 ? '+' : '' }}{{ totalDayChange() | currency }} ({{
+          totalDayChangePct() | percent: '1.2-2'
+        }}) today
       </span>
     </div>
   </header>
@@ -44,76 +46,122 @@
   }
 
   <div class="holdings-list__rows" role="list">
-    @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.portfolioId + row.symbol) {
-      <div class="holdings-list__row" role="listitem">
-        <div class="holdings-list__identity">
-          <div class="holdings-list__names">
-            <span class="holdings-list__symbol">{{ row.symbol }}</span>
-            <span class="holdings-list__company">{{ row.instrumentName }}</span>
-          </div>
-        </div>
-
-        <!-- Current price + today's $ change -->
-        <div class="holdings-list__col holdings-list__price">
-        @if (row.instrumentType === 'CASH') {
-          <span>Cash</span>
-        } @else {
-          <span>{{ row.currentPrice | currency }}</span>
-        } 
-         <span
-            class="holdings-list__day-dollar"
-            [class.positive]="row.dayChangeValue >= 0"
-            [class.negative]="row.dayChangeValue < 0"
-          >
-            {{ row.dayChangeValue >= 0 ? '+' : '' }}{{ row.dayChangeValue | currency }} today
-          </span>
-        </div>
-
-        <!-- % change for the selected period -->
-        <div
-          class="holdings-list__col holdings-list__period-change"
-          [class.positive]="row.selectedPeriodChangePct !== null && row.selectedPeriodChangePct >= 0"
-          [class.negative]="row.selectedPeriodChangePct !== null && row.selectedPeriodChangePct < 0"
+    @for (row of rows() | slice: 0 : (showLess() ? 5 : rows().length); track row.groupKey) {
+      <div class="holdings-list__group" role="listitem">
+        <button
+          type="button"
+          class="holdings-list__row holdings-list__toggle"
+          [attr.aria-expanded]="expandedGroups().has(row.groupKey)"
+          [attr.aria-label]="
+            row.symbol + ' ' + row.instrumentType + ', ' + row.trades.length + ' trades'
+          "
+          (click)="toggleGroup(row.groupKey)"
         >
-          @if (row.selectedPeriodChangePct === null) {
-            &mdash;
-          } @else {
-            {{ row.selectedPeriodChangePct >= 0 ? '+' : '' }}{{ row.selectedPeriodChangePct | percent: '1.2-2' }}
-          }
-        </div>
-
-        <!-- Total % change since purchase -->
-        <div
-          class="holdings-list__col holdings-list__total-change"
-          [class.positive]="row.totalGainPct >= 0"
-          [class.negative]="row.totalGainPct < 0"
-        >
-          {{ row.totalGainPct >= 0 ? '+' : '' }}{{ row.totalGainPct | percent: '1.2-2' }}
-        </div>
-
-        <!-- Quantity -->
-        <div class="holdings-list__col holdings-list__quantity">
-          {{ row.quantity | number: '1.0-4' }}
-        </div>
-
-        <!-- Current value -->
-        <div class="holdings-list__col holdings-list__value">
-          {{ row.marketValue | currency }}
-        </div>
-
-        <!-- 52-week range -->
-        <div class="holdings-list__col holdings-list__range">
-          <div class="holdings-list__range-bar">
-            <span class="holdings-list__range-marker" [style.left.%]="row.weekRangePosition"></span>
-          </div>
-          <span class="holdings-list__range-labels">
-            {{ row.weekLow52 | currency: 'USD' : 'symbol' : '1.0-0' }} –
-            {{ row.weekHigh52 | currency: 'USD' : 'symbol' : '1.0-0' }}
+          <span class="holdings-list__identity">
+            <span class="holdings-list__chevron" aria-hidden="true">{{
+              expandedGroups().has(row.groupKey) ? '&#9662;' : '&#9656;'
+            }}</span>
+            <span class="holdings-list__names">
+              <span class="holdings-list__symbol">{{ row.symbol }}</span>
+              <span class="holdings-list__company">{{ row.instrumentName }}</span>
+              <span class="holdings-list__company"
+                >{{ row.instrumentType }} &middot; {{ row.trades.length }} trade{{
+                  row.trades.length === 1 ? '' : 's'
+                }}</span
+              >
+            </span>
           </span>
-        </div>
+          <ng-container *ngTemplateOutlet="columns; context: { $implicit: row }" />
+        </button>
+        @if (expandedGroups().has(row.groupKey)) {
+          <div role="list" [attr.aria-label]="row.symbol + ' ' + row.instrumentType + ' trades'">
+            @for (trade of row.trades; track trade.holdingId) {
+              <div class="holdings-list__row holdings-list__trade" role="listitem">
+                <div class="holdings-list__identity">
+                  <div class="holdings-list__names">
+                    <span class="holdings-list__symbol">{{
+                      portfolioName(trade.portfolioId)
+                    }}</span>
+                    <span class="holdings-list__company">Trade {{ trade.holdingId }}</span>
+                    <span class="holdings-list__company"
+                      >Avg cost {{ trade.avgCost | currency }}</span
+                    >
+                  </div>
+                </div>
+                <ng-container *ngTemplateOutlet="columns; context: { $implicit: trade }" />
+              </div>
+            }
+          </div>
+        }
       </div>
     } @empty {
       <p class="holdings-list__empty">No holdings in this portfolio yet.</p>
     }
   </div>
+
+  <ng-template #columns let-row>
+    <!-- Current price + today's $ change -->
+    <span class="holdings-list__col holdings-list__price">
+      @if (row.instrumentType === 'CASH') {
+        <span>Cash</span>
+      } @else {
+        <span>{{ row.currentPrice | currency }}</span>
+      }
+      <span
+        class="holdings-list__day-dollar"
+        [class.positive]="row.dayChangeValue >= 0"
+        [class.negative]="row.dayChangeValue < 0"
+      >
+        {{ row.dayChangeValue >= 0 ? '+' : '' }}{{ row.dayChangeValue | currency }} today
+      </span>
+    </span>
+
+    <!-- % change for the selected period -->
+    <span
+      class="holdings-list__col holdings-list__period-change"
+      [class.positive]="row.selectedPeriodChangePct !== null && row.selectedPeriodChangePct >= 0"
+      [class.negative]="row.selectedPeriodChangePct !== null && row.selectedPeriodChangePct < 0"
+    >
+      @if (row.selectedPeriodChangePct === null) {
+        &mdash;
+      } @else {
+        {{ row.selectedPeriodChangePct >= 0 ? '+' : ''
+        }}{{ row.selectedPeriodChangePct | percent: '1.2-2' }}
+      }
+    </span>
+
+    <!-- Total % change since purchase -->
+    <span
+      class="holdings-list__col holdings-list__total-change"
+      [class.positive]="row.totalGainPct !== null && row.totalGainPct >= 0"
+      [class.negative]="row.totalGainPct !== null && row.totalGainPct < 0"
+    >
+      @if (row.totalGainPct === null) {
+        &mdash;
+      } @else {
+        {{ row.totalGainPct >= 0 ? '+' : '' }}{{ row.totalGainPct | percent: '1.2-2' }}
+      }
+    </span>
+
+    <!-- Quantity -->
+    <span class="holdings-list__col holdings-list__quantity">
+      {{ row.quantity | number: '1.0-4' }}
+    </span>
+
+    <!-- Current value -->
+    <span class="holdings-list__col holdings-list__value">
+      {{ row.marketValue | currency }}
+    </span>
+
+    <!-- 52-week range -->
+    <span class="holdings-list__col holdings-list__range">
+      <span class="holdings-list__range-bar">
+        <span class="holdings-list__range-marker" [style.left.%]="row.weekRangePosition"></span>
+      </span>
+      <span class="holdings-list__range-labels">
+        {{ row.weekLow52 | currency: 'USD' : 'symbol' : '1.0-0' }} –
+        {{ row.weekHigh52 | currency: 'USD' : 'symbol' : '1.0-0' }}
+      </span>
+    </span>
+  </ng-template>
 </section>

@@ -1,7 +1,13 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
-import { CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe } from '@angular/common';
+import {
+  CurrencyPipe,
+  DecimalPipe,
+  NgTemplateOutlet,
+  PercentPipe,
+  SlicePipe,
+} from '@angular/common';
 import { ChangePeriod, HoldingsService } from './holdings.service';
 import { HoldingSummaryResponse } from '../../../core/portfolio-holdings.models';
 import { PortfolioApiService } from '../data-access/portfolio-api.service';
@@ -10,16 +16,21 @@ import { forkJoin, Subscription } from 'rxjs';
 export interface HoldingRow extends HoldingSummaryResponse {
   marketValue: number;
   dayChangeTotal: number;
-  totalGainPct: number;
+  totalGainPct: number | null;
   selectedPeriodChangePct: number | null;
   // Where currentPrice sits within [weekLow52, weekHigh52], as a 0-100 %,
   // for positioning the marker on the 52-week range bar.
   weekRangePosition: number;
 }
 
+export interface HoldingGroup extends Omit<HoldingRow, 'holdingId' | 'portfolioId'> {
+  groupKey: string;
+  trades: HoldingRow[];
+}
+
 @Component({
   selector: 'app-holdings-list',
-  imports: [CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe],
+  imports: [CurrencyPipe, DecimalPipe, NgTemplateOutlet, PercentPipe, SlicePipe],
   templateUrl: './holdings-list.html',
   styleUrl: './holdings-list.css',
 })
@@ -29,7 +40,6 @@ export class HoldingsList {
   private accountSelectionService = inject(AccountSelectionService);
   private readonly portfolioApi = inject(PortfolioApiService);
   private totalValueSubscription: Subscription | null = null;
-  
 
   // The portfolio to show holdings for. `null` means "All Portfolios", matching
   // the semantics of AccountsList's shared selection output.
@@ -46,7 +56,7 @@ export class HoldingsList {
 
   showLess = input<boolean>(false);
 
-  rows = computed<HoldingRow[]>(() => {
+  private tradeRows = computed<HoldingRow[]>(() => {
     const portfolioId = this.activePortfolio()?.id ?? null;
     const holdings = portfolioId
       ? this.allHoldings().filter((h) => h.portfolioId === portfolioId)
@@ -54,13 +64,17 @@ export class HoldingsList {
     const period = this.selectedPeriod();
 
     return holdings.map((h) => {
-      const isCash = h.instrumentType == "CASH";
-      // const marketValue = isCash ? h.currentPrice : h.shares * h.currentPrice;
+      const isCash = h.instrumentType == 'CASH';
       const marketValue = h.quantity * h.currentPrice;
       const dayChangeTotal = isCash ? h.dayChangeValue : h.quantity * h.dayChangeValue;
-      const totalGainPct = isCash ? 0 : (h.currentPrice - h.avgCost) / h.avgCost;
+      const totalGainPct = isCash
+        ? 0
+        : h.avgCost === 0
+          ? null
+          : (h.currentPrice - h.avgCost) / h.avgCost;
       const range = h.weekHigh52 - h.weekLow52;
-      const rawPosition = isCash || range === 0 ? 50 : ((h.currentPrice - h.weekLow52) / range) * 100;
+      const rawPosition =
+        isCash || range === 0 ? 50 : ((h.currentPrice - h.weekLow52) / range) * 100;
       return {
         ...h,
         marketValue,
@@ -72,9 +86,73 @@ export class HoldingsList {
     });
   });
 
+  rows = computed<HoldingGroup[]>(() => {
+    const groups = new Map<string, HoldingRow[]>();
+    for (const row of this.tradeRows()) {
+      const key = JSON.stringify([row.symbol, row.instrumentType]);
+      const trades = groups.get(key);
+      if (trades) {
+        trades.push(row);
+      } else {
+        groups.set(key, [row]);
+      }
+    }
+
+    return Array.from(groups, ([groupKey, trades]) => {
+      const first = trades[0];
+      const quantity = trades.reduce((sum, trade) => sum + trade.quantity, 0);
+      const costBasis = trades.reduce((sum, trade) => sum + trade.quantity * trade.avgCost, 0);
+      const marketValue = trades.reduce((sum, trade) => sum + trade.marketValue, 0);
+      // Quote fields describe the instrument, not the lots. Keep the first
+      // quote snapshot while summing position values from every trade.
+      return {
+        ...first,
+        groupKey,
+        trades,
+        quantity,
+        avgCost: quantity === 0 ? 0 : costBasis / quantity,
+        marketValue,
+        dayChangeTotal: trades.reduce((sum, trade) => sum + trade.dayChangeTotal, 0),
+        totalGainPct:
+          first.instrumentType === 'CASH'
+            ? 0
+            : costBasis === 0
+              ? null
+              : (marketValue - costBasis) / costBasis,
+      };
+    });
+  });
+
+  tradeCount = computed(() => this.tradeRows().length);
+  expandedGroups = signal<ReadonlySet<string>>(new Set());
+
+  portfolioName(portfolioId: string): string {
+    return (
+      this.accountsService.accounts().find((account) => account.id === portfolioId)?.name ??
+      portfolioId
+    );
+  }
+
+  toggleGroup(groupKey: string): void {
+    this.expandedGroups.update((expanded) => {
+      const next = new Set(expanded);
+      if (next.has(groupKey)) {
+        next.delete(groupKey);
+      } else {
+        next.add(groupKey);
+      }
+      return next;
+    });
+  }
+
   totalMarketValue = signal(0);
 
   constructor() {
+    effect(() => {
+      this.activePortfolio();
+      this.expandedGroups.set(new Set());
+    });
+
     effect(() => {
       const selectedPortfolio = this.activePortfolio();
       const accounts = this.accountsService.accounts();
@@ -90,19 +168,15 @@ export class HoldingsList {
       }
 
       this.totalValueSubscription = forkJoin(
-        portfolioIds.map((portfolioId) =>
-          this.portfolioApi.getTotalValue(portfolioId)
-        )
+        portfolioIds.map((portfolioId) => this.portfolioApi.getTotalValue(portfolioId)),
       ).subscribe({
-        next: (values) => this.totalMarketValue.set(
-          values.reduce((total, value) => total + value, 0)
-        ),
+        next: (values) =>
+          this.totalMarketValue.set(values.reduce((total, value) => total + value, 0)),
         error: () => this.totalMarketValue.set(0),
       });
     });
   }
 
-  
   totalDayChange = computed(() => this.rows().reduce((sum, r) => sum + r.dayChangeTotal, 0));
   totalDayChangePct = computed(() => {
     const previousValue = this.totalMarketValue() - this.totalDayChange();
