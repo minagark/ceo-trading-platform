@@ -3,6 +3,7 @@ import { AccountSelectionService } from '../../account/accounts-list/account-sel
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import {
   CurrencyPipe,
+  DatePipe,
   DecimalPipe,
   NgTemplateOutlet,
   PercentPipe,
@@ -12,6 +13,7 @@ import { ChangePeriod, HoldingsService } from './holdings.service';
 import { HoldingSummaryResponse } from '../../../core/portfolio-holdings.models';
 import { PortfolioApiService } from '../data-access/portfolio-api.service';
 import { forkJoin, Subscription } from 'rxjs';
+import { MatAnchor } from '@angular/material/button';
 
 export interface HoldingRow extends HoldingSummaryResponse {
   marketValue: number;
@@ -30,7 +32,7 @@ export interface HoldingGroup extends Omit<HoldingRow, 'holdingId' | 'portfolioI
 
 @Component({
   selector: 'app-holdings-list',
-  imports: [CurrencyPipe, DecimalPipe, NgTemplateOutlet, PercentPipe, SlicePipe],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, NgTemplateOutlet, PercentPipe, SlicePipe, MatAnchor],
   templateUrl: './holdings-list.html',
   styleUrl: './holdings-list.css',
 })
@@ -143,6 +145,10 @@ export class HoldingsList {
       }
       return next;
     });
+  }
+
+  closeAllGroups(): void {
+    this.expandedGroups.set(new Set());
   }
 
   totalMarketValue = signal(0);

@@ -14,4 +14,5 @@ export interface HoldingSummaryResponse {
   percentChange: Record<ChangePeriod, number | null>;
   weekLow52: number;
   weekHigh52: number;
+  dateCreated: string;
 }

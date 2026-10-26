@@ -144,6 +144,22 @@
   font-size: 0.85rem;
 }
 
+.holdings-list__trade-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface-raised);
+  color: var(--color-text-faint);
+  font-size: 0.75rem;
+  text-align: right;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.holdings-list__trade-header span:first-child {
+  text-align: left;
+}
+
 .holdings-list__trade .holdings-list__identity {
   padding-left: 1rem;
 }
@@ -240,4 +256,9 @@
   color: var(--color-text-faint);
   font-style: italic;
   text-align: center;
+}
+
+.holdings-list__trade-date {
+  align-items: start;
+  grid-column: span 3;
 }

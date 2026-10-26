@@ -16,6 +16,8 @@ function holding(overrides: Partial<HoldingSummaryResponse> = {}): HoldingSummar
     instrumentName: 'Alphabet Inc.',
     instrumentType: 'EQUITY',
     quantity: 10,
+    dateCreated: '2026-10-21T10:00:00Z',
+    purchasedPrice: 95,
     avgCost: 100,
     currentPrice: 200,
     dayChangeValue: 2,
@@ -100,7 +102,7 @@ describe('HoldingsList', () => {
     expect(element.querySelectorAll('.holdings-list__toggle')).toHaveLength(3);
   });
 
-  it('expands and collapses all original trades with their portfolio and cost', () => {
+  it('expands and collapses all original trades with trade details', () => {
     const button = element.querySelector<HTMLButtonElement>('.holdings-list__toggle')!;
     expect(button.type).toBe('button');
     expect(button.getAttribute('aria-expanded')).toBe('false');
@@ -111,9 +113,24 @@ describe('HoldingsList', () => {
     expect(button.getAttribute('aria-expanded')).toBe('true');
     const details = element.querySelectorAll('.holdings-list__trade');
     expect(details).toHaveLength(3);
+    expect(element.querySelectorAll('.holdings-list__trade-header span')).toHaveLength(7);
+    expect(element.querySelector('.holdings-list__trade-header')?.textContent).toContain('Price');
+    expect(element.querySelector('.holdings-list__trade-header')?.textContent).toContain(
+      'Quantity',
+    );
+    expect(element.querySelector('.holdings-list__trade-header')?.textContent).toContain('Value');
+    expect(element.querySelector('.holdings-list__trade-header')?.textContent).toContain('Date');
     expect(details[0].textContent).toContain('Brokerage portfolio');
     expect(details[0].textContent).toContain('h-1');
     expect(details[0].textContent).toContain('Avg cost $100.00');
+    expect(details[0].querySelector('.holdings-list__trade-price')?.textContent).toContain(
+      '$95.00',
+    );
+    expect(details[0].querySelector('.holdings-list__quantity')?.textContent).toContain('10');
+    expect(details[0].querySelector('.holdings-list__value')?.textContent).toContain('$950.00');
+    expect(details[0].querySelector('.holdings-list__trade-date')?.textContent).toContain(
+      'Oct 21, 2026',
+    );
     expect(details[1].textContent).toContain('Avg cost $150.00');
     expect(details[2].textContent).toContain('Retirement portfolio');
     expect(component.totalDayChange()).toBe(70);
@@ -124,6 +141,18 @@ describe('HoldingsList', () => {
     fixture.detectChanges();
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(element.querySelectorAll('.holdings-list__trade')).toHaveLength(0);
+  });
+
+  it('shows placeholders when purchase price or date are missing', () => {
+    holdings.set([holding({ purchasedPrice: undefined, dateCreated: undefined })]);
+    fixture.detectChanges();
+    element.querySelector<HTMLButtonElement>('.holdings-list__toggle')!.click();
+    fixture.detectChanges();
+
+    const detail = element.querySelector('.holdings-list__trade')!;
+    expect(detail.querySelector('.holdings-list__trade-price')?.textContent?.trim()).toBe('\u2014');
+    expect(detail.querySelector('.holdings-list__value')?.textContent?.trim()).toBe('\u2014');
+    expect(detail.querySelector('.holdings-list__trade-date')?.textContent?.trim()).toBe('\u2014');
   });
 
   it('allows multiple groups to expand independently', () => {

@@ -213,7 +213,7 @@ export class Trades {
           addInstrumentType: addInstrument.type,
           subtractInstrumentSymbol: subInstrument.symbol,
           subtractInstrumentType: subInstrument.type,
-          changeThreshold: orderInfo.changeThreshold,
+          changeThreshold: orderInfo.changeThreshold / 100,
           quantity: orderInfo.quantity,
           side,
           quotedPrice,
