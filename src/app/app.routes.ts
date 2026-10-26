@@ -13,6 +13,7 @@ import { AccountPage } from './features/account/account-page/account-page';
 import { SettingsPage } from './features/account/settings-page/settings-page';
 import { authGuard } from './features/auth/auth/auth.guard';
 import { CreatePortfolio } from './features/portfolio/create-portfolio/create-portfolio';
+import { ConfirmPortfolio } from './features/portfolio/confirm-portfolio/confirm-portfolio';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
@@ -29,5 +30,6 @@ export const routes: Routes = [
   { path: 'account/:userId', component: AccountPage, canActivate: [authGuard] },
   { path: 'settings', component: SettingsPage, canActivate: [authGuard] },
   { path: 'create-portfolio', component: CreatePortfolio, canActivate: [authGuard] },
+  { path: 'confirm-portfolio', component: ConfirmPortfolio, canActivate: [authGuard] },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
 ];

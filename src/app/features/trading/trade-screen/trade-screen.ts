@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, effect, inject, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -98,6 +98,28 @@ export class Trades {
   );
 
   constructor() {
+    effect(() => {
+      const userId = this.authService.currentUserId();
+      if (userId) {
+        this.accountsService.loadForUser(userId); // need to loadUser information here so data will populate
+      }
+    });
+
+    const navigationState = (this.router.getCurrentNavigation()?.extras.state ?? history.state) as {
+      portfolioId?: string;
+      orderType?: OrderType;
+    } | undefined;
+
+    const navigationPortfolioId = navigationState?.portfolioId;
+    const navigationOrderType = navigationState?.orderType;
+
+    if (navigationPortfolioId) {
+      this.orderForm.controls.portfolioId.setValue(navigationPortfolioId);
+    }
+    if (navigationOrderType) {
+      this.orderForm.controls.orderType.setValue(navigationOrderType);
+    }
+
     merge(
       this.orderForm.controls.orderType.valueChanges,
       this.orderForm.controls.side.valueChanges,
