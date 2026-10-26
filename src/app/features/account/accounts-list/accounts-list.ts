@@ -1,8 +1,11 @@
 import { Component, computed, effect, inject, input } from '@angular/core';
+import { Router } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { AccountsService } from './accounts.service';
 import { AccountSelectionService } from './account-selection.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 export interface Account {
   id: string;
@@ -13,13 +16,14 @@ export interface Account {
 
 @Component({
   selector: 'app-accounts-list',
-  imports: [CurrencyPipe, MatListModule],
+  imports: [CurrencyPipe, MatListModule, MatIconModule, MatButtonModule],
   templateUrl: './accounts-list.html',
   styleUrl: './accounts-list.css',
 })
 export class AccountsList {
   private accountsService = inject(AccountsService);
   private accountSelectionService = inject(AccountSelectionService);
+  readonly router = inject(Router);
 
   // ---------------------------------------------------------------------
   // STATE
@@ -54,5 +58,9 @@ export class AccountsList {
 
   selectAllAccounts() {
     this.accountSelectionService.onAccountSelected(null);
+  }
+
+  createPortfolio() {
+    this.router.navigate(['/create-portfolio']);
   }
 }

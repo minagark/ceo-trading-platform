@@ -14,7 +14,10 @@
 
 <aside class="accounts-list">
   <header class="accounts-list__header">
-    <h2>Accounts</h2>
+    <h2>Portfolios</h2>
+    <button matButton="filled" class="add-portfolio" type="button" (click)="createPortfolio()">
+      <mat-icon>add</mat-icon>
+    </button>
   </header>
 
   <mat-action-list class="accounts-list__items">
@@ -24,7 +27,7 @@
       [class.accounts-list__item--selected]="selectedAccountId() === null"
       (click)="selectAllAccounts()"
     >
-      <span matListItemTitle>All Accounts</span>
+      <span matListItemTitle>All Portfolios</span>
       <span matListItemMeta>{{ totalBalance() | currency }}</span>
     </button>
     @for (account of accounts(); track account.id) {
@@ -40,7 +43,7 @@
       </button>
     } @empty {
       <!-- Shown automatically when accounts() is an empty array. -->
-      <p class="accounts-list__empty">No accounts yet.</p>
+      <p class="accounts-list__empty">No portfolios yet.</p>
     }
   </mat-action-list>
 </aside>

@@ -49,3 +49,22 @@
   --mat-list-list-item-hover-state-layer-color: var(--color-accent-soft);
   box-shadow: inset 3px 0 0 var(--color-accent);
 }
+
+.add-portfolio {
+  --mat-button-filled-container-color: var(--mat-sys-tertiary);
+	--mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
+  /* center the icon*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+	/* --mat-button-filled-container-height: 3rem; */
+}
+
+.add-portfolio mat-icon {
+  /* how to center the icon */
+  display: inline-block;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
