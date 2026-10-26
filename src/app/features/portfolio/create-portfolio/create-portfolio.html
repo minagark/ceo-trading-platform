@@ -4,14 +4,14 @@
             <mat-card-title>Create a new Portfolio</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            <form (ngSubmit)="createPortfolio(portfolioType.value)">
+            <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
                 <mat-label>What type of portfolio would you like to create?</mat-label>
                 <mat-radio-group formControlName="portfolioType">
-                    <mat-radio-button value="individual">Individual Brokerage</mat-radio-button>
-                    <mat-radio-button value="retirement">Retirement</mat-radio-button>
+                    <mat-radio-button value="BROKERAGE">Individual Brokerage</mat-radio-button>
+                    <mat-radio-button value="RETIREMENT">Retirement</mat-radio-button>
                 </mat-radio-group>
                 <button matButton="filled" class="portfolio-create" type="submit">
-                    Review order
+                    Create Portfolio
                 </button>
             </form>
         </mat-card-content>

@@ -42,7 +42,7 @@ export class PortfolioApiService {
 
   createPortfolio(portfolioType: PortfolioType, clientId: string): Observable<Portfolio> {
     return this.api.get<Portfolio>(
-      `new/${encodeURIComponent(portfolioType)}/${encodeURIComponent(clientId)}`
+      `portfolio/new/${encodeURIComponent(portfolioType)}/${encodeURIComponent(clientId)}`
     );
   }
     
