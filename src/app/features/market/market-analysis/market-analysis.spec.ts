@@ -1,13 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
 import { AnalyticsApiService } from '../data-access/analytics-api.service';
+import { Candle } from '../data-access/analytics-api.service';
 import { MarketAnalysis } from './market-analysis';
 
 describe('MarketAnalysis', () => {
   let component: MarketAnalysis;
   let fixture: ComponentFixture<MarketAnalysis>;
+  let candleResponse: Observable<Candle[]>;
 
   beforeEach(async () => {
+    candleResponse = of([{ date: '2026-01-02', open: 272.26, high: 277.84, low: 269, close: 271.01, volume: 37838100 }]);
     await TestBed.configureTestingModule({
       imports: [MarketAnalysis],
       providers: [{
@@ -26,7 +30,7 @@ describe('MarketAnalysis', () => {
             { symbol: 'TSLA', currentPrice: 378.18, percentageChange: -2.145 },
           ]),
           getClientActivityTrends: () => of([{ periodStart: '2026-10-19T00:00:00Z', clientSegment: 'RETAIL', totalNotional: 5251.8, totalQuantity: 15, executedTrades: 3 }]),
-          getCandles: () => of([{ date: '2026-01-02', open: 272.26, high: 277.84, low: 269, close: 271.01, volume: 37838100 }]),
+          getCandles: () => candleResponse,
         },
       }],
     }).compileComponents();
@@ -61,5 +65,37 @@ describe('MarketAnalysis', () => {
     expect(text).toContain('-7.76%');
     expect(component.topGainers().map((mover) => mover.symbol)).toEqual(['INTU', 'MCD']);
     expect(component.topDecliners().map((mover) => mover.symbol)).toEqual(['META', 'NVDA', 'TSLA']);
+  });
+
+  it('shows a quota warning for HTTP 429', () => {
+    candleResponse = throwError(() => new HttpErrorResponse({ status: 429 }));
+
+    component.refresh();
+
+    expect(component.candleError()).toBe('Market-data quota exceeded. Try again later.');
+  });
+
+  it('shows a route or symbol message for HTTP 404', () => {
+    candleResponse = throwError(() => new HttpErrorResponse({ status: 404 }));
+
+    component.refresh();
+
+    expect(component.candleError()).toBe('Market data route or symbol was not found. Check the symbol and try again.');
+  });
+
+  it('shows a general message for other market-data errors', () => {
+    candleResponse = throwError(() => new HttpErrorResponse({ status: 500 }));
+
+    component.refresh();
+
+    expect(component.candleError()).toBe('Market price history could not be loaded. Please try again later.');
+  });
+
+  it('recognizes a quota error code outside HTTP 429', () => {
+    candleResponse = throwError(() => new HttpErrorResponse({ status: 503, error: { code: 'QUOTA_EXCEEDED' } }));
+
+    component.refresh();
+
+    expect(component.candleError()).toBe('Market-data quota exceeded. Try again later.');
   });
 });
