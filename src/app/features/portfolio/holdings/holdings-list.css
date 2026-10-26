@@ -121,28 +121,7 @@
 .holdings-list__identity {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   min-width: 0;
-}
-
-.holdings-list__logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 0;
-  object-fit: contain;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  flex-shrink: 0;
-}
-
-.holdings-list__logo--fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-accent-text);
-  background: var(--color-accent);
 }
 
 .holdings-list__names {

@@ -2,11 +2,12 @@ import { Component, computed, effect, inject, input, signal } from '@angular/cor
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe, SlicePipe } from '@angular/common';
-import { ChangePeriod, Holding, HoldingsService } from './holdings.service';
+import { ChangePeriod, HoldingsService } from './holdings.service';
+import { HoldingSummaryResponse } from '../../../core/portfolio-holdings.models';
 import { PortfolioApiService } from '../data-access/portfolio-api.service';
 import { forkJoin, Subscription } from 'rxjs';
 
-export interface HoldingRow extends Holding {
+export interface HoldingRow extends HoldingSummaryResponse {
   marketValue: number;
   dayChangeTotal: number;
   totalGainPct: number;
@@ -110,31 +111,5 @@ export class HoldingsList {
 
   onPeriodChange(event: Event) {
     this.selectedPeriod.set((event.target as HTMLSelectElement).value as ChangePeriod);
-  }
-
-  // Logos that failed to load (bad domain, offline, etc.) — tracked so those
-  // rows can fall back to an initials avatar instead of a broken image icon.
-  private failedLogos = signal<ReadonlySet<string>>(new Set());
-
-  logoUrl(row: HoldingRow): string {
-    return `https://logo.clearbit.com/${row.logoDomain}`;
-  }
-
-  logoFailed(symbol: string): boolean {
-    return this.failedLogos().has(symbol);
-  }
-
-  onLogoError(symbol: string) {
-    this.failedLogos.update((failed) => new Set(failed).add(symbol));
-  }
-
-  initials(instrumentName: string | null | undefined): string {
-    return (instrumentName ?? '')
-      .split(' ')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((word) => word[0])
-      .join('')
-      .toUpperCase();
   }
 }

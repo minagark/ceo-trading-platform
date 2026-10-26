@@ -47,16 +47,6 @@
     @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.portfolioId + row.symbol) {
       <div class="holdings-list__row" role="listitem">
         <div class="holdings-list__identity">
-          @if (!logoFailed(row.symbol)) {
-            <img
-              class="holdings-list__logo"
-              [src]="logoUrl(row)"
-              [alt]="row.instrumentName + ' logo'"
-              (error)="onLogoError(row.symbol)"
-            />
-          } @else {
-            <span class="holdings-list__logo holdings-list__logo--fallback">{{ initials(row.instrumentName) }}</span>
-          }
           <div class="holdings-list__names">
             <span class="holdings-list__symbol">{{ row.symbol }}</span>
             <span class="holdings-list__company">{{ row.instrumentName }}</span>

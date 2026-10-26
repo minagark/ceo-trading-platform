@@ -18,6 +18,7 @@ describe('HoldingsList', () => {
         {
           provide: PortfolioApiService,
           useValue: {
+            getTotalValue: () => of(0),
             getHoldings: (portfolioId: string) =>
               of(
                 portfolioId === '2'
@@ -66,5 +67,6 @@ describe('HoldingsList', () => {
     expect(rows.length).toBe(1);
     expect(fixture.nativeElement.textContent).toContain('GOOGL');
     expect(fixture.nativeElement.textContent).not.toContain('AAPL');
+    expect(fixture.nativeElement.querySelector('img')).toBeNull();
   });
 });
