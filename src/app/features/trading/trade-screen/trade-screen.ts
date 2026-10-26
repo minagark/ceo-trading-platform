@@ -61,11 +61,7 @@ export class Trades {
   private currencyService = inject(CurrencyService);
   private orderApiService = inject(OrderApiService);
   private marketApiService = inject(MarketApiService);
-<<<<<<< HEAD
-  private readonly authService = inject(AuthService);
-=======
   private authService = inject(AuthService);
->>>>>>> main
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
