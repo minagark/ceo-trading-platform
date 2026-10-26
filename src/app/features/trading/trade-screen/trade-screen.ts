@@ -189,10 +189,13 @@ export class Trades {
     // TODO: CHANGE THE GET QUOTE TO THE CORRECT INSTRUMENT
     this.marketApiService.getQuote(addInstrument.symbol, addInstrument.type).pipe(
       switchMap(quote => {
-        const quotedPrice =
+        let quotedPrice =
           orderInfo.side === 'BUY'
             ? quote.ask
             : quote.bid;
+        if (quotedPrice === null) {
+          quotedPrice = quote.price;
+        }
 
         let side: Side;
         if (orderInfo.orderType === "DEPOSIT") {
@@ -216,6 +219,7 @@ export class Trades {
                   this.IN_TIMEZONE_STRING : 
                   this.US_TIMEZONE_STRING,
         };
+        console.log("Submitting: ", orderRequest);
         return of(orderRequest);
       }),
     ).subscribe({
@@ -303,12 +307,12 @@ export class Trades {
       addInstrument = { symbol, type: 'EQUITY' };
       subInstrument = {
         symbol: country === 'US' ? this.US_CURRENCY_SYMBOL : this.IN_CURRENCY_SYMBOL,
-        type: 'EQUITY',
+        type: 'CASH',
       };
     } else /*if (side === 'SELL')*/ {
       addInstrument = {
         symbol: country === 'US' ? this.US_CURRENCY_SYMBOL : this.IN_CURRENCY_SYMBOL,
-        type: 'EQUITY',
+        type: 'CASH',
       };
       subInstrument = { symbol, type: 'EQUITY' };
     } 

@@ -1,1 +1,83 @@
-<p>market-analysis works!</p>
+<section class="analyst-dashboard">
+  <header class="dashboard-header">
+    <div>
+      <p class="eyebrow">Analytics</p>
+      <h1>Analyst Dashboard</h1>
+      <p class="dashboard-summary">Trading activity, instrument concentration, client momentum, and market context.</p>
+    </div>
+    <button type="button" class="refresh-button" (click)="refresh()" [disabled]="loading()">Refresh data <span>&#8635;</span></button>
+  </header>
+
+  <div class="filter-bar">
+    <label>Start date <input type="date" [(ngModel)]="startDate" (change)="refresh()" aria-label="Analytics start date" /></label>
+    <label>End date <input type="date" [(ngModel)]="endDate" (change)="refresh()" aria-label="Analytics end date" /></label>
+    <label>Instrument <input [(ngModel)]="symbolFilter" maxlength="12" (keyup.enter)="refresh()" aria-label="Analytics instrument symbol" /></label>
+    <label>Client segment <input [(ngModel)]="clientSegment" maxlength="24" (keyup.enter)="refresh()" aria-label="Analytics client segment" /></label>
+    <label>Top instruments <select [(ngModel)]="topLimit" (change)="refresh()" aria-label="Number of top instruments"><option [ngValue]="5">5</option><option [ngValue]="10">10</option><option [ngValue]="20">20</option></select></label>
+    <label>Price symbol <input [(ngModel)]="candleSymbol" maxlength="12" aria-label="Candle symbol" (keyup.enter)="refresh()" /></label>
+    <span class="filter-note">Analytics filters are limited to the query parameters supported by the current API.</span>
+  </div>
+
+  @if (loading()) {
+    <div class="state-panel" role="status"><span class="spinner"></span><strong>Loading analytics</strong><span>Fetching the latest trading activity...</span></div>
+  } @else if (error()) {
+    <div class="state-panel state-panel--error" role="alert"><strong>Unable to load dashboard</strong><span>{{ error() }}</span><button type="button" class="text-button" (click)="refresh()">Try again</button></div>
+  } @else {
+    <div class="metric-grid">
+      <article class="metric-card metric-card--accent"><span class="metric-label">Total notional</span><strong>{{ volume()?.totalNotional | currency:'USD':'symbol':'1.2-2' }}</strong><span class="metric-context">Executed trading volume</span></article>
+      <article class="metric-card"><span class="metric-label">Total quantity</span><strong>{{ volume()?.totalQuantity | number:'1.0-0' }}</strong><span class="metric-context">Units traded</span></article>
+      <article class="metric-card"><span class="metric-label">Fulfilled trades</span><strong>{{ volume()?.executedTrades | number:'1.0-0' }}</strong><span class="metric-context">Completed executions</span></article>
+    </div>
+
+    <div class="dashboard-grid">
+      <article class="panel chart-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Execution concentration</p><h2>Top traded instruments</h2></div><span class="panel-kicker">{{ topInstruments().length }} returned</span></div>
+        @if (topInstrumentsOptions(); as options) { <div class="chart-wrap"><ag-charts [options]="options"></ag-charts></div> } @else { <div class="empty-state"><strong>No instruments returned</strong><span>There is no traded instrument data for the current query.</span></div> }
+      </article>
+
+      <article class="panel chart-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Client contribution</p><h2>Trading volume by client segment</h2></div><span class="panel-kicker">{{ activityTrends().length }} records</span></div>
+        @if (activityOptions(); as options) { <div class="chart-wrap"><ag-charts [options]="options"></ag-charts></div> } @else { <div class="empty-state"><strong>No activity trends returned</strong><span>The API did not return any client activity periods.</span></div> }
+      </article>
+
+      <article class="panel top-movers-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Market momentum</p><h2>Top market movers</h2></div><span class="panel-kicker">Latest price changes</span></div>
+        @if (topMoversLoading()) {
+          <div class="movers-state" role="status"><span class="spinner"></span><span>Loading market movers...</span></div>
+        } @else if (topMoversError()) {
+          <div class="movers-state movers-state--error" role="alert"><strong>Market movers unavailable</strong><span>{{ topMoversError() }}</span><button type="button" class="text-button" (click)="refreshTopMovers()">Try again</button></div>
+        } @else if (!topGainers().length && !topDecliners().length) {
+          <div class="movers-state"><strong>No market movers returned</strong><span>There are no price changes available right now.</span></div>
+        } @else {
+          <div class="movers-columns">
+            <section class="mover-list mover-list--gainers" aria-labelledby="gainers-heading">
+              <h3 id="gainers-heading"><span aria-hidden="true">&#8593;</span> Top 5 Gainers</h3>
+              @if (topGainers().length) {
+                @for (mover of topGainers(); track mover.symbol) {
+                  <div class="mover-row"><strong class="mover-symbol">{{ mover.symbol }}</strong><span class="mover-change mover-change--up"><span aria-hidden="true">&#8593;</span> +{{ mover.percentageChange | number:'1.2-2' }}%</span>@if (mover.currentPrice !== undefined) { <span class="mover-price">{{ mover.currentPrice | currency:'USD':'symbol':'1.2-2' }}</span> }</div>
+                }
+              } @else {
+                <p class="mover-empty">No gainers returned.</p>
+              }
+            </section>
+            <section class="mover-list mover-list--decliners" aria-labelledby="decliners-heading">
+              <h3 id="decliners-heading"><span aria-hidden="true">&#8595;</span> Top 5 Decliners</h3>
+              @if (topDecliners().length) {
+                @for (mover of topDecliners(); track mover.symbol) {
+                  <div class="mover-row"><strong class="mover-symbol">{{ mover.symbol }}</strong><span class="mover-change mover-change--down"><span aria-hidden="true">&#8595;</span> {{ mover.percentageChange | number:'1.2-2' }}%</span>@if (mover.currentPrice !== undefined) { <span class="mover-price">{{ mover.currentPrice | currency:'USD':'symbol':'1.2-2' }}</span> }</div>
+                }
+              } @else {
+                <p class="mover-empty">No decliners returned.</p>
+              }
+            </section>
+          </div>
+        }
+      </article>
+
+      <article class="panel candle-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Market reference</p><h2>{{ candleSymbol.trim().toUpperCase() }} price history</h2></div><span class="panel-kicker">{{ candles().length }} candle{{ candles().length === 1 ? '' : 's' }}</span></div>
+        @if (candleOptions(); as options) { <div class="chart-wrap"><ag-charts [options]="options"></ag-charts></div> } @else if (candles().length === 1) { @let candle = candles()[0]; <div class="ohlc-grid"><div><span>Open</span><strong>{{ candle.open | currency:'USD' }}</strong></div><div><span>High</span><strong>{{ candle.high | currency:'USD' }}</strong></div><div><span>Low</span><strong>{{ candle.low | currency:'USD' }}</strong></div><div><span>Close</span><strong>{{ candle.close | currency:'USD' }}</strong></div><div class="ohlc-meta"><span>{{ candle.date }}</span><span>Market volume: {{ candle.volume | number:'1.0-0' }}</span></div></div> } @else { <div class="empty-state"><strong>{{ candleError() ? 'Price history unavailable' : 'No price history returned' }}</strong><span>{{ candleError() || 'Try another symbol or confirm that the market data service is available.' }}</span></div> }
+      </article>
+    </div>
+  }
+</section>
