@@ -73,6 +73,8 @@ export class PreviewPage {
   confirm() {
     this.submitting.set(true);
 
+    console.log(this.request());
+
     this.orderApi.submitOrder(this.request()).subscribe({
       next: (order) => {
         this.submitting.set(false);

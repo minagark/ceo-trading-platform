@@ -61,7 +61,11 @@ export class Trades {
   private currencyService = inject(CurrencyService);
   private orderApiService = inject(OrderApiService);
   private marketApiService = inject(MarketApiService);
+<<<<<<< HEAD
   private readonly authService = inject(AuthService);
+=======
+  private authService = inject(AuthService);
+>>>>>>> main
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
@@ -206,8 +210,8 @@ export class Trades {
           side = orderInfo.side
         }
         const orderRequest: OrderRequest = {
-          clientId:  this.authService.currentUserId()!,
-          clientName: this.authService.currentUserFullName()!,
+          clientId: this.authService.currentUserId() || '2c522b92-7151-4daa-92db-81a2253c772a', 
+          clientName: this.authService.currentUserFullName() || "Unknown user",
           portfolioId: orderInfo.portfolioId,
           addInstrumentSymbol: addInstrument.symbol,
           addInstrumentType: addInstrument.type,

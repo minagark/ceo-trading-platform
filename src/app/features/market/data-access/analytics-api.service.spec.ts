@@ -25,7 +25,8 @@ describe('AnalyticsApiService', () => {
     let result: unknown;
     service.getCandles('AAPL').subscribe((candles) => result = candles);
 
-    const request = http.expectOne((request) => request.url.endsWith('/analytics/candles/AAPL'));
+    const request = http.expectOne((request) => request.url.endsWith('/analytics/candles/AAPL/EQUITY'));
+    expect(request.request.params.has('type')).toBe(false);
     request.flush({ date: '2026-01-02', open: 272.26, high: 277.84, low: 269, close: 271.01, volume: 37838100 });
 
     expect(result).toEqual([{ date: '2026-01-02', open: 272.26, high: 277.84, low: 269, close: 271.01, volume: 37838100 }]);
