@@ -76,7 +76,7 @@ export class AnalyticsApiService {
 
   getCandles(symbol: string): Observable<Candle[]> {
     return this.api
-      .get<CandleResponse>(`analytics/candles/${encodeURIComponent(symbol)}`)
+      .get<CandleResponse>(`analytics/candles/${encodeURIComponent(symbol)}/EQUITY`)
       .pipe(map((response) => {
         const candles = response === null ? [] : Array.isArray(response) ? response : [response];
         return candles.filter((candle) => Number.isFinite(candle?.open) && Number.isFinite(candle?.high) && Number.isFinite(candle?.low) && Number.isFinite(candle?.close));
