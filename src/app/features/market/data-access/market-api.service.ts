@@ -34,4 +34,30 @@ export class MarketApiService {
         )
       );
   }
+
+  getInstrumentFullName(symbol: string, type: InstrumentType): Observable<string> {
+    return this.api.getText(
+      `instruments/${encodeURIComponent(symbol)}/${encodeURIComponent(type)}/fullname`
+    ).pipe(
+      map((response) => {
+        const text = response.trim();
+
+        try {
+          const parsed: unknown = JSON.parse(text);
+          if (typeof parsed === 'string') {
+            return parsed.trim();
+          }
+          if (parsed && typeof parsed === 'object' && 'fullName' in parsed) {
+            const fullName = (parsed as { fullName?: unknown }).fullName;
+            return typeof fullName === 'string' ? fullName.trim() : text;
+          }
+        } catch {
+          // The endpoint may return an unquoted plain-text name.
+        }
+
+        return text;
+      })
+    );
+  }
+  
 }

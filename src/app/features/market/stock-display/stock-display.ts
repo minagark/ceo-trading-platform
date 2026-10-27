@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { InstrumentType } from '../../../core/trading.models';
 import { MarketApiService } from '../data-access/market-api.service';
 import { FormsModule } from '@angular/forms';
@@ -8,8 +8,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { PortfolioPerformance } from '../../portfolio/portfolio-performance/portfolio-performance';
 import { MatButtonModule } from '@angular/material/button';
-import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { distinctUntilChanged, forkJoin, map, switchMap } from 'rxjs';
+import { InstrumentSearch } from '../../trading/instrument-search/instrument-search';
+import { NonDepositOrderType } from '../../../core/trading.models';
 
 interface PriceHistoryPoint {
   time: string;
@@ -39,7 +41,8 @@ export type TimeFrame = typeof TIME_FRAMES[number];
     MatFormFieldModule, 
     MatSelectModule, 
     MatButtonModule, 
-    PortfolioPerformance
+    PortfolioPerformance,
+    InstrumentSearch
   ],
   selector: 'app-stock-display',
   styleUrl: './stock-display.css',
@@ -47,67 +50,93 @@ export type TimeFrame = typeof TIME_FRAMES[number];
 })
 export class StockDisplay {
   private router: Router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly marketApi = inject(MarketApiService);
 
-  stockDisplayInfo: StockDisplayInfo;
-  constructor() {
-    this.stockDisplayInfo = {
-      name: this.name,
-      symbol: this.symbol,
-      currentPrice: 0,
-      previousClose: 0,
-      timeUpdated: new Date(),
-    };
-    this.fetchStockInfo();
-  }
-
-  // Example data, all of this comes from backend/db
   readonly TIME_FRAMES = TIME_FRAMES;
+  // defualt values
   selectedTimeFrame: TimeFrame = '1D';
-  // get the stock name and type
-  name: string = "Apple";
-  symbol: string = "AAPL";
-  type: InstrumentType = "EQUITY"; // for now, need toget from input
-  // Example data end
+  symbol = 'AAPL';
+  type: InstrumentType = 'EQUITY';
+  name = '';
 
-  get priceChange(): number {
-    return this.stockDisplayInfo.currentPrice - this.stockDisplayInfo.previousClose;
-  }
 
-  get priceChangePercent(): number {
-    return (this.priceChange / this.stockDisplayInfo.previousClose) * 100;
-  }
+  stockDisplayInfo = signal<StockDisplayInfo>({
+    name: '',
+    symbol: '',
+    currentPrice: 0,
+    previousClose: 0,
+    timeUpdated: new Date(),
+  });
+  constructor() {
+    this.route.queryParamMap.pipe(
+      map((params) => {
+        const symbol = params.get('symbol')?.trim().toUpperCase() || 'AAPL';
+        const orderType = params.get('type') as NonDepositOrderType | null;
 
-  priceHistory: PriceHistoryPoint[] = [];
-
-  fetchStockInfo(): void {
-    forkJoin({
-      history: this.marketApi.getStockInfo(
-        this.symbol,
-        this.type,
-        this.selectedTimeFrame,
+        return {
+          symbol,
+          type: orderType ? this.instrumentTypeFor(orderType) : 'EQUITY' as InstrumentType,
+        };
+      }),
+      distinctUntilChanged(
+        (previous, current) =>
+          previous.symbol === current.symbol && previous.type === current.type,
       ),
-      today: this.marketApi.getTodaysCandle(this.symbol, this.type),
-      currentQuote: this.marketApi.getQuote(this.symbol, this.type)
-    }).subscribe({
-      next: ({ history, today, currentQuote }) => {
+      switchMap(({ symbol, type }) =>
+        forkJoin({
+          symbol: [symbol],
+          type: [type],
+          name: this.marketApi.getInstrumentFullName(symbol, type),
+          history: this.marketApi.getStockInfo(symbol, type, this.selectedTimeFrame),
+          today: this.marketApi.getTodaysCandle(symbol, type),
+          currentQuote: this.marketApi.getQuote(symbol, type),
+        }),
+      ),
+    ).subscribe({
+      next: ({ symbol, type, name, history, today, currentQuote }) => {
+        this.symbol = symbol;
+        this.type = type;
+        this.name = name.trim() || symbol;
         const latestHistoryPoint = history.at(-1);
-        const previousClose = latestHistoryPoint?.balance ?? today?.close ?? 0;
 
-        this.stockDisplayInfo = {
+        this.stockDisplayInfo.set({
           name: this.name,
-          symbol: this.symbol,
+          symbol,
           currentPrice: currentQuote.price,
-          previousClose,
+          previousClose: latestHistoryPoint?.balance ?? today?.close ?? 0,
           highPriceToday: today?.high,
           lowPriceToday: today?.low,
           timeUpdated: new Date(),
-        };
+        });
       },
       error: (error) => {
         console.error('Unable to load stock information:', error);
       },
     });
+  }
+
+  get priceChange(): number {
+    return this.stockDisplayInfo().currentPrice - this.stockDisplayInfo().previousClose;
+  }
+
+  get priceChangePercent(): number {
+    return (this.priceChange / this.stockDisplayInfo().previousClose) * 100;
+  }
+
+  priceHistory: PriceHistoryPoint[] = [];
+
+  private instrumentTypeFor(orderType: NonDepositOrderType): InstrumentType {
+    switch (orderType) {
+      case 'CRYPTO':
+        return 'CRYPTO';
+      case 'FOREX':
+        return 'CASH';
+      case 'US_EQUITY':
+      case 'INDIA_EQUITY':
+      default:
+        return 'EQUITY';
+    }
   }
 
   handleTrade() {
@@ -116,9 +145,9 @@ export class StockDisplay {
     // a navigation to a full trades page.
     this.router.navigate(["trades"], {
       queryParams: { 
-        name: this.stockDisplayInfo.name, 
-        symbol: this.stockDisplayInfo.symbol, 
-        currentPrice: this.stockDisplayInfo.currentPrice 
+        name: this.stockDisplayInfo().name, 
+        symbol: this.stockDisplayInfo().symbol, 
+        currentPrice: this.stockDisplayInfo().currentPrice 
       }
     });
   }
