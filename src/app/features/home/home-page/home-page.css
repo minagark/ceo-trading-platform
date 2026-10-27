@@ -30,3 +30,38 @@
 .welcome-msg {
   padding: 16px;
 }
+
+.top-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(10rem, 5vw, 4rem);
+  width: min(100% - 2rem, 72rem);
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.top-section app-instrument-search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.trade-button {
+  flex: 0 0 auto;
+  min-width: 6rem;
+  --mat-button-filled-container-color: var(--mat-sys-tertiary);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
+}
+
+@media (max-width: 42rem) {
+  .top-section {
+    align-items: stretch;
+    flex-direction: column;
+    width: min(100% - 2rem, 28rem);
+  }
+
+  .trade-button {
+    width: 100%;
+  }
+}

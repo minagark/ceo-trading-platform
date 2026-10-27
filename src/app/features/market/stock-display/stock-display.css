@@ -7,7 +7,9 @@
 .search {
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  width: min(calc(100% - 2rem), 46rem);
+  margin: 1rem auto 0;
+  box-sizing: border-box;
 }
 
 .stock-display-page mat-card-content {

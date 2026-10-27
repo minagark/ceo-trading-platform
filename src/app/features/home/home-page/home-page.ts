@@ -1,4 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PortfolioPerformance } from '../../portfolio/portfolio-performance/portfolio-performance';
 import type { Widget } from '../../../shared/models/widget';
@@ -11,10 +12,11 @@ import { AuthService } from '../../auth/auth/auth.service';
 import { InstrumentSearch } from '../../trading/instrument-search/instrument-search';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PortfolioPrompt } from '../../portfolio/portfolio-prompt/portfolio-prompt';
+import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
-  imports: [HomepageWidget, AccountsList, InstrumentSearch, MatDialogModule], // imports to the template
+  imports: [HomepageWidget, AccountsList, InstrumentSearch, MatDialogModule, MatButtonModule], // imports to the template
   selector: 'app-home-page',
   styleUrl: './home-page.css',
   templateUrl: './home-page.html',
@@ -23,6 +25,7 @@ export class HomePage {
   readonly authService = inject(AuthService);
   private readonly accountsService = inject(AccountsService);
   private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
   private promptShown = false;
 
   constructor() {
@@ -72,5 +75,9 @@ export class HomePage {
       },
       route: "/history"
     }]
+
+    goToTrade() {
+      this.router.navigate(['/trades']);
+    }
 
 }
