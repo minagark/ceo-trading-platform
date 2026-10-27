@@ -17,7 +17,6 @@ function holding(overrides: Partial<HoldingSummaryResponse> = {}): HoldingSummar
     instrumentType: 'EQUITY',
     quantity: 10,
     dateCreated: '2026-10-21T10:00:00Z',
-    purchasedPrice: 95,
     avgCost: 100,
     currentPrice: 200,
     dayChangeValue: 2,
@@ -144,7 +143,7 @@ describe('HoldingsList', () => {
   });
 
   it('shows placeholders when purchase price or date are missing', () => {
-    holdings.set([holding({ purchasedPrice: undefined, dateCreated: undefined })]);
+    holdings.set([holding({ avgCost: undefined, dateCreated: undefined })]);
     fixture.detectChanges();
     element.querySelector<HTMLButtonElement>('.holdings-list__toggle')!.click();
     fixture.detectChanges();
