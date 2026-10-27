@@ -4,6 +4,14 @@
   margin: 0 auto;
 }
 
+.search {
+  display: flex;
+  justify-content: center;
+  width: min(calc(100% - 2rem), 46rem);
+  margin: 1rem auto 0;
+  box-sizing: border-box;
+}
+
 .stock-display-page mat-card-content {
   display: flex;
   flex-direction: column;
@@ -64,9 +72,13 @@
 .price-history {
   border: 1px solid #ddd;
   border-radius: 0px;
-  padding: 2rem;
+  padding: 0.75rem;
   text-align: center;
   color: #999;
+}
+
+.price-history .chart-placeholder {
+  margin: 0 0 0.5rem;
 }
 
 .trade-button {

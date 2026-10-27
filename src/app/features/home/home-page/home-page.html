@@ -1,6 +1,11 @@
 
 <h1 class="welcome-msg">Welcome, {{ authService.currentUserFirstName() || 'there' }}</h1>
-<app-instrument-search></app-instrument-search>
+<div class="top-section">
+    <button matButton="filled" class="trade-button" (click)="goToTrade()">
+        Trade
+    </button>
+    <app-instrument-search></app-instrument-search>
+</div>
 <div class="home-page-container">
     <aside>
         <app-accounts-list 
