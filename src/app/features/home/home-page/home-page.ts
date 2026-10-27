@@ -25,6 +25,9 @@ export class HomePage {
       id: "pp",
       label: "Portfolio Performance",
       content: PortfolioPerformance,
+      inputs: {
+        showTimeFrame: true
+      }
     }, {
       id: "pc",
       label: "Portfolio Composition",
