@@ -5,8 +5,9 @@
   align-items: center;
   justify-content: center;
   gap: 40px;
-  padding: 16px 16px 128px;
-  background: var(--color-bg);
+  padding: 80px 16px 128px;
+  background-color: var(--color-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66v34l28-16V50M28 100l-28-16V50' fill='none' stroke='%23e3b53c' stroke-opacity='0.1'/%3E%3C/svg%3E");
   color: var(--color-text);
 }
 
@@ -71,6 +72,7 @@
 .login-brand__logo {
   width: 72px;
   height: 72px;
+  animation: logo-float 3s ease-in-out infinite;
 }
 
 .bee-wing {
@@ -93,19 +95,34 @@
   font-size: 2.5rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: var(--color-text);
+  /* background: linear-gradient(90deg, var(--color-text), var(--color-accent)); */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: var(--mat-sys-primary);
+}
+
+.login-brand__slogan {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+}
+
+.login-brand__slogan-honey {
+  color: var(--mat-sys-tertiary);
 }
 
 .login-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 560px;
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 12px;
+  padding: 20px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  /* border: 1px solid var(--color-border); */
+  border: 2px solid var(--mat-sys-tertiary);
   border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
 .auth-tabs {
@@ -194,10 +211,12 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 .login-submit:hover {
   background: var(--color-accent-hover);
+  transform: translateY(-1px);
 }
 
 .auth-switch-prompt {
@@ -220,6 +239,22 @@
 .auth-switch-link:hover {
   color: var(--color-accent-hover);
   text-decoration: underline;
+}
+
+@keyframes logo-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-brand__logo {
+    animation: none;
+  }
 }
 
 @media (max-width: 480px) {
