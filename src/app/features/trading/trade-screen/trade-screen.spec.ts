@@ -46,12 +46,13 @@ describe('Trades', () => {
       settlementCurrency: 'USD',
       quantity: 1,
       side: 'BUY',
-      changeThreshold: 0,
+      changeThreshold: 5,
     }, { emitEvent: false });
 
     component.reviewOrder();
 
     expect(component.draft()?.subtractInstrumentSymbol).toBe('USD');
     expect(component.draft()?.subtractInstrumentType).toBe('CASH');
+    expect(component.draft()?.changeThreshold).toBe(0.05);
   });
 });

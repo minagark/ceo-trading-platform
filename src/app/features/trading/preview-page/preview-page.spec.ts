@@ -91,6 +91,7 @@ describe('PreviewPage', () => {
     expect(text()).toContain('Rate');
     expect(text()).toContain('1 AAPL = 227.52 USD');
     expect(text()).toContain('Price tolerance');
+    expect(text()).toContain('± 5%');
     expect(text()).toContain('(max 238.896)');
     expect(text()).toContain('Brokerage');
   });

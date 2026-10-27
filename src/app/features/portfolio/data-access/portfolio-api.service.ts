@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../../core/api-client.service';
-import { Portfolio } from '../../../core/trading.models';
+import { Portfolio, PortfolioType } from '../../../core/trading.models';
 import { HoldingSummaryResponse } from '../../../core/portfolio-holdings.models';
 import { TimeFrame } from '../../market/stock-display/stock-display';
 import { PerformanceResponse } from '../../../core/portfolio-performance.models';
@@ -39,4 +39,11 @@ export class PortfolioApiService {
       `portfolio/${encodeURIComponent(portfolioId)}/performance/${encodeURIComponent(timeframe)}`
     );
   }
+
+  createPortfolio(portfolioType: PortfolioType, clientId: string): Observable<Portfolio> {
+    return this.api.get<Portfolio>(
+      `portfolio/new/${encodeURIComponent(portfolioType)}/${encodeURIComponent(clientId)}`
+    );
+  }
+    
 }

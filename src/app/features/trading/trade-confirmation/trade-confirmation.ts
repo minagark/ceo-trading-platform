@@ -108,7 +108,13 @@ export class TradeConfirmation {
       return this.message() ?? 'Something went wrong placing your order.';
     }
     const seen = this.updates();
-    return seen.REJECTED?.message || seen.CANCELLED?.message || null;
+    if (seen.REJECTED) {
+      return seen.REJECTED.message || 'The backend rejected this order. Check the portfolio balance, instrument availability, and order rules.';
+    }
+    if (seen.CANCELLED) {
+      return seen.CANCELLED.message || 'The backend cancelled this order.';
+    }
+    return null;
   });
 
   steps = computed<Step[]>(() => {

@@ -15,6 +15,7 @@ import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { HoldingsService } from '../holdings/holdings.service';
 import { forkJoin } from 'rxjs';
 import { InstrumentType } from '../../../core/trading.models';
+import { catchError, forkJoin, of } from 'rxjs';
 
 
 // mock account data
@@ -148,7 +149,9 @@ export class PortfolioPerformance {
 
       const request = forkJoin(
         portfolioIds.map((portfolioId) =>
-          this.portfolioApi.getPerformance(portfolioId, timeframe)
+          this.portfolioApi.getPerformance(portfolioId, timeframe).pipe(
+            catchError(() => of([])),
+          )
         )
       )
         .subscribe({
@@ -191,8 +194,6 @@ export class PortfolioPerformance {
   }
 
   private updateChart(data: GraphItem[]): void {
-    console.log('Chart data:', data);
-
     this.items.set(data);
       this.options.update((options) => ({
         ...options,
