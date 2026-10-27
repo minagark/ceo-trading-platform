@@ -5,7 +5,7 @@ import { Trades } from '../../trading/trade-screen/trade-screen';
 import { AccountActivity } from '../../account/account-activity/account-activity';
 import { PortfolioPerformance } from '../../portfolio/portfolio-performance/portfolio-performance';
 import { MarketAnalysis } from '../../market/market-analysis/market-analysis';
-import { AccountsList, Account } from '../../account/accounts-list/accounts-list';
+import { AccountsList } from '../../account/accounts-list/accounts-list';
 import { PreviewPage } from '../../trading/preview-page/preview-page';
 import { OrderRequest } from '../../../core/trading.models';
 import { TradeConfirmation } from '../../trading/trade-confirmation/trade-confirmation';
@@ -31,15 +31,6 @@ const mockOrderRequest: OrderRequest = {
   side: 'BUY',
   changeThreshold: 0.02,
   market: 'America/New_York',
-};
-
-// id '1' lines up with AccountsService's mock "Brokerage" account, so
-// HoldingsService's mock holdings for that account show up here.
-const mockHoldingsAccount: Account = {
-  id: '1',
-  name: 'Brokerage',
-  type: 'Individual',
-  balance: 24310.55,
 };
 
 @Component({
@@ -72,7 +63,7 @@ export class ComponentGallery {
     {
       name: 'Holdings List',
       component: HoldingsList,
-      inputs: { account: mockHoldingsAccount },
+      inputs: {},
     },
     { name: 'Portfolio Holdings Page', component: PortfolioHoldingsPage },
   ];

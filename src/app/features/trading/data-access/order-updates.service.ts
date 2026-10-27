@@ -140,6 +140,7 @@ export class OrderUpdatesService {
       // runs on every (re)connect: live topic first, then ask for the current status
       // so anything that happened before we subscribed isn't missed
       const subscribe = () => {
+        stompSubscriptions.forEach(subscription => subscription.unsubscribe());
         stompSubscriptions = [
           this.client.subscribe(`/topic/orders/${orderId}`, onMessage),
           this.client.subscribe(`/app/orders/${orderId}`, onMessage),

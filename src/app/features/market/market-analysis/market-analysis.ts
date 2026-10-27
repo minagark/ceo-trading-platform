@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../auth/auth/auth.service';
 import { AgCharts } from 'ag-charts-angular';
 import { AgChartOptions, AllCommunityModule, ModuleRegistry } from 'ag-charts-community';
 import { catchError, forkJoin, of } from 'rxjs';
@@ -24,6 +25,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 })
 export class MarketAnalysis {
   private readonly analyticsApi = inject(AnalyticsApiService);
+  readonly authService = inject(AuthService);
 
   readonly volume = signal<VolumeAnalytics | null>(null);
   readonly topInstruments = signal<TopInstrumentAnalytics[]>([]);

@@ -2,7 +2,8 @@
   <header class="dashboard-header">
     <div>
       <p class="eyebrow">Analytics</p>
-      <h1>Analyst Dashboard</h1>
+      <h1>Welcome, {{ authService.currentUserFirstName() || 'Analyst' }}</h1>
+      <p class="dashboard-title">Analyst Dashboard</p>
       <p class="dashboard-summary">Trading activity, instrument concentration, client momentum, and market context.</p>
     </div>
     <button type="button" class="refresh-button" (click)="refresh()" [disabled]="loading()">Refresh data <span>&#8635;</span></button>

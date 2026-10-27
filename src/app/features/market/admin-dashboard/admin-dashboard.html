@@ -1,0 +1,63 @@
+<section class="admin-dashboard">
+  <header class="dashboard-header">
+    <div>
+      <h1>Welcome, {{ authService.currentUserFirstName() || 'Admin' }}</h1>
+      <p class="dashboard-title">Welcome to the Admin Dashboard! Search through every order, deposit, forex exchange, and their status updates.</p>
+    </div>
+    <div class="record-count"><strong>{{ totalElements() | number:'1.0-0' }}</strong><span>records found</span></div>
+  </header>
+
+  <form class="filter-bar" (ngSubmit)="search()">
+    <label>Order ID <input name="orderId" [(ngModel)]="orderId" placeholder="Exact UUID" /></label>
+    <label>Client ID <input name="clientId" [(ngModel)]="clientId" placeholder="Client UUID" /></label>
+    <label>Status <select name="status" [(ngModel)]="status"><option value="">All statuses</option>@for (orderStatus of statuses; track orderStatus) { <option [value]="orderStatus">{{ orderStatus | titlecase }}</option> }</select></label>
+    <label>Ticker <input name="ticker" [(ngModel)]="ticker" maxlength="12" placeholder="AAPL" /></label>
+    <label>Placed from <input name="from" type="date" [(ngModel)]="from" /></label>
+    <label>Placed to <input name="to" type="date" [(ngModel)]="to" /></label>
+    <div class="filter-actions"><button class="primary-button" type="submit">Search records</button><button class="quiet-button" type="button" (click)="clearFilters()">Clear</button></div>
+  </form>
+
+  @if (loading()) {
+    <div class="state-panel" role="status"><span class="spinner"></span><strong>Loading order records</strong><span>Reading the firm audit ledger...</span></div>
+  } @else if (error()) {
+    <div class="state-panel state-panel--error" role="alert"><strong>Unable to read audit records</strong><span>{{ error() }}</span><button class="text-button" type="button" (click)="search()">Try again</button></div>
+  } @else if (!orders().length) {
+    <div class="state-panel"><strong>No matching orders</strong><span>Try broadening the filters or searching a different client.</span></div>
+  } @else {
+    <div class="table-shell">
+      <table>
+        <caption>All client order records</caption>
+        <thead><tr><th>Placed</th><th>Order ID</th><th>Client</th><th>Instrument</th><th>Side</th><th>Quantity</th><th>Quoted price</th><th>Actual price</th><th>Status</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody>
+          @for (order of orders(); track trackOrder($index, order)) {
+            <tr class="order-row" (click)="inspect(order)">
+              <td class="muted-cell">{{ formatDate(order.createdDate) }}</td>
+              <td><button class="order-link" type="button" (click)="$event.stopPropagation(); inspect(order)">{{ formatText(order.orderId, 'Could not be found') }}</button></td>
+              <td><strong>{{ formatText(order.clientName, 'Could not be found') }}</strong><span class="sub-cell mono-cell">{{ formatText(order.clientId) }}</span></td>
+              <td><strong>{{ instrumentLabel(order) }}</strong><span class="sub-cell">{{ instrumentTypeLabel(order) | titlecase }}</span></td>
+              <td><span class="side" [class.side--sell]="order.side === 'SELL'">{{ statusLabel(order.side) }}</span></td>
+              <td>{{ formatNumber(order.quantity) }}</td>
+              <td>{{ formatPrice(order.quotedPrice) }}</td>
+              <td>{{ executionLabel(order) }}</td>
+              <td><span class="status" [class]="'status status--' + statusClass(order.currentStatus)">{{ statusLabel(order.currentStatus) | titlecase }}</span></td>
+              <td><button class="inspect-button" type="button" (click)="$event.stopPropagation(); inspect(order)">View audit</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer class="pagination"><span>Page {{ page() + 1 }} of {{ totalPages() }}</span><span>{{ totalElements() | number:'1.0-0' }} total orders</span><div><button class="quiet-button" type="button" (click)="previousPage()" [disabled]="page() === 0">Previous</button><button class="quiet-button" type="button" (click)="nextPage()" [disabled]="page() + 1 >= totalPages()">Next</button></div></footer>
+  }
+
+  @if (selectedOrder(); as order) {
+    <div class="audit-modal-backdrop" role="presentation" (click)="closeDetails()">
+    <aside class="detail-panel audit-modal" role="dialog" aria-modal="true" aria-labelledby="audit-detail-title" (click)="$event.stopPropagation()">
+      <div class="detail-header"><div><p class="eyebrow">Immutable record view</p><h2 id="audit-detail-title">{{ order.orderId }}</h2></div><button class="close-button" type="button" (click)="closeDetails()" aria-label="Close order audit details">&times;</button></div>
+      <div class="detail-summary"><div><span>Client</span><strong>{{ formatText(order.clientName, 'Could not be found') }}</strong><small>{{ formatText(order.clientId) }}</small></div><div><span>Portfolio ID</span><strong>{{ formatText(order.portfolioId) }}</strong><small>Portfolio name unavailable from API</small></div><div><span>Placed</span><strong>{{ formatDate(order.createdDate) }}</strong></div><div><span>Resolved</span><strong>{{ formatDate(order.resolvedDate) }}</strong></div><div><span>Instrument</span><strong>{{ instrumentLabel(order) }}</strong><small>{{ instrumentTypeLabel(order) | titlecase }}</small></div></div>
+      <div class="facts-grid"><div><span>Submitted quote</span><strong>{{ formatPrice(order.quotedPrice, order.side !== 'DEPOSIT') }}</strong></div><div><span>Actual buy price</span><strong>{{ formatPrice(order.addPurchasePrice, order.side === 'BUY') }}</strong></div><div><span>Actual sell price</span><strong>{{ formatPrice(order.subtractPurchasePrice, order.side === 'SELL') }}</strong></div><div><span>Units bought</span><strong>{{ formatAmount(order.unitsBought, order.side === 'BUY') }}</strong></div><div><span>Units sold</span><strong>{{ formatAmount(order.unitsSold, order.side === 'SELL') }}</strong></div><div><span>Cash balance difference</span><strong [class.positive-value]="order.cashBalanceDifference !== null && order.cashBalanceDifference > 0" [class.negative-value]="order.cashBalanceDifference !== null && order.cashBalanceDifference < 0">{{ formatAmount(order.cashBalanceDifference, cashDifferenceApplies(order)) }}</strong></div></div>
+      <h3>Order lifecycle</h3>
+      @if (historyLoading()) { <div class="detail-state"><span class="spinner"></span><span>Loading status history...</span></div> } @else if (historyError()) { <div class="detail-state detail-state--error">{{ historyError() }}</div> } @else if (!history().length) { <div class="detail-state">No lifecycle entries were returned for this order.</div> } @else { <ol class="timeline">@for (entry of history(); track $index) { <li><span class="timeline-marker"></span><div><strong>{{ statusLabel(entry.status) }}</strong><time>{{ formatDate(entry.timestamp || entry.createdDate) }}</time>@if (entry.message) { <p>{{ entry.message }}</p> }</div></li> }</ol> }
+    </aside>
+    </div>
+  }
+</section>

@@ -1,0 +1,22 @@
+<div class="confirm-portfolio">
+    <mat-card appearance="outlined" class="portfolio-panel confirmation-card">
+        <mat-card-header class="portfolio-panel__header">
+        <mat-card-title>Portfolio created</mat-card-title>
+        <mat-card-subtitle>Your new portfolio is ready to fund</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="portfolio-panel__content">
+        <p class="portfolio-panel__section-title">Portfolio details</p>
+        <mat-list>
+            <mat-list-item>
+                <span><strong>Portfolio type</strong><br>{{ portfolioInfo?.portfolioType }}</span>
+            </mat-list-item>
+            <mat-list-item>
+                <span><strong>Portfolio name</strong><br>{{ portfolioInfo?.name || 'Unnamed portfolio' }}</span>
+            </mat-list-item>
+        </mat-list>
+    </mat-card-content>
+    <mat-card-actions class="portfolio-panel__actions">
+        <button matButton="filled" class="portfolio-submit" type="button" (click)="fundPortfolio()">Fund portfolio</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

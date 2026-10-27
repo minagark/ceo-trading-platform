@@ -1,23 +1,40 @@
 
+@if (!isLoginPage()) {
 <main class="main">
-  <mat-toolbar class="app-nav">
-    <a matButton routerLink="/home" style="font-size: x-large;">Market Hive</a>
+  <mat-toolbar class="app-nav" [class.app-nav--admin]="authService.isAdmin()" [class.app-nav--analyst]="authService.isAnalyst()" [class.app-nav--client]="authService.isClient()">
+    <a matButton class="app-brand" routerLink="/home">
+      <span>Market Hive</span>
+      <svg class="app-brand__logo" viewBox="0 0 64 64" aria-hidden="true">
+        <ellipse class="bee-wing bee-wing--left" cx="20" cy="26" rx="12" ry="9" />
+        <ellipse class="bee-wing bee-wing--right" cx="44" cy="26" rx="12" ry="9" />
+        <circle class="bee-head" cx="32" cy="14" r="8" />
+        <path class="bee-body" d="M32 20c-10 0-16 8-16 20 0 8 7 14 16 14s16-6 16-14c0-12-6-20-16-20z" />
+        <path class="bee-stripe" d="M17 34h30" />
+        <path class="bee-stripe" d="M18.5 44h27" />
+        <path class="bee-stripe" d="M22 52h20" />
+      </svg>
+    </a>
     <span class="example-spacer"></span>
     @if (authService.isAuthenticated()) {
-      <!-- <a matButton class="app-nav__link" routerLink="/home" href="#">Home</a> -->
-      <a matButton="text" class="app-nav__link" routerLink="/stock" href="#">Stock Display</a>
-      <a matButton="text" class="app-nav__link" routerLink="/trades" href="#">Trades</a>
-      <a matButton="text" class="app-nav__link" routerLink="/history" href="#">Account Activity</a>
-      <a matButton="text" class="app-nav__link" routerLink="/portfolio" href="#">Portfolio Performance</a>
-      <a matButton="text" class="app-nav__link" routerLink="/composition" href="#">Portfolio Composition</a>
-      <a matButton="text" class="app-nav__link" routerLink="/holdings" href="#">Holdings</a>
-      <a matButton="text" class="app-nav__link" routerLink="/analysis" href="#">Analyst Dashboard</a>
-      <a matButton="text" class="app-nav__link" routerLink="/components" href="#">Components</a>
+      @if (authService.isAdmin()) {
+        <a matButton="text" class="app-nav__link app-nav__admin-link" routerLink="/admin" routerLinkActive="app-nav__link--active" [routerLinkActiveOptions]="{ exact: true }">Admin Dashboard</a>
+      } @else if (authService.isAnalyst()) {
+        <a matButton="text" class="app-nav__link app-nav__analyst-link" routerLink="/analysis" routerLinkActive="app-nav__link--active" [routerLinkActiveOptions]="{ exact: true }">Analyst Dashboard</a>
+      } @else {
+        <nav class="client-nav" aria-label="Client navigation">
+          <a matButton="text" class="app-nav__link" routerLink="/home" routerLinkActive="app-nav__link--active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+          <a matButton="text" class="app-nav__link" routerLink="/stock" routerLinkActive="app-nav__link--active">Search Stocks</a>
+          <a matButton="text" class="app-nav__link" routerLink="/trades" routerLinkActive="app-nav__link--active">Trade</a>
+          <a matButton="text" class="app-nav__link" routerLink="/holdings" routerLinkActive="app-nav__link--active">Holdings</a>
+          <a matButton="text" class="app-nav__link" routerLink="/history" routerLinkActive="app-nav__link--active">Account Activity</a>
+        </nav>
+      }
       <app-user-profile />
     } @else {
       <a matButton class="app-nav__link" routerLink="/login" href="#">Login</a>
     }
   </mat-toolbar>
 </main>
+}
 
 <router-outlet />

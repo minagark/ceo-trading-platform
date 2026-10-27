@@ -1,7 +1,8 @@
+<app-instrument-search class="search"></app-instrument-search>
 <mat-card class="stock-display-page" appearance="outlined">
   <div class="stock-display-header">
-    <h1 class="stock-display-name">{{ stockDisplayInfo.name }}</h1>
-    <span class="stock-display-symbol">{{ stockDisplayInfo.symbol }}</span>
+    <h1 class="stock-display-name">{{ stockDisplayInfo().name }}</h1>
+    <span class="stock-display-symbol">{{ stockDisplayInfo().symbol }}</span>
   </div>
 
   <mat-card-content>
@@ -10,15 +11,15 @@
         <span class="label">Current Price</span>
         <span 
           class="value current-price-value" 
-          [class.positive]="stockDisplayInfo.currentPrice > stockDisplayInfo.previousClose" 
-          [class.negative]="stockDisplayInfo.currentPrice <= stockDisplayInfo.previousClose"
+          [class.positive]="stockDisplayInfo().currentPrice >= stockDisplayInfo().previousClose" 
+          [class.negative]="stockDisplayInfo().currentPrice < stockDisplayInfo().previousClose"
         >
-          {{ stockDisplayInfo.currentPrice | number: '1.2-2' }}
+          {{ stockDisplayInfo().currentPrice | number: '1.2-2' }}
         </span>
       </div>
       <div class="previous-close">
         <span class="label">Previous Close</span>
-        <span class="value">{{ stockDisplayInfo.previousClose | number: '1.2-2' }}</span>
+        <span class="value">{{ stockDisplayInfo().previousClose | number: '1.2-2' }}</span>
       </div>
     </div>
 
@@ -33,18 +34,23 @@
       </mat-form-field>
       <div class="high-price">
         <span class="label">High Today</span>
-        <span class="value">{{ stockDisplayInfo.highPriceToday | number: '1.2-2' }}</span>
+        <span class="value">{{ stockDisplayInfo().highPriceToday | number: '1.2-2' }}</span>
       </div>
       <div class="low-price">
         <span class="label">Low Today</span>
-        <span class="value">{{ stockDisplayInfo.lowPriceToday | number: '1.2-2' }}</span>
+        <span class="value">{{ stockDisplayInfo().lowPriceToday | number: '1.2-2' }}</span>
       </div>
     </div>
 
     <div class="price-history" style="border-color: var(--mat-sys-tertiary);">
       <!-- placeholder until real chart data/library is integrated -->
       <p class="chart-placeholder">Price history chart for: {{ selectedTimeFrame }}</p>
-      <performance-chart [selectedTimeFrame]="selectedTimeFrame"></performance-chart>
+      <performance-chart
+        [selectedTimeFrame]="selectedTimeFrame"
+        [instrumentSymbol]="stockDisplayInfo().symbol"
+        [instrumentType]="type"
+        [showTimeFrame]="false"
+      ></performance-chart>
     </div>
     
     <button matButton="filled" class="trade-button" (click)="handleTrade()">

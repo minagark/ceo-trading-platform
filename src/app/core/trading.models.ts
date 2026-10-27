@@ -1,5 +1,6 @@
 export interface Portfolio {
   ID: string;
+  name?: string | null;
   holdingIds: string[];
   type: PortfolioType;
 }
@@ -66,7 +67,7 @@ export interface OrderRequest {
   side: Side;
   changeThreshold: number;
   market: string;
-}
+} 
 
 export interface OrderResponse {
   orderId: string;
@@ -80,11 +81,21 @@ export interface OrderResponse {
   subtractInstrumentFullName: string;
   quantity: number;
   quotedPrice: number;
+  resolvedPrice: number;
   side: Side;
   changeThreshold: number;
   createdDate: string;
   resolvedDate: string;
   currentStatus: OrderStatus;
+}
+
+export interface AdminOrderResponse extends OrderResponse {
+  clientName: string;
+  addPurchasePrice: number | null;
+  subtractPurchasePrice: number | null;
+  unitsBought: number | null;
+  unitsSold: number | null;
+  cashBalanceDifference: number | null;
 }
 
 // pushed by the backend on /topic/orders/{orderId} (STOMP over WebSocket)

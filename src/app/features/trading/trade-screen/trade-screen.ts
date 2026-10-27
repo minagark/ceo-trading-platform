@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, effect, inject, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -98,6 +98,28 @@ export class Trades {
   );
 
   constructor() {
+    effect(() => {
+      const userId = this.authService.currentUserId();
+      if (userId) {
+        this.accountsService.loadForUser(userId); // need to loadUser information here so data will populate
+      }
+    });
+
+    const navigationState = (this.router.getCurrentNavigation()?.extras.state ?? history.state) as {
+      portfolioId?: string;
+      orderType?: OrderType;
+    } | undefined;
+
+    const navigationPortfolioId = navigationState?.portfolioId;
+    const navigationOrderType = navigationState?.orderType;
+
+    if (navigationPortfolioId) {
+      this.orderForm.controls.portfolioId.setValue(navigationPortfolioId);
+    }
+    if (navigationOrderType) {
+      this.orderForm.controls.orderType.setValue(navigationOrderType);
+    }
+
     merge(
       this.orderForm.controls.orderType.valueChanges,
       this.orderForm.controls.side.valueChanges,
@@ -206,14 +228,14 @@ export class Trades {
           side = orderInfo.side
         }
         const orderRequest: OrderRequest = {
-          clientId: this.authService.currentUserId() || '2c522b92-7151-4daa-92db-81a2253c772a', 
-          clientName: this.authService.currentUserFullName() || "Unknown user",
+          clientId: this.authService.currentUserId()!, 
+          clientName: this.authService.currentUserFullName()!,
           portfolioId: orderInfo.portfolioId,
           addInstrumentSymbol: addInstrument.symbol,
           addInstrumentType: addInstrument.type,
           subtractInstrumentSymbol: subInstrument.symbol,
           subtractInstrumentType: subInstrument.type,
-          changeThreshold: orderInfo.changeThreshold,
+          changeThreshold: orderInfo.changeThreshold / 100,
           quantity: orderInfo.quantity,
           side,
           quotedPrice,

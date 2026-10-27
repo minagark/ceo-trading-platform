@@ -21,6 +21,24 @@ export class AuthService {
   readonly accessToken = signal<string | null>(null);
   readonly currentUserRole = signal<string | null>(null);
 
+  isAdmin(): boolean {
+    return this.hasRole('ADMIN');
+  }
+
+  isAnalyst(): boolean {
+    return this.hasRole('ANALYST');
+  }
+
+  isClient(): boolean {
+    return !this.isAdmin() && !this.isAnalyst();
+  }
+
+  landingPath(): string {
+    if (this.isAdmin()) return '/admin';
+    if (this.isAnalyst()) return '/analysis';
+    return '/home';
+  }
+
   constructor(backend: HttpBackend) {
     // Bypass the auth interceptor for auth endpoints to avoid refresh recursion.
     this.http = new HttpClient(backend);
@@ -108,6 +126,7 @@ export class AuthService {
     this.http
       .get<AuthUserResponse>(`${environment.apiBaseUrl}/auth/me`, {
         headers: { Authorization: `Bearer ${response.accessToken}` },
+        withCredentials: true,
       })
       .pipe(catchError(() => of(null)))
       .subscribe((user) => {
@@ -115,5 +134,10 @@ export class AuthService {
           this.updateCurrentUser(user);
         }
       });
+  }
+
+  private hasRole(role: string): boolean {
+    const currentRole = (this.currentUserRole() ?? '').toUpperCase();
+    return currentRole === role || currentRole === `ROLE_${role}`;
   }
 }

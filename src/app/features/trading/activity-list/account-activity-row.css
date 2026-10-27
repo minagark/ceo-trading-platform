@@ -6,23 +6,32 @@
 
 :host {
   display: grid;
-  grid-template-columns:
-    minmax(0, 1.6fr) minmax(0, 0.7fr) minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr)
-    minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: var(--activity-columns);
   align-items: center;
   gap: 0.75rem;
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid var(--color-border);
+  min-height: 4rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
   cursor: default;
   user-select: text;
+  box-shadow: inset 3px 0 transparent;
+}
+
+:host(:last-child) {
+  border-bottom: 0;
 }
 
 :host(:hover) {
-  background: var(--color-surface-hover);
+  background: var(--mat-sys-surface-container);
 }
 
 :host(.account-activity-row--selected) {
-  background: var(--color-accent-soft);
+  background: color-mix(in srgb, var(--mat-sys-tertiary) 12%, var(--mat-sys-surface));
+  box-shadow: inset 3px 0 var(--mat-sys-tertiary);
+}
+
+:host(.account-activity-row--selected:hover) {
+  background: color-mix(in srgb, var(--mat-sys-tertiary) 18%, var(--mat-sys-surface));
 }
 
 .account-activity-row__cell {
@@ -31,6 +40,26 @@
 
 .account-activity-row__numeric {
   text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.account-activity-row__time {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.account-activity-row__symbol {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.account-activity-row__type {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.8125rem;
 }
 
 .account-activity__action {
@@ -38,41 +67,54 @@
 }
 
 .account-activity__action--buy {
-  color: var(--color-success);
+  color: var(--activity-positive);
 }
 
 .account-activity__action--sell {
-  color: var(--color-danger);
+  color: var(--mat-sys-error);
+}
+
+.account-activity__action--deposit {
+  color: var(--mat-sys-tertiary);
 }
 
 .account-activity__status {
-  --mdc-chip-label-text-weight: 600;
-  --mdc-chip-elevated-container-color: var(--color-surface-raised);
-  --mdc-chip-label-text-color: var(--color-text);
-  --mdc-chip-disabled-label-text-color: var(--color-text);
-  opacity: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.account-activity__status::before {
+  content: '';
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .account-activity__status--fulfilled {
-  --mdc-chip-elevated-container-color: var(--color-success);
-  --mdc-chip-label-text-color: var(--color-on-success, #000);
-  --mdc-chip-disabled-label-text-color: var(--color-on-success, #000);
+  color: var(--activity-positive);
 }
 
+.account-activity__status--accepted,
 .account-activity__status--pending {
-  --mdc-chip-elevated-container-color: var(--mat-sys-tertiary);
-  --mdc-chip-label-text-color: var(--mat-sys-on-tertiary);
-  --mdc-chip-disabled-label-text-color: var(--mat-sys-on-tertiary);
+  color: var(--mat-sys-tertiary);
 }
 
-.account-activity__status--cancelled {
-  --mdc-chip-elevated-container-color: var(--color-border-strong);
-  --mdc-chip-label-text-color: var(--color-text);
-  --mdc-chip-disabled-label-text-color: var(--color-text);
-}
-
+.account-activity__status--cancelled,
 .account-activity__status--rejected {
-  --mdc-chip-elevated-container-color: var(--color-danger);
-  --mdc-chip-label-text-color: #fff;
-  --mdc-chip-disabled-label-text-color: #fff;
+  color: var(--mat-sys-error);
+}
+
+@media (forced-colors: active) {
+  :host(.account-activity-row--selected) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
