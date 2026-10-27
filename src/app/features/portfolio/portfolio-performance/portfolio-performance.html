@@ -12,6 +12,12 @@
             </mat-select>
         </mat-form-field>
     }
-    <ag-charts class="performance-chart" [options]="options()"></ag-charts>
-    <p class="performance-timeframe">Time Frame: {{ selectedTimeFrame() }}</p>
+    <ag-charts
+        class="performance-chart"
+        [class.performance-chart--compact]="!showTimeFrame()"
+        [options]="options()"
+    ></ag-charts>
+    @if (showTimeFrame()) {
+        <p class="performance-timeframe">Time Frame: {{ selectedTimeFrame() }}</p>
+    }
 </div>

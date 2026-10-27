@@ -70,9 +70,13 @@
 .price-history {
   border: 1px solid #ddd;
   border-radius: 0px;
-  padding: 2rem;
+  padding: 0.75rem;
   text-align: center;
   color: #999;
+}
+
+.price-history .chart-placeholder {
+  margin: 0 0 0.5rem;
 }
 
 .trade-button {
