@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, effect, inject, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -19,6 +19,7 @@ import { merge, of, startWith, switchMap } from 'rxjs';
 import { OrderApiService } from '../data-access/order-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../auth/auth/auth.service';
 
 export interface Asset {
   abbrName: string;
@@ -60,6 +61,7 @@ export class Trades {
   private currencyService = inject(CurrencyService);
   private orderApiService = inject(OrderApiService);
   private marketApiService = inject(MarketApiService);
+  private authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly US_CURRENCY_SYMBOL: "USD" = "USD";
@@ -96,6 +98,28 @@ export class Trades {
   );
 
   constructor() {
+    effect(() => {
+      const userId = this.authService.currentUserId();
+      if (userId) {
+        this.accountsService.loadForUser(userId); // need to loadUser information here so data will populate
+      }
+    });
+
+    const navigationState = (this.router.getCurrentNavigation()?.extras.state ?? history.state) as {
+      portfolioId?: string;
+      orderType?: OrderType;
+    } | undefined;
+
+    const navigationPortfolioId = navigationState?.portfolioId;
+    const navigationOrderType = navigationState?.orderType;
+
+    if (navigationPortfolioId) {
+      this.orderForm.controls.portfolioId.setValue(navigationPortfolioId);
+    }
+    if (navigationOrderType) {
+      this.orderForm.controls.orderType.setValue(navigationOrderType);
+    }
+
     merge(
       this.orderForm.controls.orderType.valueChanges,
       this.orderForm.controls.side.valueChanges,
@@ -204,14 +228,14 @@ export class Trades {
           side = orderInfo.side
         }
         const orderRequest: OrderRequest = {
-          clientId: '931cfc07-df54-43e5-b809-541c7b200238',
-          clientName: 'Eric Li',
+          clientId: this.authService.currentUserId()!, 
+          clientName: this.authService.currentUserFullName()!,
           portfolioId: orderInfo.portfolioId,
           addInstrumentSymbol: addInstrument.symbol,
           addInstrumentType: addInstrument.type,
           subtractInstrumentSymbol: subInstrument.symbol,
           subtractInstrumentType: subInstrument.type,
-          changeThreshold: orderInfo.changeThreshold,
+          changeThreshold: orderInfo.changeThreshold / 100,
           quantity: orderInfo.quantity,
           side,
           quotedPrice,

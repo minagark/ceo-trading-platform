@@ -1,0 +1,20 @@
+<div class="create-portfolio">
+    <mat-card appearance="outlined" class="portfolio-panel">
+        <mat-card-header class="portfolio-panel__header">
+            <mat-card-title>Create a new portfolio</mat-card-title>
+            <mat-card-subtitle>Choose the account type you want to open</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="portfolio-panel__content">
+            <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+                <p class="portfolio-panel__section-title">Portfolio type</p>
+                <mat-radio-group class="portfolio-type-options" formControlName="portfolioType">
+                    <mat-radio-button value="BROKERAGE">Individual Brokerage</mat-radio-button>
+                    <mat-radio-button value="RETIREMENT">Retirement</mat-radio-button>
+                </mat-radio-group>
+                <mat-card-actions class="portfolio-panel__actions">
+                    <button matButton="filled" class="portfolio-submit" type="submit">Create portfolio</button>
+                </mat-card-actions>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -15,6 +15,8 @@ import { AdminDashboard } from './features/market/admin-dashboard/admin-dashboar
 import { authGuard } from './features/auth/auth/auth.guard';
 import { adminGuard } from './features/auth/auth/admin.guard';
 import { roleGuard } from './features/auth/auth/role.guard';
+import { CreatePortfolio } from './features/portfolio/create-portfolio/create-portfolio';
+import { ConfirmPortfolio } from './features/portfolio/confirm-portfolio/confirm-portfolio';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
@@ -31,5 +33,7 @@ export const routes: Routes = [
   { path: 'account', component: AccountPage, canActivate: [authGuard] },
   { path: 'account/:userId', component: AccountPage, canActivate: [authGuard] },
   { path: 'settings', component: SettingsPage, canActivate: [authGuard] },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'create-portfolio', component: CreatePortfolio, canActivate: [authGuard] },
+  { path: 'confirm-portfolio', component: ConfirmPortfolio, canActivate: [authGuard] },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
 ];

@@ -126,6 +126,7 @@ export class AuthService {
     this.http
       .get<AuthUserResponse>(`${environment.apiBaseUrl}/auth/me`, {
         headers: { Authorization: `Bearer ${response.accessToken}` },
+        withCredentials: true,
       })
       .pipe(catchError(() => of(null)))
       .subscribe((user) => {

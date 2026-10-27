@@ -5,16 +5,12 @@ import { ChangePeriod, HoldingSummaryResponse } from '../../../core/portfolio-ho
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PortfolioApiService } from '../data-access/portfolio-api.service';
 
-export interface Holding extends HoldingSummaryResponse {
-  logoDomain: string;
-}
-
 @Injectable({ providedIn: 'root' })
 export class HoldingsService {
   private readonly accountsService = inject(AccountsService);
   private readonly portfolioApi = inject(PortfolioApiService);
 
-  readonly holdings = signal<Holding[]>([]);
+  readonly holdings = signal<HoldingSummaryResponse[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
@@ -43,9 +39,7 @@ export class HoldingsService {
       portfolioIds.map((portfolioId) => this.portfolioApi.getHoldings(portfolioId)),
     ).subscribe({
       next: (responses) => {
-        this.holdings.set(
-          responses.flat().map((holding) => this.toHolding(holding)),
-        );
+        this.holdings.set(responses.flat());
       },
       error: () => {
         this.error.set('Unable to load holdings.');
@@ -54,16 +48,5 @@ export class HoldingsService {
       },
       complete: () => this.loading.set(false),
     });
-  }
-
-  private toHolding(holding: HoldingSummaryResponse): Holding {
-    return {
-      ...holding,
-      logoDomain: this.logoDomainFor(holding.symbol),
-    };
-  }
-
-  private logoDomainFor(symbol: string): string {
-    return `${symbol.trim().toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
   }
 }

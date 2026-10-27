@@ -4,6 +4,7 @@ import { EMPTY, Observable, catchError, distinctUntilChanged, exhaustMap, map, t
 import { environment } from '../../../../environments/environment';
 import { OrderStatus, OrderStatusUpdate } from '../../../core/trading.models';
 import { OrderApiService } from './order-api.service';
+import { AuthService } from '../../auth/auth/auth.service';
 
 const TERMINAL_STATUSES: readonly OrderStatus[] = ['FULFILLED', 'REJECTED', 'CANCELLED'];
 
@@ -30,13 +31,19 @@ export function webSocketUrl(apiBaseUrl: string, pageUrl: string): string {
 @Injectable({ providedIn: 'root' })
 export class OrderUpdatesService {
   private readonly orderApi = inject(OrderApiService);
+  private readonly authService = inject(AuthService);
 
   // one shared connection, opened while at least one order is being watched
   private readonly client = new Client({
     brokerURL: webSocketUrl(environment.apiBaseUrl, window.location.href),
-    reconnectDelay: 5000,
+    reconnectDelay: 0,
+    beforeConnect: async () => {
+      const token = this.authService.accessToken();
+      this.client.connectHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+    },
     onConnect: () => this.watchers.forEach(watcher => watcher.onConnect()),
     onWebSocketError: () => this.failWatchers('Order updates connection failed'),
+    onWebSocketClose: () => this.failWatchers('Order updates connection closed'),
     onStompError: frame => this.failWatchers(frame.headers['message'] ?? 'Order updates error'),
   });
   private readonly watchers = new Set<{ onConnect: () => void; onError: (error: Error) => void }>();
@@ -86,6 +93,7 @@ export class OrderUpdatesService {
       // runs on every (re)connect: live topic first, then ask for the current status
       // so anything that happened before we subscribed isn't missed
       const subscribe = () => {
+        stompSubscriptions.forEach(subscription => subscription.unsubscribe());
         stompSubscriptions = [
           this.client.subscribe(`/topic/orders/${orderId}`, onMessage),
           this.client.subscribe(`/app/orders/${orderId}`, onMessage),

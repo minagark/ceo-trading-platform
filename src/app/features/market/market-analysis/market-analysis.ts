@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -65,8 +66,8 @@ export class MarketAnalysis {
       volume: this.analyticsApi.getVolume(query),
       topInstruments: this.analyticsApi.getTopInstruments(this.topLimit, query),
       activityTrends: this.analyticsApi.getClientActivityTrends(query),
-      candles: this.analyticsApi.getCandles(this.candleSymbol.trim().toUpperCase()).pipe(catchError(() => {
-        this.candleError.set('Market price history is temporarily unavailable because the market data provider quota has been reached.');
+      candles: this.analyticsApi.getCandles(this.candleSymbol.trim().toUpperCase()).pipe(catchError((error: unknown) => {
+        this.candleError.set(this.marketDataErrorMessage(error));
         return of([]);
       })),
     }).subscribe({
@@ -109,6 +110,20 @@ export class MarketAnalysis {
         this.topMoversLoading.set(false);
       },
     });
+  }
+
+  private marketDataErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const body = error.error as { code?: unknown; errorCode?: unknown } | null;
+      const errorCode = String(body?.code ?? body?.errorCode ?? '').toUpperCase();
+      if (error.status === 429 || ['QUOTA_EXCEEDED', 'MARKET_DATA_QUOTA_EXCEEDED'].includes(errorCode)) {
+        return 'Market-data quota exceeded. Try again later.';
+      }
+      if (error.status === 404) {
+        return 'Market data route or symbol was not found. Check the symbol and try again.';
+      }
+    }
+    return 'Market price history could not be loaded. Please try again later.';
   }
 
   formatDate(value: string): string {
