@@ -27,11 +27,11 @@ export class LoginPage {
 
   constructor() {
     if (this.authService.isAuthenticated()) {
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl(this.authService.landingPath());
     } else {
       this.authService.restoreSession().subscribe((restored) => {
         if (restored) {
-          this.router.navigateByUrl('/home');
+          this.router.navigateByUrl(this.authService.landingPath());
         }
       });
     }
@@ -59,7 +59,7 @@ export class LoginPage {
     this.authService.login(this.email().trim(), this.password()).subscribe({
       next: () => {
         this.submitting.set(false);
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home';
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? this.authService.landingPath();
         this.router.navigateByUrl(returnUrl);
       },
       error: (error: unknown) => {

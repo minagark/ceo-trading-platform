@@ -204,8 +204,8 @@ export class Trades {
           side = orderInfo.side
         }
         const orderRequest: OrderRequest = {
-          clientId: '2c522b92-7151-4daa-92db-81a2253c772a',
-          clientName: 'John Doe',
+          clientId: '931cfc07-df54-43e5-b809-541c7b200238',
+          clientName: 'Eric Li',
           portfolioId: orderInfo.portfolioId,
           addInstrumentSymbol: addInstrument.symbol,
           addInstrumentType: addInstrument.type,
