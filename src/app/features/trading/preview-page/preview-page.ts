@@ -1,4 +1,5 @@
-import { Component, inject, input, output, computed, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, output, computed, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,6 +23,7 @@ interface Leg {
 })
 export class PreviewPage {
   private orderApi = inject(OrderApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   request = input.required<OrderRequest>();
   portfolioLabel = input<string>('');
@@ -75,7 +77,7 @@ export class PreviewPage {
 
     console.log(this.request());
 
-    this.orderApi.submitOrder(this.request()).subscribe({
+    this.orderApi.submitOrder(this.request()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (order) => {
         this.submitting.set(false);
         this.confirmed.emit(order);

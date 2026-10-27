@@ -87,6 +87,15 @@ export interface OrderResponse {
   currentStatus: OrderStatus;
 }
 
+export interface AdminOrderResponse extends OrderResponse {
+  clientName: string;
+  addPurchasePrice: number | null;
+  subtractPurchasePrice: number | null;
+  unitsBought: number | null;
+  unitsSold: number | null;
+  cashBalanceDifference: number | null;
+}
+
 // pushed by the backend on /topic/orders/{orderId} (STOMP over WebSocket)
 export interface OrderStatusUpdate {
   orderId: string;

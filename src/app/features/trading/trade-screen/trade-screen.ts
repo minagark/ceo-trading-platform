@@ -228,8 +228,8 @@ export class Trades {
           side = orderInfo.side
         }
         const orderRequest: OrderRequest = {
-          clientId: this.authService.currentUserId() || '2c522b92-7151-4daa-92db-81a2253c772a', 
-          clientName: this.authService.currentUserFullName() || "Unknown user",
+          clientId: this.authService.currentUserId()!, 
+          clientName: this.authService.currentUserFullName()!,
           portfolioId: orderInfo.portfolioId,
           addInstrumentSymbol: addInstrument.symbol,
           addInstrumentType: addInstrument.type,

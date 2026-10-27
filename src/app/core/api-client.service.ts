@@ -12,25 +12,27 @@ export class ApiClient {
   get<T>(path: string, params?: QueryParams): Observable<T> {
     return this.http.get<T>(this.url(path), {
       params: this.toHttpParams(params),
+      withCredentials: true,
     });
   }
 
   getRoot<T>(path: string, params?: QueryParams): Observable<T> {
     return this.http.get<T>(this.rootUrl(path), {
       params: this.toHttpParams(params),
+      withCredentials: true,
     });
   }
 
   post<TResponse, TRequest>(path: string, body: TRequest): Observable<TResponse> {
-    return this.http.post<TResponse>(this.url(path), body);
+    return this.http.post<TResponse>(this.url(path), body, { withCredentials: true });
   }
 
   postRoot<TResponse, TRequest>(path: string, body: TRequest): Observable<TResponse> {
-    return this.http.post<TResponse>(this.rootUrl(path), body);
+    return this.http.post<TResponse>(this.rootUrl(path), body, { withCredentials: true });
   }
 
   patch<TResponse, TRequest>(path: string, body: TRequest): Observable<TResponse> {
-    return this.http.patch<TResponse>(this.url(path), body);
+    return this.http.patch<TResponse>(this.url(path), body, { withCredentials: true });
   }
 
   private url(path: string): string {
