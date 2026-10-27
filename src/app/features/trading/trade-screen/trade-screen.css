@@ -9,6 +9,7 @@
 }
 
 .order-panel {
+  align-self: flex-start;
   width: min(100%, 34rem);
   overflow: hidden;
   border-color: var(--mat-sys-outline-variant);
