@@ -23,6 +23,15 @@
           <div><dt>Account type</dt><dd>{{ account.role }}</dd></div>
           <div><dt>Member since</dt><dd>{{ account.joinDate | date: 'mediumDate' }}</dd></div>
         </dl>
+        <div class="account-balance">
+          <span>Total account balance</span>
+          <strong>{{ totalBalance() | currency }}</strong>
+          <div class="balance-breakdown" aria-label="Balance breakdown">
+            <div><span>Cash</span><strong>{{ balanceBreakdown().cash | currency }}</strong></div>
+            <div><span>Stocks</span><strong>{{ balanceBreakdown().stocks | currency }}</strong></div>
+            <div><span>Crypto</span><strong>{{ balanceBreakdown().crypto | currency }}</strong></div>
+          </div>
+        </div>
       </section>
 
       <section class="account-card account-card--portfolios">
@@ -38,16 +47,14 @@
         @for (portfolio of portfolioSummaries(); track portfolio.ID) {
           <article class="portfolio-item">
             <div class="portfolio-item__heading">
-              <h3>{{ portfolio.type }}</h3>
-              <span>{{ portfolio.holdings.length }} holdings</span>
+              <h3>{{ portfolio.name || 'Unnamed portfolio' }} <small>({{ portfolio.type }})</small></h3>
+              <span>{{ portfolio.holdingCount }} holdings</span>
             </div>
-            @if (portfolio.holdings.length) {
-              <ul class="portfolio-holdings">
-                @for (holding of portfolio.holdings; track holding) {
-                  <li>{{ holding }}</li>
-                }
-              </ul>
-            }
+            <div class="balance-breakdown portfolio-breakdown" aria-label="Portfolio balance breakdown">
+              <div><span>Cash</span><strong>{{ portfolio.breakdown.cash | currency }}</strong></div>
+              <div><span>Stocks</span><strong>{{ portfolio.breakdown.stocks | currency }}</strong></div>
+              <div><span>Crypto</span><strong>{{ portfolio.breakdown.crypto | currency }}</strong></div>
+            </div>
           </article>
         }
           </div>
@@ -60,13 +67,4 @@
     <p class="account-page__state">Sign in to view your account details.</p>
   }
 
-  <section class="account-card account-card--accounts">
-    <div class="account-card__title-row">
-      <div>
-        <p class="account-page__eyebrow">BALANCES</p>
-        <h2>Accounts</h2>
-      </div>
-    </div>
-    <app-accounts-list [userId]="userId()" />
-  </section>
 </section>
