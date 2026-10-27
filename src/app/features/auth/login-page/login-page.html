@@ -31,6 +31,7 @@
       <path class="bee-stripe" d="M22 52h20" />
     </svg>
     <h1 class="login-brand__title">MarketHive</h1>
+    <p class="login-brand__slogan">where money becomes <span class="login-brand__slogan-honey">honey</span></p>
   </div>
 
   <section class="login-card" [attr.aria-label]="activeView() === 'login' ? 'Sign in' : 'Sign up'">
@@ -59,7 +60,6 @@
 
     @if (activeView() === 'login') {
       <form class="auth-form" (ngSubmit)="onLoginSubmit()">
-        <h2 class="auth-heading">Welcome back</h2>
         <label class="login-field">
           Email
           <input
