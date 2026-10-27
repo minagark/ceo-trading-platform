@@ -1,11 +1,9 @@
 /*
-  No card/border chrome here on purpose — ActivityList owns all the info and
-  is rendered borderless; this file just constrains the page's width.
+  ActivityList owns its table styling; the page leaves room for all nine columns.
 */
 
 .account-activity {
   display: block;
-  max-width: 960px;
+  max-width: 1280px;
   margin: 0 auto;
 }
-

@@ -5,19 +5,50 @@
 
 :host {
   display: block;
+  min-width: 0;
+  --activity-columns: minmax(9rem, 1.8fr) minmax(9rem, 1.8fr) minmax(4.5rem, 0.8fr)
+    minmax(4rem, 0.7fr) minmax(4rem, 0.7fr) minmax(4.5rem, 0.9fr) minmax(6rem, 1fr)
+    minmax(6rem, 1fr) minmax(6.5rem, 1fr);
+  color: var(--mat-sys-on-surface);
+  font-family: var(--mat-sys-body-medium-font);
+  font-size: 0.875rem;
+}
+
+.account-activity__table {
+  overflow-x: auto;
+  background: var(--mat-sys-surface);
+  border-block: 1px solid var(--mat-sys-outline-variant);
+  scrollbar-color: var(--mat-sys-outline) var(--mat-sys-surface);
+}
+
+.account-activity__table:focus-visible {
+  outline: 2px solid var(--mat-sys-tertiary);
+  outline-offset: -2px;
 }
 
 .account-activity__col-headers {
   display: grid;
-  grid-template-columns:
-    minmax(0, 1.6fr) minmax(0, 0.7fr) minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr)
-    minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: var(--activity-columns);
+  align-items: center;
   gap: 0.75rem;
-  padding: 0 1rem 0.5rem;
-  font-size: 0.75rem;
-  color: var(--color-text-faint);
+  padding: 0.85rem 1.25rem;
+  background: var(--mat-sys-surface-container-low);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.account-activity__col-headers,
+.account-activity__rows {
+  min-width: 68rem;
+}
+
+.account-activity__col-headers span:first-child {
+  color: var(--mat-sys-tertiary);
 }
 
 .account-activity__numeric {
@@ -30,9 +61,20 @@
 }
 
 .account-activity__empty {
-  padding: 1.5rem;
-  margin: 0;
-  color: var(--color-text-faint);
-  font-style: italic;
+  padding: 3rem 1.25rem;
+  background: var(--mat-sys-surface-container-low);
+  border-block: 1px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface-variant);
   text-align: center;
+}
+
+.account-activity__empty p {
+  margin: 0;
+}
+
+.account-activity__empty .account-activity__empty-title {
+  margin-bottom: 0.5rem;
+  color: var(--mat-sys-on-surface);
+  font-size: 1rem;
+  font-weight: 600;
 }

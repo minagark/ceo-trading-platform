@@ -1,5 +1,9 @@
-<div class="account-activity-row__cell account-activity-row__time">{{ order().createdDate | date: 'short' }}</div>
-<div class="account-activity-row__cell account-activity-row__time">{{ order().resolvedDate | date: 'short' }}</div>
+<div class="account-activity-row__cell account-activity-row__time">
+  {{ order().createdDate | date: 'short' }}
+</div>
+<div class="account-activity-row__cell account-activity-row__time">
+  {{ order().resolvedDate ? (order().resolvedDate | date: 'short') : '—' }}
+</div>
 
 <div class="account-activity-row__cell">
   <span
@@ -12,10 +16,12 @@
   </span>
 </div>
 
-<div class="account-activity-row__cell">{{ order().addInstrumentType | titlecase }}</div>
+<div class="account-activity-row__cell account-activity-row__type">
+  {{ primaryInstrument().type | titlecase }}
+</div>
 
-<div class="account-activity-row__cell">
-
+<div class="account-activity-row__cell account-activity-row__symbol">
+  {{ primaryInstrument().symbol }}
 </div>
 
 <div class="account-activity-row__cell account-activity-row__numeric">
@@ -31,7 +37,14 @@
 </div>
 
 <div class="account-activity-row__cell">
-  <mat-chip-set>
-    <mat-chip [class]="statusClass()" disabled>{{ order().currentStatus | titlecase }}</mat-chip>
-  </mat-chip-set>
+  <span
+    class="account-activity__status"
+    [class.account-activity__status--fulfilled]="order().currentStatus === 'FULFILLED'"
+    [class.account-activity__status--accepted]="order().currentStatus === 'ACCEPTED'"
+    [class.account-activity__status--pending]="order().currentStatus === 'PENDING'"
+    [class.account-activity__status--cancelled]="order().currentStatus === 'CANCELLED'"
+    [class.account-activity__status--rejected]="order().currentStatus === 'REJECTED'"
+  >
+    {{ order().currentStatus | titlecase }}
+  </span>
 </div>

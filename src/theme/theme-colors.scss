@@ -137,6 +137,9 @@ $primary-palette: map.merge(map.get($_palettes, primary), $_rest);
 $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
 
 html {
+  // Semantic trading color; Material supplies the surface, gold, and error tokens.
+  --activity-positive: #3fb950;
+
   @include mat.core();
   @include mat.theme((
     color: (

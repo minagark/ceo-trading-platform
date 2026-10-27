@@ -21,7 +21,7 @@ interface OrderHistoryEntry {
 }
 
 @Component({
-  imports: [DatePipe, DecimalPipe, FormsModule, TitleCasePipe],
+  imports: [DecimalPipe, FormsModule, TitleCasePipe],
   selector: 'app-admin-dashboard',
   styleUrl: './admin-dashboard.css',
   templateUrl: './admin-dashboard.html',
