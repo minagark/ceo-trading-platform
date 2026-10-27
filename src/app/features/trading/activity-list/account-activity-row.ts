@@ -1,7 +1,7 @@
 import { Component, HostBinding, HostListener, input, output } from '@angular/core';
 import { CurrencyPipe, DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
-import { Order } from './activity-list.service';
+import { OrderResponse } from '../../../core/trading.models';
 
 @Component({
   selector: 'app-account-activity-row',
@@ -10,7 +10,7 @@ import { Order } from './activity-list.service';
   styleUrl: './account-activity-row.css',
 })
 export class AccountActivityRow {
-  order = input.required<Order>();
+  order = input.required<OrderResponse>();
   selected = input(false);
 
   // Lets the parent track a click-and-drag multi-row selection — mousedown
@@ -36,6 +36,6 @@ export class AccountActivityRow {
   }
 
   statusClass(): string {
-    return `account-activity__status account-activity__status--${this.order().status}`;
+    return `account-activity__status account-activity__status--${this.order().currentStatus}`;
   }
 }

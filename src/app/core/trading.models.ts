@@ -67,7 +67,7 @@ export interface OrderRequest {
   side: Side;
   changeThreshold: number;
   market: string;
-}
+} 
 
 export interface OrderResponse {
   orderId: string;
@@ -81,6 +81,7 @@ export interface OrderResponse {
   subtractInstrumentFullName: string;
   quantity: number;
   quotedPrice: number;
+  resolvedPrice: number;
   side: Side;
   changeThreshold: number;
   createdDate: string;

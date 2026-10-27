@@ -13,27 +13,13 @@ import { TimeFrame } from '../../market/stock-display/stock-display';
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { HoldingsService } from '../holdings/holdings.service';
-import { forkJoin } from 'rxjs';
 import { InstrumentType } from '../../../core/trading.models';
 import { catchError, forkJoin, of } from 'rxjs';
-
-
-// mock account data
-interface Account {
-  id: number;
-  name: string;
-  balance: number;
-  holdings: { symbol: string; 
-              quantity: number; 
-            }[],
-  history: number[];
-}
 
 interface GraphItem {
   date: Date; // is it date... lowkey could be time too depending on time frame
   balance: number;
 }
-
 
 ModuleRegistry.registerModules([
   AllCommunityModule,

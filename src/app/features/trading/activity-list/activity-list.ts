@@ -1,7 +1,9 @@
 import { Component, HostListener, computed, effect, inject, signal, input } from '@angular/core';
 import { AccountActivityRow } from './account-activity-row';
-import { ActivityListService, Order } from './activity-list.service';
+import { ActivityListService } from './activity-list.service';
 import { SlicePipe } from '@angular/common';
+import { AuthService } from '../../auth/auth/auth.service';
+import { OrderResponse } from '../../../core/trading.models';
 
 
 @Component({
@@ -12,8 +14,9 @@ import { SlicePipe } from '@angular/common';
 })
 export class ActivityList {
   private activityListService = inject(ActivityListService);
+  private authService = inject(AuthService);
   showLess = input<boolean>(false);
-  clientId = input<string | null>(null);
+  clientId = computed(() => this.authService.currentUserId());
 
   constructor() {
     effect(() => {
@@ -24,9 +27,9 @@ export class ActivityList {
     });
   }
 
-  rows = computed<Order[]>(() =>
+  rows = computed<OrderResponse[]>(() =>
     [...this.activityListService.orders()].sort(
-      (a, b) => new Date(b.time).getTime() - new Date(a.time).getTime(),
+      (a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime(),
     ),
   );
 
