@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './features/auth/auth/auth.service';
 import { UserProfile } from './features/account/user-profile/user-profile';
 
@@ -9,7 +9,7 @@ import { filter } from 'rxjs';
 
 
 @Component({
-  imports: [RouterOutlet, RouterLink, MatButtonModule, MatToolbarModule, UserProfile],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatButtonModule, MatToolbarModule, UserProfile],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
