@@ -16,23 +16,10 @@ import { HoldingsService } from '../holdings/holdings.service';
 import { InstrumentType } from '../../../core/trading.models';
 import { catchError, forkJoin, of } from 'rxjs';
 
-
-// mock account data
-interface Account {
-  id: number;
-  name: string;
-  balance: number;
-  holdings: { symbol: string; 
-              quantity: number; 
-            }[],
-  history: number[];
-}
-
 interface GraphItem {
   date: Date; // is it date... lowkey could be time too depending on time frame
   balance: number;
 }
-
 
 ModuleRegistry.registerModules([
   AllCommunityModule,

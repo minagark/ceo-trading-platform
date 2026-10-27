@@ -1,25 +1,32 @@
 @if (rows().length) {
-  <div class="account-activity__col-headers">
-    <span>Time</span>
-    <span>Action</span>
-    <span>Instrument</span>
-    <span class="account-activity__numeric">Amount</span>
-    <span class="account-activity__numeric">Quoted Price</span>
-    <span class="account-activity__numeric">Actual Price</span>
-    <span>Status</span>
-  </div>
+  <div class="account-activity__table" role="region" aria-label="Account activity" tabindex="0">
+    <div class="account-activity__col-headers">
+      <span>Created Date</span>
+      <span>Resolved Date</span>
+      <span>Action</span>
+      <span>Type</span>
+      <span>Symbol</span>
+      <span class="account-activity__numeric">Amount</span>
+      <span class="account-activity__numeric">Quoted Price</span>
+      <span class="account-activity__numeric">Actual Price</span>
+      <span>Status</span>
+    </div>
 
-  <div class="account-activity__rows" role="list">
-    @for (row of rows() | slice:0:(showLess() ? 5 : rows().length); track row.orderId) {
-      <app-account-activity-row
-        role="listitem"
-        [order]="row"
-        [selected]="isSelected(row.orderId)"
-        (rowPointerDown)="onRowPointerDown(row.orderId)"
-        (rowPointerEnter)="onRowPointerEnter(row.orderId)"
-      />
-    }
+    <div class="account-activity__rows" role="list">
+      @for (row of rows() | slice: 0 : (showLess() ? 5 : rows().length); track row.orderId) {
+        <app-account-activity-row
+          role="listitem"
+          [order]="row"
+          [selected]="isSelected(row.orderId)"
+          (rowPointerDown)="onRowPointerDown(row.orderId)"
+          (rowPointerEnter)="onRowPointerEnter(row.orderId)"
+        />
+      }
+    </div>
   </div>
 } @else {
-  <p class="account-activity__empty">No account activity yet.</p>
+  <div class="account-activity__empty">
+    <p class="account-activity__empty-title">No account activity yet.</p>
+    <p>Your orders and deposits will appear here.</p>
+  </div>
 }

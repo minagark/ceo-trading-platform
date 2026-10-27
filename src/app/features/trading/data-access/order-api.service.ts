@@ -14,6 +14,7 @@ export class OrderApiService {
   }
 
   getClientOrders(clientId: string): Observable<OrderResponse[]> {
+    console.log("Client ID: ", clientId);
     return this.api.getRoot<OrderResponse[]>(
       `/api/order/by_client/${encodeURIComponent(clientId)}`,
     );
