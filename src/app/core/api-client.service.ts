@@ -16,6 +16,13 @@ export class ApiClient {
     });
   }
 
+  getText(path: string, params?: QueryParams): Observable<string> {
+    return this.http.get(this.url(path), {
+      params: this.toHttpParams(params),
+      responseType: 'text',
+    });
+  }
+
   getRoot<T>(path: string, params?: QueryParams): Observable<T> {
     return this.http.get<T>(this.rootUrl(path), {
       params: this.toHttpParams(params),

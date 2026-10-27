@@ -57,9 +57,9 @@ export class InstrumentSearch {
       return;
     }
 
-    this.router.navigate(['/trades'], {
+    this.router.navigate(['/stock'], {
       queryParams: {
-        symbol: symbol, 
+        symbol: symbol.trim().toUpperCase(),
         type: orderType,
       }
     })
