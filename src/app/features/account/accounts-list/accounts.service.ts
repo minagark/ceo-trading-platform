@@ -48,7 +48,7 @@ export class AccountsService {
   private toAccount(portfolio: Portfolio, balance: number): Account {
     return {
       id: portfolio.ID,
-      name: `${portfolio.type} portfolio`,
+      name: portfolio.name ?? `${portfolio.type} portfolio`,
       type: portfolio.type,
       balance: balance
     };

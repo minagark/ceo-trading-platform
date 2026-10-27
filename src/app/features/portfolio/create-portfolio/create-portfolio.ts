@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,7 +13,7 @@ import { PortfolioCreationService } from '../data-access/portfolio-creation.serv
 import { Router } from '@angular/router';
 
 @Component({
-  imports: [ReactiveFormsModule, MatSelectModule, MatFormFieldModule, MatCardModule, MatRadioModule, MatButtonModule],
+  imports: [ReactiveFormsModule, MatSelectModule, MatFormFieldModule, MatInputModule, MatCardModule, MatRadioModule, MatButtonModule],
   selector: 'app-create-portfolio',
   styleUrl: './create-portfolio.css',
   templateUrl: './create-portfolio.html',
@@ -26,21 +27,26 @@ export class CreatePortfolio {
 
   constructor(private fb: FormBuilder) {
     this.myForm = this.fb.group({
+      portfolioName: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
       portfolioType: [''], // default
     });
   }
 
   onSubmit(): void {
+    if (this.myForm.invalid) {
+      return;
+    }
+    const portfolioName = (this.myForm.get('portfolioName')?.value as string).trim();
     const portfolioType = this.myForm.get('portfolioType')?.value as PortfolioType;
-    console.log('Submitting portfolio form:', portfolioType);
-    this.createPortfolio(portfolioType);
+    console.log('Submitting portfolio form:', portfolioName, portfolioType);
+    this.createPortfolio(portfolioName, portfolioType);
   }
 
-  createPortfolio(portfolioType: PortfolioType) {
+  createPortfolio(portfolioName: string, portfolioType: PortfolioType) {
     console.log('Creating portfolio with type:', portfolioType);
     const clientId = this.authService.currentUserId();
     if (clientId != null) {
-      this.portfolioApi.createPortfolio(portfolioType, clientId).subscribe({
+      this.portfolioApi.createPortfolio({ name: portfolioName, type: portfolioType, clientId }).subscribe({
         next: (response) => {
           console.log('Portfolio created successfully:', response);
           this.portfolioCreationService.setPortfolioData({

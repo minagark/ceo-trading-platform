@@ -6,6 +6,12 @@ import { HoldingSummaryResponse } from '../../../core/portfolio-holdings.models'
 import { TimeFrame } from '../../market/stock-display/stock-display';
 import { PerformanceResponse } from '../../../core/portfolio-performance.models';
 
+export interface CreatePortfolioRequest {
+  name: string;
+  type: PortfolioType;
+  clientId: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PortfolioApiService {
   private readonly api = inject(ApiClient);
@@ -40,10 +46,7 @@ export class PortfolioApiService {
     );
   }
 
-  createPortfolio(portfolioType: PortfolioType, clientId: string): Observable<Portfolio> {
-    return this.api.get<Portfolio>(
-      `portfolio/new/${encodeURIComponent(portfolioType)}/${encodeURIComponent(clientId)}`
-    );
+  createPortfolio(request: CreatePortfolioRequest): Observable<Portfolio> {
+    return this.api.post<Portfolio, CreatePortfolioRequest>('portfolio', request);
   }
-    
 }

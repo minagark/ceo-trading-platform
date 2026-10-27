@@ -1,5 +1,6 @@
 export interface Portfolio {
   ID: string;
+  name?: string | null;
   holdingIds: string[];
   type: PortfolioType;
 }

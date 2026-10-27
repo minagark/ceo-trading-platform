@@ -6,6 +6,11 @@
         </mat-card-header>
         <mat-card-content class="portfolio-panel__content">
             <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+                <mat-form-field>
+                    <mat-label>Portfolio name</mat-label>
+                    <input matInput formControlName="portfolioName" />
+                    <mat-error>Enter a name between 1 and 100 characters.</mat-error>
+                </mat-form-field>
                 <p class="portfolio-panel__section-title">Portfolio type</p>
                 <mat-radio-group class="portfolio-type-options" formControlName="portfolioType">
                     <mat-radio-button value="BROKERAGE">Individual Brokerage</mat-radio-button>
