@@ -27,7 +27,7 @@
         <mat-label>Portfolio</mat-label>
         <mat-select required formControlName="portfolioId">
           @for (account of accounts(); track $index) {
-            <mat-option [value]="account.id">{{account.id}}({{account.type}})</mat-option>
+            <mat-option [value]="account.id">{{account.name}}({{account.type}})</mat-option>
           }
         </mat-select>
       </mat-form-field>
