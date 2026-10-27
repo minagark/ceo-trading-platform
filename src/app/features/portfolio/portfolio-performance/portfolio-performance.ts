@@ -13,7 +13,6 @@ import { TimeFrame } from '../../market/stock-display/stock-display';
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { HoldingsService } from '../holdings/holdings.service';
-import { forkJoin } from 'rxjs';
 import { InstrumentType } from '../../../core/trading.models';
 import { catchError, forkJoin, of } from 'rxjs';
 

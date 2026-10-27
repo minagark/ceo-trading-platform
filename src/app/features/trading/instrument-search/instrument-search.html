@@ -1,5 +1,5 @@
 
-<div>
+<div class="search">
     <form [formGroup]="instrumentSearchForm" (ngSubmit)="submit()">
         <mat-form-field>
             <mat-label>Order Type</mat-label>
@@ -15,7 +15,7 @@
             <mat-label>{{ searchDisplay() }}</mat-label>
             <input matInput formControlName="symbol"/>
         </mat-form-field>
-        <button matButton type="submit">
+        <button matButton="filled" class="search-submit"type="submit">
             Submit
         </button>
     </form>
