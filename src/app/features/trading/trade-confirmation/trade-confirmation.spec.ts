@@ -22,6 +22,7 @@ describe('TradeConfirmation', () => {
     subtractInstrumentFullName: 'US Dollar',
     quantity: 10,
     quotedPrice: 227.52,
+    resolvedPrice: 0,
     side: 'BUY',
     changeThreshold: 0.05,
     createdDate: '2026-10-21T10:00:00Z',

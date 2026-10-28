@@ -5,6 +5,8 @@ import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.s
 export interface OwnedCurrency {
   symbol: string;
   name: string;
+  // net cash held in this currency (sum of the ledger rows)
+  balance: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -16,7 +18,7 @@ export class CurrencyService {
             map(holdings => {
                 // holdings are a ledger (one row per order leg, debits negative), so sum per symbol.
                 // only cash can settle a trade, so skip stocks and crypto the portfolio also holds
-                const currencies = new Map<string, OwnedCurrency & { balance: number }>();
+                const currencies = new Map<string, OwnedCurrency>();
                 for (const holding of holdings) {
                     if (holding.instrumentType !== 'CASH') {
                         continue;
@@ -29,8 +31,7 @@ export class CurrencyService {
                     });
                 }
                 return [...currencies.values()]
-                    .filter(currency => currency.balance > 0)
-                    .map(({ symbol, name }) => ({ symbol, name }));
+                    .filter(currency => currency.balance > 0);
             }),
         );
     }

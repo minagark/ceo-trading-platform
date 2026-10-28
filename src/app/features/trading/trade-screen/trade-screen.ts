@@ -1,13 +1,14 @@
 import { Component, effect, inject, signal, computed } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { QuoteResponse } from '../../../core/api.models';
 import { AssetsService } from './assets.service';
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PreviewPage } from '../preview-page/preview-page';
@@ -15,7 +16,7 @@ import { TradeConfirmation } from '../trade-confirmation/trade-confirmation';
 import { InstrumentType, isInstrumentType, isNonDepositOrderType, ORDER_TYPES, OrderRequest, OrderResponse, OrderType, SIDES } from '../../../core/trading.models';
 import { Side } from '../../../core/trading.models';
 import { CurrencyService, OwnedCurrency } from './owned-currency.service';
-import { merge, of, startWith, switchMap } from 'rxjs';
+import { EMPTY, catchError, debounceTime, distinctUntilChanged, filter, ignoreElements, merge, of, startWith, switchMap, tap, timer } from 'rxjs';
 import { OrderApiService } from '../data-access/order-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -38,18 +39,43 @@ type Instrument = {
   symbol: string,
 }
 
+type Sparkline = { line: string; area: string };
+
+// how often the quote panel re-fetches while the ticket is open
+const QUOTE_REFRESH_MS = 15_000;
+
+// turns a price series into SVG paths for a 600x120 viewBox
+function buildSparkline(values: number[]): Sparkline | null {
+  if (values.length < 2) return null;
+  const lo = Math.min(...values);
+  const span = Math.max(...values) - lo || 1;
+  const line = values
+    .map((value, i) => {
+      const x = (i / (values.length - 1)) * 600;
+      const y = 108 - ((value - lo) / span) * 96;
+      return `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join('');
+  return { line, area: `${line}L600 120L0 120Z` };
+}
+
 @Component({
   imports: [
-    // CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
     ReactiveFormsModule,
     PreviewPage,
     TradeConfirmation,
-    MatCardModule,
-    MatButtonToggleModule,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
     MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+  ],
+  // outlined fields for this screen only; the rest of the app keeps Material's default
+  providers: [
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline', subscriptSizing: 'dynamic' } },
   ],
   selector: 'app-trades-screen',
   styleUrl: './trade-screen.css',
@@ -88,7 +114,7 @@ export class Trades {
     changeThreshold: this.fb.control(0, [Validators.min(0), Validators.max(100)]),
   });
 
-  private readonly formState = toSignal(
+  readonly formState = toSignal(
     this.orderForm.valueChanges.pipe(
       startWith(this.orderForm.getRawValue()),
     ),
@@ -96,6 +122,109 @@ export class Trades {
       initialValue: this.orderForm.getRawValue(),
     },
   );
+
+  // short labels so all five order types fit on one tab row; full label is the tooltip
+  readonly orderTypeTabLabels: Record<OrderType, string> = {
+    US_EQUITY: 'US equity',
+    INDIA_EQUITY: 'India',
+    CRYPTO: 'Crypto',
+    FOREX: 'FX',
+    DEPOSIT: 'Deposit',
+  };
+  readonly orderTypeIndex = computed(() =>
+    Math.max(0, this.orderTypes.findIndex(type => type.value === this.formState().orderType)),
+  );
+
+  readonly thresholdPresets = [0, 0.5, 1, 2];
+  readonly customThreshold = signal(false);
+
+  // the instrument being traded, which is what the quote panel shows (not the cash leg)
+  private readonly quoteTarget = computed<Instrument | null>(() => {
+    const { orderType, symbol } = this.formState();
+    const trimmed = (symbol ?? '').trim();
+    if (!trimmed || orderType === 'DEPOSIT') return null;
+    const type: InstrumentType = orderType === 'CRYPTO' ? 'CRYPTO' : orderType === 'FOREX' ? 'CASH' : 'EQUITY';
+    return { symbol: trimmed, type };
+  });
+
+  readonly quote = signal<QuoteResponse | null>(null);
+  readonly quoteStatus = signal<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  readonly sparkline = signal<Sparkline | null>(null);
+  // flash-up-a / flash-up-b etc.; alternating a/b restarts the CSS animation on every tick
+  readonly priceFlash = signal('');
+  private flashToggle = false;
+
+  readonly quoteUp = computed(() => (this.quote()?.change ?? 0) >= 0);
+  readonly marketOpen = computed(() => /open|regular/i.test(this.quote()?.marketState ?? ''));
+  readonly marketLabel = computed(() => {
+    const state = this.quote()?.marketState;
+    return state ? `Market ${state.toLowerCase().replace(/_/g, ' ')}` : '';
+  });
+  readonly priceFormat = computed(() => {
+    const price = this.quote()?.price ?? 1;
+    return price < 0.1 ? '1.5-5' : price < 10 ? '1.4-4' : '1.2-2';
+  });
+
+  // the side control keeps its last value while hidden (FX), so only trust it when it's shown
+  readonly effectiveSide = computed<Side>(() =>
+    this.activeSides().length ? this.formState().side ?? 'BUY' : 'BUY',
+  );
+
+  // the side of the book this order would fill against
+  readonly tradePrice = computed(() => {
+    const quote = this.quote();
+    if (!quote) return null;
+    const price = this.effectiveSide() === 'SELL' ? quote.bid : quote.ask;
+    return price ?? quote.price;
+  });
+  readonly estimatedTotal = computed(() => {
+    const price = this.tradePrice();
+    const quantity = Number(this.formState().quantity);
+    return price !== null && quantity > 0 ? price * quantity : null;
+  });
+  // furthest the price can move before the change threshold rejects the order
+  readonly worstPrice = computed(() => {
+    const price = this.tradePrice();
+    if (price === null) return null;
+    const threshold = (Number(this.formState().changeThreshold) || 0) / 100;
+    return this.effectiveSide() === 'SELL' ? price * (1 - threshold) : price * (1 + threshold);
+  });
+
+  // the cash currency this order spends (BUY) or receives (SELL); deposits credit the typed currency
+  readonly cashCurrency = computed<string | null>(() => {
+    const { orderType, settlementCurrency, symbol } = this.formState();
+    if (orderType === 'US_EQUITY') return this.US_CURRENCY_SYMBOL;
+    if (orderType === 'INDIA_EQUITY') return this.IN_CURRENCY_SYMBOL;
+    if (orderType === 'DEPOSIT') return (symbol ?? '').trim().toUpperCase() || null;
+    return (settlementCurrency ?? '').trim().toUpperCase() || null;
+  });
+  readonly availableCash = computed<number | null>(() => {
+    const currency = this.cashCurrency();
+    if (!currency || !this.formState().portfolioId) return null;
+    return this.ownedCurrencies().find(owned => owned.symbol === currency)?.balance ?? 0;
+  });
+  // warn (don't block) when a purchase looks bigger than the cash on hand; the backend makes the final call
+  readonly cashShortfall = computed(() => {
+    const total = this.estimatedTotal();
+    const cash = this.availableCash();
+    const sameCurrency = this.quote()?.currency?.toUpperCase() === this.cashCurrency();
+    if (this.effectiveSide() !== 'BUY' || total === null || cash === null || !sameCurrency) return false;
+    return total > cash;
+  });
+
+  readonly quantityLabel = computed(() => {
+    const { orderType } = this.formState();
+    return orderType === 'DEPOSIT' || orderType === 'FOREX' ? 'Amount' : 'Quantity';
+  });
+  readonly reviewLabel = computed(() => {
+    const { orderType, symbol } = this.formState();
+    const verb = orderType === 'DEPOSIT' ? 'deposit' : orderType === 'FOREX' ? 'exchange' : this.effectiveSide() === 'SELL' ? 'sell' : 'buy';
+    const trimmed = (symbol ?? '').trim();
+    return trimmed ? `Review ${verb} · ${trimmed}` : 'Review order';
+  });
+
+  // true after "Back" from review, so the form slides in from the left instead of the right
+  readonly returnedToForm = signal(false);
 
   constructor() {
     effect(() => {
@@ -144,6 +273,10 @@ export class Trades {
     })
     
     this.updateSettlementCurrencyState();
+    // a portfolio passed in via navigation was set before the subscription above, so load its cash now
+    if (this.orderForm.controls.portfolioId.value) {
+      this.updateOwnedCurrencies();
+    }
 
     // drop the "please fix" message as soon as the form becomes valid
     this.orderForm.statusChanges.subscribe(status => {
@@ -151,6 +284,79 @@ export class Trades {
         this.formError.set(null);
       }
     });
+
+    // live quote: wait for typing to settle, then poll; a new symbol cancels the old poll
+    toObservable(this.quoteTarget).pipe(
+      debounceTime(400),
+      distinctUntilChanged((a, b) => a?.symbol === b?.symbol && a?.type === b?.type),
+      switchMap(target => {
+        this.quote.set(null);
+        this.sparkline.set(null);
+        this.priceFlash.set('');
+        if (!target) {
+          this.quoteStatus.set('idle');
+          return EMPTY;
+        }
+        this.quoteStatus.set('loading');
+        return merge(
+          this.marketApiService.getStockInfo(target.symbol, target.type, '1D').pipe(
+            catchError(() => of([])),
+            tap(points => this.sparkline.set(buildSparkline(points.map(point => point.balance)))),
+            ignoreElements(),
+          ),
+          timer(0, QUOTE_REFRESH_MS).pipe(
+            // skip refreshes while reviewing/confirming or in a background tab
+            filter((tick) => tick === 0 || (this.screen() === 'form' && !document.hidden)),
+            switchMap(() => this.marketApiService.getQuote(target.symbol, target.type).pipe(
+              catchError(() => of(null)),
+            )),
+          ),
+        );
+      }),
+      takeUntilDestroyed(),
+    ).subscribe(quote => this.applyQuote(quote));
+  }
+
+  private applyQuote(quote: QuoteResponse | null) {
+    const previous = this.quote();
+    if (!quote) {
+      // a failed refresh keeps the last good quote on screen
+      if (!previous) this.quoteStatus.set('error');
+      return;
+    }
+    if (previous && previous.symbol === quote.symbol && previous.price !== quote.price) {
+      this.flashToggle = !this.flashToggle;
+      const direction = quote.price > previous.price ? 'up' : 'down';
+      this.priceFlash.set(`flash-${direction}-${this.flashToggle ? 'a' : 'b'}`);
+    }
+    this.quote.set(quote);
+    this.quoteStatus.set('ready');
+  }
+
+  selectOrderType(type: OrderType) {
+    this.orderForm.controls.orderType.setValue(type);
+    // deposits have no change threshold field, so don't let a hidden value ride along
+    if (type === 'DEPOSIT') {
+      this.selectThreshold(0);
+    }
+  }
+
+  selectSide(side: Side) {
+    this.orderForm.controls.side.setValue(side);
+  }
+
+  selectThreshold(value: number) {
+    this.customThreshold.set(false);
+    this.orderForm.controls.changeThreshold.setValue(value);
+  }
+
+  stepQuantity(direction: 1 | -1) {
+    const { orderType } = this.formState();
+    const step = orderType === 'CRYPTO' ? 0.01 : orderType === 'FOREX' || orderType === 'DEPOSIT' ? 100 : 1;
+    const current = Number(this.orderForm.controls.quantity.value) || 0;
+    // never step to 0: quantity must be positive
+    const next = Math.max(step, +(current + direction * step).toFixed(8));
+    this.orderForm.controls.quantity.setValue(next);
   }
 
 
@@ -210,23 +416,24 @@ export class Trades {
       ));
     }
 
-    // TODO: CHANGE THE GET QUOTE TO THE CORRECT INSTRUMENT
-    this.marketApiService.getQuote(addInstrument.symbol, addInstrument.type).pipe(
+    // FX and deposits have no side toggle, so a leftover SELL from another order type must not leak in
+    const side: Side = orderInfo.orderType === "DEPOSIT"
+      ? "DEPOSIT"
+      : orderInfo.orderType === "FOREX" ? "BUY" : orderInfo.side;
+
+    // quote the instrument being traded: the backend checks the change threshold against
+    // the add instrument's price on a BUY and the subtract instrument's price on a SELL
+    const quotedInstrument = side === 'SELL' ? subInstrument : addInstrument;
+    this.marketApiService.getQuote(quotedInstrument.symbol, quotedInstrument.type).pipe(
       switchMap(quote => {
         let quotedPrice =
-          orderInfo.side === 'BUY'
-            ? quote.ask
-            : quote.bid;
+          side === 'SELL'
+            ? quote.bid
+            : quote.ask;
         if (quotedPrice === null) {
           quotedPrice = quote.price;
         }
 
-        let side: Side;
-        if (orderInfo.orderType === "DEPOSIT") {
-          side = "DEPOSIT";
-        } else {
-          side = orderInfo.side
-        }
         const orderRequest: OrderRequest = {
           clientId: this.authService.currentUserId()!, 
           clientName: this.authService.currentUserFullName()!,
@@ -251,6 +458,7 @@ export class Trades {
         const portfolio = this.accounts().find(account => account.id === orderRequest.portfolioId);
         this.draftPortfolioLabel.set(portfolio ? `${portfolio.id} (${portfolio.type})` : orderRequest.portfolioId);
         this.draft.set(orderRequest);
+        this.returnedToForm.set(false);
         this.screen.set('preview');
       },
       error: error => {
@@ -376,6 +584,7 @@ export class Trades {
   accounts = this.accountsService.accounts;
 
   cancelPreview() {
+    this.returnedToForm.set(true);
     this.screen.set('form');
   }
 
@@ -398,6 +607,11 @@ export class Trades {
   finishConfirmation() {
     this.submittedOrder.set(null);
     this.submitError.set(null);
+    this.returnedToForm.set(true);
     this.screen.set('form');
+    // the order just placed may have moved cash, so refresh the balance shown on the ticket
+    if (this.orderForm.controls.portfolioId.value) {
+      this.updateOwnedCurrencies();
+    }
   }
 }

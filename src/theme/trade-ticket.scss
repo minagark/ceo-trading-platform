@@ -1,0 +1,280 @@
+// Market Hive trade ticket theme.
+//
+// Everything here is scoped under `.trade-theme`, which only the trade screen
+// (and the review/confirmation steps rendered inside it) carries. The rest of
+// the app keeps theme-colors.scss + styles.css as they are. If the look is
+// adopted site-wide later, these tokens move to :root in styles.css.
+
+@use '@angular/material' as mat;
+
+.trade-theme {
+  // Neutrals: ground < card < hover < raised
+  --color-bg: #14120f;
+  --color-well: #14120f;
+  --color-surface: #1b1915;
+  --color-surface-hover: #221f1a;
+  --color-surface-raised: #2b2721;
+  --color-surface-raised-hover: #332e27;
+  --color-border: #2f2a23;
+  --color-border-strong: #403a2f;
+
+  // Text: solid values so contrast holds on every surface
+  --color-text: #f3efe4;
+  --color-text-muted: #bdb6a8;
+  --color-text-faint: #9d9686;
+
+  // Gold accent; hover goes lighter so pressing reads as "lit"
+  --color-accent: #e3b53c;
+  --color-accent-hover: #efc65b;
+  --color-accent-text: #1a1509;
+  --color-accent-soft: rgba(227, 181, 60, 0.12);
+  --color-accent-line: rgba(227, 181, 60, 0.45);
+
+  // Up/down, always paired with an arrow or a word
+  --color-danger: #ef6b55;
+  --color-danger-soft: rgba(239, 107, 85, 0.1);
+  --color-success: #4cc38a;
+  --color-success-soft: rgba(76, 195, 138, 0.1);
+
+  // Type
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --tracking-display: -0.03em;
+  --tracking-title: -0.02em;
+  --tracking-label: 0.1em;
+
+  // Layout
+  --page-max: 1760px;
+  --page-gutter: clamp(16px, 2.5vw, 40px);
+
+  // Shape
+  --radius-control: 6px;
+  --radius-well: 8px;
+  --radius-card: 10px;
+
+  // Depth
+  --shadow-card:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 18px 40px -18px rgba(0, 0, 0, 0.65);
+  --shadow-raised:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+  --focus-ring: 0 0 0 3px rgba(227, 181, 60, 0.16);
+
+  // Motion: one curve, fast start, soft settle
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-press: 120ms;
+  --dur-fast: 180ms;
+  --dur-slide: 300ms;
+  --dur-enter: 420ms;
+  --stagger: 40ms;
+
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+
+  // Material inside the ticket: same surfaces, gold accent, small radii, Geist.
+  @include mat.theme-overrides((
+    surface: #14120f,
+    surface-container: #1b1915,
+    surface-container-high: #221f1a,
+    surface-container-highest: #2b2721,
+    on-surface: #f3efe4,
+    on-surface-variant: #bdb6a8,
+    outline: #403a2f,
+    outline-variant: #2f2a23,
+    primary: #e3b53c,
+    on-primary: #1a1509,
+    tertiary: #e3b53c,
+    on-tertiary: #1a1509,
+    error: #ef6b55,
+    corner-extra-small: 4px,
+    corner-small: 6px,
+    corner-medium: 10px,
+    corner-large: 12px,
+    corner-full: 999px,
+    body-large-font: var(--font-sans),
+    body-medium-font: var(--font-sans),
+    body-small-font: var(--font-sans),
+    label-large-font: var(--font-sans),
+    label-medium-font: var(--font-sans),
+    title-large-font: var(--font-sans),
+    title-medium-font: var(--font-sans),
+  ));
+
+  @include mat.form-field-overrides((
+    outlined-container-shape: 6px,
+    outlined-outline-color: var(--color-border),
+    outlined-hover-outline-color: var(--color-border-strong),
+    outlined-focus-outline-color: var(--color-accent),
+    outlined-focus-outline-width: 1px,
+    outlined-label-text-color: var(--color-text-muted),
+    outlined-hover-label-text-color: var(--color-text),
+    outlined-focus-label-text-color: var(--color-accent-hover),
+    outlined-input-text-placeholder-color: var(--color-text-faint),
+  ));
+
+  @include mat.select-overrides((
+    enabled-arrow-color: var(--color-text-muted),
+    focused-arrow-color: var(--color-accent),
+  ));
+
+  @include mat.card-overrides((
+    outlined-container-color: var(--color-surface),
+    outlined-outline-color: var(--color-border),
+    outlined-container-shape: var(--radius-card),
+    title-text-tracking: -0.015em,
+    title-text-weight: 600,
+    subtitle-text-color: var(--color-text-muted),
+  ));
+
+  @include mat.button-overrides((
+    filled-container-color: var(--color-accent),
+    filled-label-text-color: var(--color-accent-text),
+    filled-container-shape: var(--radius-control),
+    filled-label-text-tracking: 0,
+    outlined-container-shape: var(--radius-control),
+    outlined-outline-color: var(--color-border-strong),
+    outlined-label-text-color: var(--color-text),
+    outlined-label-text-tracking: 0,
+    text-container-shape: var(--radius-control),
+  ));
+
+  @include mat.progress-spinner-overrides((
+    active-indicator-color: var(--color-accent),
+  ));
+
+  // --- Utilities used by the ticket templates ------------------------------
+
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  .page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .page-head h1 {
+    margin: 6px 0 0;
+    font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2rem);
+    font-weight: 600;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.1;
+  }
+
+  .rise {
+    animation: mh-rise var(--dur-enter) var(--ease-out) both;
+  }
+
+  .stagger > * {
+    animation: mh-rise var(--dur-enter) var(--ease-out) both;
+  }
+
+  @for $i from 2 through 7 {
+    .stagger > *:nth-child(#{$i}) { animation-delay: calc(var(--stagger) * #{$i - 1}); }
+  }
+
+  .stagger > *:nth-child(n + 8) { animation-delay: calc(var(--stagger) * 7); }
+
+  // Price tick flash. Two identical keyframes so toggling a/b restarts it.
+  .flash-up-a { animation: mh-flash-up-a 900ms ease-out; }
+  .flash-up-b { animation: mh-flash-up-b 900ms ease-out; }
+  .flash-down-a { animation: mh-flash-down-a 900ms ease-out; }
+  .flash-down-b { animation: mh-flash-down-b 900ms ease-out; }
+
+  // --- Material refinements the token overrides can't express --------------
+
+  .mat-mdc-form-field .mdc-text-field--outlined {
+    background: var(--color-well);
+    border-radius: var(--radius-control);
+    transition: box-shadow var(--dur-fast) var(--ease-out);
+  }
+
+  .mat-mdc-form-field.mat-focused .mdc-text-field--outlined {
+    box-shadow: var(--focus-ring);
+  }
+
+  .mat-mdc-button-base {
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      transform var(--dur-press) var(--ease-out);
+  }
+
+  .mat-mdc-button-base:active:not([disabled]) {
+    transform: scale(0.985);
+  }
+
+  .mat-mdc-unelevated-button:not([disabled]) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  .mat-mdc-unelevated-button:not([disabled]):hover {
+    --mat-button-filled-container-color: var(--color-accent-hover);
+  }
+
+  input[type='number'] {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes mh-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mh-slide-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mh-slide-back {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mh-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mh-flash-up-a { from { color: #4cc38a; } }
+@keyframes mh-flash-up-b { from { color: #4cc38a; } }
+@keyframes mh-flash-down-a { from { color: #ef6b55; } }
+@keyframes mh-flash-down-b { from { color: #ef6b55; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .trade-theme,
+  .trade-theme *,
+  .trade-theme *::before,
+  .trade-theme *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
