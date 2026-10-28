@@ -1,0 +1,15 @@
+{
+  "/api": {
+    "target": "http://more-of-ivans-bs.us-east-1.elasticbeanstalk.com",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "warn"
+  },
+  "/ws": {
+    "target": "http://more-of-ivans-bs.us-east-1.elasticbeanstalk.com",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true,
+    "logLevel": "warn"
+  }
+}
