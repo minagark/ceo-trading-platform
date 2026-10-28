@@ -1,11 +1,11 @@
-import { Component, effect, inject, Input, input, model, signal } from '@angular/core';
+import { Component, effect, inject, input, model, signal } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
 import { AgCharts } from "ag-charts-angular";
 import {
-  AgChartOptions,
+  AgCartesianChartOptions,
   AllCommunityModule,
   ModuleRegistry,
 } from "ag-charts-community";
@@ -55,7 +55,7 @@ export class PortfolioPerformance {
   }
 
 
-  public options = signal<AgChartOptions>({
+  public options = signal<AgCartesianChartOptions>({
  // title: {
       //   text: this.accounts[0].name,
       // },
@@ -68,7 +68,11 @@ export class PortfolioPerformance {
           yKey: 'balance',
           // title: 'Account Balance'
           marker: {
-            enabled: false, // no dots
+            enabled: true,
+            itemStyler: () => ({
+              size: this.graphData().length === 1 ? 8 : 0,
+              fill: "green",
+            }),
           },
           stroke: "green" //red or green
         }
