@@ -1,113 +1,266 @@
 <div class="trade-screen">
-  @if (screen() === 'preview' && draft()) {
-  <app-preview-page
-    [request]="draft()!"
-    [portfolioLabel]="draftPortfolioLabel()"
-    (back)="cancelPreview()"
-    (confirmed)="onOrderPlaced($event)"
-    (failed)="onOrderFailed($event)" />
-  } @else if (screen() === 'confirmation') {
-  <app-trade-confirmation
-    [order]="submittedOrder()"
-    [message]="submitError()"
-    (done)="finishConfirmation()"
-    (viewActivity)="viewActivity()" />
-  } @else {
-  <mat-card appearance="outlined" class="order-panel">
-    <mat-card-header class="order-panel__header">
-      <mat-card-title>Place a trade</mat-card-title>
-      <mat-card-subtitle>Build an order across your portfolios</mat-card-subtitle>
-    </mat-card-header>
+  <header class="page-head rise">
+    <div>
+      <span class="eyebrow">Trade</span>
+      <h1>Place an order</h1>
+    </div>
+    @if (quote(); as q) {
+      <div class="market-chip">
+        <span class="market-chip__dot" [class.market-chip__dot--live]="marketOpen()" aria-hidden="true"></span>
+        <span>{{ marketLabel() }}</span>
+      </div>
+    }
+  </header>
 
-    <form [formGroup]="orderForm" (ngSubmit)="reviewOrder()">
-      <mat-card-content class="order-panel__content">
-        <p class="order-panel__section-title">Order details</p>
-
-        <mat-form-field class="order-field">
-        <mat-label>Portfolio</mat-label>
-        <mat-select required formControlName="portfolioId">
-          @for (account of accounts(); track $index) {
-            <mat-option [value]="account.id">{{account.name}}({{account.type}})</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <div class="order-panel__field-row">
-        <mat-form-field class="order-field">
-          <mat-label>Order type</mat-label>
-          <mat-select required formControlName="orderType">
-            @for (type of orderTypes; track $index) {
-              <mat-option [value]="type.value">{{type.label}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        @if (activeSides().length > 0) {
-          <mat-form-field class="order-field">
-            <mat-label>Side</mat-label>
-            <mat-select required formControlName="side">
-              @for (side of activeSides(); track $index) {
-                <mat-option [value]="side">{{side}}</mat-option>
+  <div class="trade-layout">
+    <section class="ticket rise" aria-label="Order ticket">
+      @if (screen() === 'preview' && draft()) {
+      <app-preview-page
+        class="ticket__step ticket__step--forward"
+        [request]="draft()!"
+        [portfolioLabel]="draftPortfolioLabel()"
+        (back)="cancelPreview()"
+        (confirmed)="onOrderPlaced($event)"
+        (failed)="onOrderFailed($event)" />
+      } @else if (screen() === 'confirmation') {
+      <app-trade-confirmation
+        class="ticket__step ticket__step--forward"
+        [order]="submittedOrder()"
+        [message]="submitError()"
+        (done)="finishConfirmation()"
+        (viewActivity)="viewActivity()" />
+      } @else {
+      <form class="order-panel ticket__step" [class.ticket__step--back]="returnedToForm()" [formGroup]="orderForm" (ngSubmit)="reviewOrder()">
+        <div class="order-panel__top">
+          <mat-form-field class="order-field order-field--portfolio">
+            <mat-label>Portfolio</mat-label>
+            <mat-select required formControlName="portfolioId">
+              @for (account of accounts(); track $index) {
+                <mat-option [value]="account.id">{{ account.name }} ({{ account.type }})</mat-option>
               }
             </mat-select>
           </mat-form-field>
-        }
-      </div>
+        </div>
 
-      <mat-form-field class="order-field">
-        <mat-label>Symbol</mat-label>
-        <input matInput type="text" placeholder="e.g. USD" formControlName="symbol"/>
-        <mat-hint>AKA "ticker"</mat-hint>
-      </mat-form-field>
+        <div class="type-tabs" role="group" aria-label="Order type">
+          @for (type of orderTypes; track type.value) {
+            <button
+              type="button"
+              class="type-tabs__tab"
+              [class.type-tabs__tab--active]="formState().orderType === type.value"
+              [attr.aria-pressed]="formState().orderType === type.value"
+              [attr.title]="type.label"
+              (click)="selectOrderType(type.value)">
+              {{ orderTypeTabLabels[type.value] }}
+            </button>
+          }
+          <span class="type-tabs__indicator" aria-hidden="true" [style.transform]="'translateX(' + orderTypeIndex() * 100 + '%)'"></span>
+        </div>
 
-      <!-- Settlement Currency (more complex logic) -->
-      @if (settlementMode().visible) {
-        <mat-form-field class="order-field">
-          <mat-label>Settlement currency</mat-label>
-          @if (settlementMode().source === 'owned') {
-            <mat-select required formControlName="settlementCurrency">
-              @for (currency of ownedCurrencies(); track currency.symbol) {
-                <mat-option [value]="currency.symbol">{{ currency.symbol }} &middot; {{ currency.name }}</mat-option>
-              } @empty {
-                <mat-option disabled>
-                  {{ orderForm.controls.portfolioId.value ? 'This portfolio holds no cash' : 'Choose a portfolio first' }}
-                </mat-option>
+        <div class="order-panel__body stagger">
+          @if (activeSides().length > 0) {
+            <div class="side-toggle" role="group" aria-label="Side">
+              <span class="side-toggle__thumb" aria-hidden="true" [class.side-toggle__thumb--sell]="formState().side === 'SELL'"></span>
+              @for (side of activeSides(); track side) {
+                <button
+                  type="button"
+                      class="side-toggle__option"
+                  [class.side-toggle__option--buy]="side === 'BUY' && formState().side === 'BUY'"
+                  [class.side-toggle__option--sell]="side === 'SELL' && formState().side === 'SELL'"
+                  [attr.aria-pressed]="formState().side === side"
+                  (click)="selectSide(side)">
+                  {{ side === 'BUY' ? 'Buy' : 'Sell' }}
+                </button>
               }
-            </mat-select>
+            </div>
+          }
+
+          <mat-form-field class="order-field">
+            <mat-label>Symbol</mat-label>
+            <mat-icon matIconPrefix aria-hidden="true">search</mat-icon>
+            <input matInput class="num order-field__symbol" type="text" placeholder="e.g. AAPL" autocomplete="off" spellcheck="false" formControlName="symbol"/>
+            @if (quote(); as q) {
+              <span matTextSuffix class="symbol-status symbol-status--ok">{{ q.currency }}</span>
+            } @else if (quoteStatus() === 'loading') {
+              <mat-spinner matSuffix class="symbol-status__spinner" diameter="16" strokeWidth="2" />
+            }
+            @if (quoteStatus() === 'error') {
+              <mat-hint class="symbol-status--error">No quote found for this symbol</mat-hint>
+            } @else {
+              <mat-hint>AKA "ticker"</mat-hint>
+            }
+          </mat-form-field>
+
+          <!-- Settlement Currency (more complex logic) -->
+          @if (settlementMode().visible) {
+            <mat-form-field class="order-field">
+              <mat-label>Settlement currency</mat-label>
+              @if (settlementMode().source === 'owned') {
+                <mat-select required formControlName="settlementCurrency">
+                  @for (currency of ownedCurrencies(); track currency.symbol) {
+                    <mat-option [value]="currency.symbol">{{ currency.symbol }} &middot; {{ currency.name }}</mat-option>
+                  } @empty {
+                    <mat-option disabled>
+                      {{ orderForm.controls.portfolioId.value ? 'This portfolio holds no cash' : 'Choose a portfolio first' }}
+                    </mat-option>
+                  }
+                </mat-select>
+              } @else {
+                <input matInput class="num" type="text" placeholder="e.g. INR" formControlName="settlementCurrency" [defaultValue]="' '"/>
+              }
+              @if (orderForm.controls.settlementCurrency.hasError('required')) {
+                <mat-error>Settlement currency is required</mat-error>
+              }
+            </mat-form-field>
+          }
+
+          <mat-form-field class="order-field order-field--quantity">
+            <mat-label>{{ quantityLabel() }}</mat-label>
+            <button matIconPrefix matIconButton type="button" aria-label="Decrease quantity" (click)="stepQuantity(-1)">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <input matInput type="number" placeholder="Quantity" formControlName="quantity"/>
+            <button matIconSuffix matIconButton type="button" aria-label="Increase quantity" (click)="stepQuantity(1)">
+              <mat-icon>add</mat-icon>
+            </button>
+          </mat-form-field>
+
+          @if (formState().orderType !== 'DEPOSIT') {
+            <div class="threshold">
+              <div class="threshold__head">
+                <span class="eyebrow" id="threshold-label">Change threshold</span>
+                <span class="threshold__hint">Optional percentage</span>
+              </div>
+              <div class="threshold__options" role="group" aria-labelledby="threshold-label">
+                @for (preset of thresholdPresets; track preset) {
+                  <button
+                    type="button"
+                          class="chip num"
+                    [class.chip--active]="!customThreshold() && formState().changeThreshold === preset"
+                    [attr.aria-pressed]="!customThreshold() && formState().changeThreshold === preset"
+                    (click)="selectThreshold(preset)">
+                    {{ preset }}%
+                  </button>
+                }
+                <button
+                  type="button"
+                      class="chip"
+                  [class.chip--active]="customThreshold()"
+                  [attr.aria-pressed]="customThreshold()"
+                  (click)="customThreshold.set(true)">
+                  Custom
+                </button>
+              </div>
+              @if (customThreshold()) {
+                <mat-form-field class="order-field threshold__custom rise">
+                  <mat-label>Change threshold</mat-label>
+                  <input matInput type="number" formControlName="changeThreshold"/>
+                  <span matTextSuffix>%</span>
+                </mat-form-field>
+              }
+            </div>
+          }
+
+          <dl class="order-summary">
+            @if (formState().orderType === 'DEPOSIT') {
+              <div class="order-summary__row">
+                <dt>Deposit</dt>
+                <dd class="num">{{ (formState().quantity || 0) | number: '1.2-2' }} {{ formState().symbol || '—' }}</dd>
+              </div>
+            } @else {
+              <div class="order-summary__row">
+                <dt>{{ effectiveSide() === 'SELL' ? 'Bid price' : 'Ask price' }}</dt>
+                <dd class="num">
+                  @if (tradePrice() !== null) {
+                    {{ tradePrice() | number: priceFormat() }} {{ quote()?.currency }}
+                  } @else { — }
+                </dd>
+              </div>
+              <div class="order-summary__row">
+                <dt>{{ effectiveSide() === 'SELL' ? 'Worst fill (min)' : 'Worst fill (max)' }}</dt>
+                <dd class="num">
+                  @if (worstPrice() !== null) {
+                    {{ worstPrice() | number: priceFormat() }} {{ quote()?.currency }}
+                  } @else { — }
+                </dd>
+              </div>
+              <div class="order-summary__divider" aria-hidden="true"></div>
+              <div class="order-summary__row order-summary__row--total">
+                <dt>{{ effectiveSide() === 'SELL' ? 'Est. proceeds' : 'Est. cost' }}</dt>
+                <dd class="num">
+                  @if (estimatedTotal() !== null) {
+                    {{ estimatedTotal() | number: '1.2-2' }} {{ quote()?.currency }}
+                  } @else { — }
+                </dd>
+              </div>
+            }
+          </dl>
+
+          @if (formError(); as error) {
+            <p class="order-form-error rise" role="alert">
+              <mat-icon aria-hidden="true">error_outline</mat-icon>
+              <span>{{ error }}</span>
+            </p>
+          }
+
+          <button matButton="filled" class="order-submit" type="submit">
+            {{ reviewLabel() }}
+          </button>
+        </div>
+      </form>
+      }
+    </section>
+
+    <aside class="quote-panel" aria-label="Quote" aria-live="polite">
+      @if (quote(); as q) {
+        <div class="quote-card rise">
+          <div class="quote-card__head">
+            <div>
+              <span class="quote-card__symbol num">{{ q.symbol }}</span>
+              <div class="quote-card__price-row">
+                <span class="quote-card__price num" [class]="priceFlash()">{{ q.price | number: priceFormat() }}</span>
+                <span class="quote-card__currency num">{{ q.currency }}</span>
+              </div>
+            </div>
+            <span class="quote-card__change num" [class.quote-card__change--up]="quoteUp()" [class.quote-card__change--down]="!quoteUp()">
+              {{ quoteUp() ? '▲ +' : '▼ ' }}{{ q.changePercent | number: '1.2-2' }}%
+            </span>
+          </div>
+
+          @if (sparkline(); as spark) {
+            <svg class="quote-card__spark" viewBox="0 0 600 120" preserveAspectRatio="none" role="img" [attr.aria-label]="q.symbol + ' intraday price'">
+              <path class="quote-card__spark-grid" d="M0 30H600M0 60H600M0 90H600" />
+              <path class="quote-card__spark-area" [attr.d]="spark.area" />
+              <path class="quote-card__spark-line" [attr.d]="spark.line" />
+            </svg>
           } @else {
-            <input matInput type="text" placeholder="e.g. INR" formControlName="settlementCurrency" [defaultValue]="' '"/>
+            <div class="quote-card__spark quote-card__spark--empty" aria-hidden="true"></div>
           }
-          @if (orderForm.controls.settlementCurrency.hasError('required')) {
-            <mat-error>Settlement currency is required</mat-error>
+
+          <dl class="quote-stats">
+            <div><dt class="eyebrow">Bid</dt><dd class="num">{{ q.bid | number: priceFormat() }}</dd></div>
+            <div><dt class="eyebrow">Ask</dt><dd class="num">{{ q.ask | number: priceFormat() }}</dd></div>
+            <div><dt class="eyebrow">Prev close</dt><dd class="num">{{ q.previousClose | number: priceFormat() }}</dd></div>
+            <div><dt class="eyebrow">Spread</dt><dd class="num">{{ q.spreadBps | number: '1.0-1' }} bps</dd></div>
+          </dl>
+          @if (q.asOf) {
+            <p class="quote-card__asof">As of <span class="num">{{ q.asOf | date: 'mediumTime' }}</span> · refreshes every 15s</p>
           }
-        </mat-form-field>
+        </div>
+      } @else {
+        <div class="quote-empty rise">
+          <mat-icon aria-hidden="true">show_chart</mat-icon>
+          @if (quoteStatus() === 'loading') {
+            <p>Fetching quote…</p>
+          } @else if (quoteStatus() === 'error') {
+            <p>We couldn't find a quote for that symbol.</p>
+          } @else if (formState().orderType === 'DEPOSIT') {
+            <p>Deposits post to your portfolio's cash balance.</p>
+          } @else {
+            <p>Enter a symbol to see its live price.</p>
+          }
+        </div>
       }
-
-      <p class="order-panel__section-title order-panel__section-title--spaced">Quantity &amp; limits</p>
-      <div class="order-panel__field-row">
-        <mat-form-field class="order-field">
-          <mat-label>Quantity</mat-label>
-          <input matInput type="number" placeholder="Quantity" formControlName="quantity"/>
-        </mat-form-field>
-
-        <mat-form-field class="order-field">
-          <mat-label>Change threshold</mat-label>
-          <input matInput type="number" formControlName="changeThreshold"/>
-          <mat-hint>Optional percentage</mat-hint>
-        </mat-form-field>
-      </div>
-      </mat-card-content>
-
-      @if (formError(); as error) {
-        <p class="order-form-error" role="alert">{{ error }}</p>
-      }
-
-      <mat-card-actions class="order-panel__actions">
-      <button matButton="filled" class="order-submit" type="submit">
-        Review order
-      </button>
-      </mat-card-actions>
-    </form>
-  </mat-card>
-  }
+    </aside>
+  </div>
 </div>

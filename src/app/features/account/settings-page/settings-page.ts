@@ -1,3 +1,4 @@
+import { MatIconModule } from '@angular/material/icon';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +8,7 @@ import { UserApiService } from '../data-access/user-api.service';
 
 @Component({
   selector: 'app-settings-page',
-  imports: [FormsModule],
+  imports: [FormsModule, MatIconModule],
   templateUrl: './settings-page.html',
   styleUrl: './settings-page.css',
 })

@@ -1,24 +1,31 @@
+<div class="home">
+    <header class="page-head rise">
+        <div>
+            <span class="eyebrow">Overview</span>
+            <h1 class="welcome-msg">Welcome, {{ authService.currentUserFirstName() || 'there' }}</h1>
+        </div>
+        <button matButton="filled" class="trade-button" (click)="goToTrade()">
+            <mat-icon>swap_horiz</mat-icon>
+            Trade
+        </button>
+    </header>
 
-<h1 class="welcome-msg">Welcome, {{ authService.currentUserFirstName() || 'there' }}</h1>
-<div class="top-section">
-    <button matButton="filled" class="trade-button" (click)="goToTrade()">
-        Trade
-    </button>
-    <app-instrument-search></app-instrument-search>
-</div>
-<div class="home-page-container">
-    <aside>
-        <app-accounts-list 
-            class="portfolio-sidebar" 
-            [userId]="authService.currentUserId()"
-        />
-    </aside>
-    <div class="homepage-widgets">
-        <app-homepage-widget class="top-row" [data]="data[0]"></app-homepage-widget>
-        <app-homepage-widget class="top-row" [data]="data[1]"></app-homepage-widget>
-        <app-homepage-widget [data]="data[2]" class="full-width"></app-homepage-widget>
-        <app-homepage-widget [data]="data[3]" class="full-width"></app-homepage-widget>
-        <!-- should i do ?this instead of widgets -->
+    <div class="top-section rise">
+        <app-instrument-search></app-instrument-search>
     </div>
 
+    <div class="home-page-container">
+        <aside class="rise">
+            <app-accounts-list
+                class="portfolio-sidebar"
+                [userId]="authService.currentUserId()"
+            />
+        </aside>
+        <div class="homepage-widgets stagger">
+            <app-homepage-widget class="top-row" [data]="data[0]"></app-homepage-widget>
+            <app-homepage-widget class="top-row" [data]="data[1]"></app-homepage-widget>
+            <app-homepage-widget [data]="data[2]" class="full-width"></app-homepage-widget>
+            <app-homepage-widget [data]="data[3]" class="full-width"></app-homepage-widget>
+        </div>
+    </div>
 </div>

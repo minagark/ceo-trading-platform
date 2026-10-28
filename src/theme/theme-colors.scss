@@ -138,31 +138,157 @@ $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
 
 html {
   // Semantic trading color; Material supplies the surface, gold, and error tokens.
-  --activity-positive: #3fb950;
+  --activity-positive: #4cc38a;
 
   @include mat.core();
   @include mat.theme((
     color: (
-      primary: $primary-palette, 
+      primary: $primary-palette,
       tertiary: $tertiary-palette,
       theme-type: dark,
     ),
-    typography: Roboto,
+    typography: (
+      plain-family: ('Geist', system-ui, sans-serif),
+      brand-family: ('Geist', system-ui, sans-serif),
+      bold-weight: 600,
+      medium-weight: 500,
+      regular-weight: 400,
+    ),
     density: 0,
   ), $overrides: (
-    // *** This removes all border radius by default on Material components. 
-    // *** Change this at some point if desired.
-    corner-extra-small: 0px,
-    corner-small: 0px,
-    corner-medium: 0px,
-    corner-large: 0px,
-    corner-extra-large: 0px,
-    corner-full: 0px,
+    // Surfaces step up in lightness: ground < card < hover < raised.
+    // These mirror the --color-* tokens in styles.css so Material and
+    // hand-written components share one ladder.
+    background: #14120f,
+    on-background: #f3efe4,
+    surface: #14120f,
+    surface-dim: #14120f,
+    surface-bright: #2b2721,
+    surface-container-lowest: #100e0c,
+    surface-container-low: #181613,
+    surface-container: #1b1915,
+    surface-container-high: #221f1a,
+    surface-container-highest: #2b2721,
+    on-surface: #f3efe4,
+    on-surface-variant: #aaa396,
+    outline: #403a2f,
+    outline-variant: #2f2a23,
+
+    // Gold is the single accent: focus, selection, primary action.
+    primary: #e3b53c,
+    on-primary: #1a1509,
+    primary-container: #3a2f12,
+    on-primary-container: #efc65b,
+    tertiary: #e3b53c,
+    on-tertiary: #1a1509,
+    tertiary-container: #3a2f12,
+    on-tertiary-container: #efc65b,
+
+    error: #ef6b55,
+    on-error: #1a0905,
+    error-container: #3a1a14,
+    on-error-container: #ffb4a7,
+
+    // Small radii: crisp enough for a trading tool, softer than square.
+    corner-extra-small: 4px,
+    corner-small: 6px,
+    corner-medium: 10px,
+    corner-large: 12px,
+    corner-extra-large: 16px,
+    corner-full: 999px,
+  ));
+
+  @include mat.form-field-overrides((
+    outlined-container-shape: 6px,
+    outlined-outline-color: var(--color-border),
+    outlined-hover-outline-color: var(--color-border-strong),
+    outlined-focus-outline-color: var(--color-accent),
+    outlined-focus-outline-width: 1px,
+    outlined-label-text-color: var(--color-text-muted),
+    outlined-hover-label-text-color: var(--color-text),
+    outlined-focus-label-text-color: var(--color-accent-hover),
+    outlined-input-text-placeholder-color: var(--color-text-faint),
+    filled-container-color: var(--color-well),
+    filled-active-indicator-color: var(--color-border-strong),
+    filled-focus-active-indicator-color: var(--color-accent),
+    filled-focus-label-text-color: var(--color-accent-hover),
+  ));
+
+  @include mat.select-overrides((
+    panel-background-color: var(--color-surface-raised),
+    enabled-arrow-color: var(--color-text-muted),
+    focused-arrow-color: var(--color-accent),
+    container-elevation-shadow: var(--shadow-pop),
+  ));
+
+  @include mat.option-overrides((
+    selected-state-label-text-color: var(--color-accent-hover),
+    selected-state-layer-color: var(--color-accent-soft),
+  ));
+
+  @include mat.card-overrides((
+    outlined-container-color: var(--color-surface),
+    outlined-outline-color: var(--color-border),
+    outlined-container-shape: var(--radius-card),
+    elevated-container-color: var(--color-surface),
+    elevated-container-shape: var(--radius-card),
+    filled-container-color: var(--color-surface),
+    filled-container-shape: var(--radius-card),
+    title-text-tracking: -0.015em,
+    title-text-weight: 600,
+    subtitle-text-color: var(--color-text-muted),
+  ));
+
+  @include mat.button-overrides((
+    filled-container-color: var(--color-accent),
+    filled-label-text-color: var(--color-accent-text),
+    filled-container-shape: var(--radius-control),
+    filled-label-text-tracking: 0,
+    outlined-container-shape: var(--radius-control),
+    outlined-outline-color: var(--color-border-strong),
+    outlined-label-text-color: var(--color-text),
+    outlined-label-text-tracking: 0,
+    text-container-shape: var(--radius-control),
+    text-label-text-color: var(--color-text),
+    text-label-text-tracking: 0,
+    protected-container-shape: var(--radius-control),
+    tonal-container-shape: var(--radius-control),
+  ));
+
+  @include mat.button-toggle-overrides((
+    shape: 8px,
+    selected-state-background-color: var(--color-surface-raised),
+    selected-state-text-color: var(--color-text),
+    text-color: var(--color-text-faint),
+    divider-color: var(--color-border),
+  ));
+
+  @include mat.menu-overrides((
+    container-color: var(--color-surface-raised),
+    container-shape: 8px,
+    container-elevation-shadow: var(--shadow-pop),
+  ));
+
+  @include mat.dialog-overrides((
+    container-color: var(--color-surface),
+    container-shape: 12px,
+  ));
+
+  @include mat.list-overrides((
+    list-item-container-color: transparent,
+  ));
+
+  @include mat.progress-spinner-overrides((
+    active-indicator-color: var(--color-accent),
+  ));
+
+  @include mat.toolbar-overrides((
+    container-background-color: var(--color-bg),
   ));
 }
 
 body {
-  background: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font-family: var(--mat-sys-body-medium-font);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
 }

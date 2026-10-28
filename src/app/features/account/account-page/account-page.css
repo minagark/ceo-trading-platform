@@ -1,6 +1,7 @@
 .account-page {
-  width: min(100% - 2rem, 1100px);
-  margin: 2rem auto;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 72px;
   color: var(--color-text);
 }
 
@@ -10,16 +11,19 @@
 
 .account-page__eyebrow {
   margin: 0 0 0.45rem;
-  color: var(--color-accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  color: var(--color-text-faint);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .account-page__title {
   margin: 0;
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  letter-spacing: -0.04em;
+  font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2rem);
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.1;
 }
 
 .account-page__subtitle {
@@ -39,8 +43,9 @@
   padding: clamp(1rem, 2vw, 1.4rem);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 15px;
-  box-shadow: 0 14px 36px rgb(0 0 0 / 10%);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  animation: mh-rise var(--dur-enter) var(--ease-out) both;
 }
 
 .account-balance {
@@ -62,8 +67,10 @@
 .account-balance strong {
   margin-top: .25rem;
   color: var(--color-text);
-  font-size: 1.65rem;
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
   font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 .balance-breakdown {
@@ -75,9 +82,9 @@
 
 .balance-breakdown div {
   padding: .6rem .7rem;
-  background: var(--color-surface-raised);
+  background: var(--color-well);
   border: 1px solid var(--color-border);
-  border-radius: 7px;
+  border-radius: var(--radius-control);
 }
 
 .balance-breakdown span,
@@ -92,8 +99,10 @@
 
 .balance-breakdown strong {
   margin-top: .25rem;
+  font-family: var(--font-mono);
   font-size: .9rem;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .account-card__heading,
@@ -116,11 +125,12 @@
   height: 3.25rem;
   flex: 0 0 auto;
   place-items: center;
-  color: var(--color-accent-text);
-  background: var(--color-accent);
+  color: var(--color-accent-hover);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-strong);
   border-radius: 50%;
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .account-card__heading h2,
@@ -145,10 +155,11 @@
   height: 2rem;
   padding: 0 0.55rem;
   place-items: center;
-  color: var(--color-accent);
+  color: var(--color-accent-hover);
   background: var(--color-accent-soft);
   border-radius: 999px;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-weight: 500;
 }
 
 .account-page__details {
@@ -183,9 +194,14 @@
 
 .portfolio-item {
   padding: 0.95rem;
-  background: var(--color-bg);
+  background: var(--color-well);
   border: 1px solid var(--color-border);
-  border-radius: 11px;
+  border-radius: var(--radius-well);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.portfolio-item:hover {
+  border-color: var(--color-border-strong);
 }
 
 .portfolio-item__heading h3 {
@@ -236,8 +252,8 @@
   margin: 0;
   padding: 1rem;
   color: var(--color-text-muted);
-  background: var(--color-bg);
-  border-radius: 10px;
+  background: var(--color-well);
+  border-radius: var(--radius-well);
 }
 
 .account-page__state--error {
@@ -251,5 +267,15 @@
 
   .account-page__grid {
     grid-template-columns: 1fr;
+  }
+}
+
+.account-card--portfolios {
+  animation-delay: 60ms;
+}
+
+@media (max-width: 560px) {
+  .account-page {
+    padding: 24px 16px 56px;
   }
 }

@@ -11,6 +11,21 @@
   color: var(--color-text);
 }
 
+/* Fade the honeycomb out toward the edges so the card sits in a pool of quiet. */
+.login-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.login-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse 60% 55% at 50% 45%, transparent 0%, var(--color-bg) 85%);
+  pointer-events: none;
+}
+
 .welcome-banner {
   position: fixed;
   top: 0;
@@ -39,9 +54,10 @@
 }
 
 .welcome-text {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--color-accent);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-title);
+  color: var(--color-accent-hover);
 }
 
 @keyframes fly-across {
@@ -91,94 +107,129 @@
 }
 
 .login-brand__title {
-  margin: 0;
-  font-size: 2.5rem;
+  margin: 4px 0 0;
+  font-size: clamp(2.25rem, 1.8rem + 2vw, 3rem);
   font-weight: 600;
-  letter-spacing: -0.01em;
-  /* background: linear-gradient(90deg, var(--color-text), var(--color-accent)); */
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: var(--mat-sys-primary);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--color-text);
 }
 
 .login-brand__slogan {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   color: var(--color-text-muted);
 }
 
 .login-brand__slogan-honey {
-  color: var(--mat-sys-tertiary);
+  color: var(--color-accent-hover);
 }
 
 .login-card {
   width: 100%;
-  max-width: 560px;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
   gap: 0;
   padding: 20px;
   background: var(--color-surface);
-  /* border: 1px solid var(--color-border); */
-  border: 2px solid var(--mat-sys-tertiary);
-  border-radius: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 1px rgba(227, 181, 60, 0.06),
+    0 40px 80px -40px rgba(0, 0, 0, 0.8);
+  animation: mh-rise var(--dur-enter) var(--ease-out) 80ms both;
 }
 
 .auth-tabs {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  padding: 4px;
-  background: var(--color-bg);
-  border-radius: 9px;
+  padding: 3px;
+  background: var(--color-well);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-well);
+}
+
+/* Raised thumb that slides under the active tab. */
+.auth-tabs::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-raised);
+  transition: transform var(--dur-slide) var(--ease-out);
+}
+
+.auth-tabs:has(.auth-tab--active:last-child)::before {
+  transform: translateX(100%);
 }
 
 .auth-tab {
-  padding: 10px 12px;
+  position: relative;
+  z-index: 1;
+  height: 40px;
+  padding: 0 12px;
   font: inherit;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--color-text-muted);
+  color: var(--color-text-faint);
   background: transparent;
   border: 0;
-  border-radius: 7px;
   cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
 }
 
+.auth-tab:hover,
 .auth-tab--active {
-  color: var(--color-accent-text);
-  background: var(--color-accent);
+  color: var(--color-text);
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 22px 12px 12px;
+  gap: 16px;
+  padding: 24px 4px 4px;
+  animation: mh-rise var(--dur-enter) var(--ease-out) both;
 }
 
 .auth-heading {
   margin: 0 0 2px;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
+  letter-spacing: var(--tracking-title);
 }
 
 .login-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 0.95rem;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--color-text);
+  color: var(--color-text-muted);
 }
 
 .login-field input {
-  padding: 10px 12px;
+  height: 44px;
+  padding: 0 12px;
   font: inherit;
+  font-size: 14px;
   color: var(--color-text);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border-strong);
-  border-radius: 8px;
+  background: var(--color-well);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.login-field input:hover {
+  border-color: var(--color-border-strong);
 }
 
 .login-field input::placeholder {
@@ -188,6 +239,7 @@
 .login-field input:focus {
   outline: none;
   border-color: var(--color-accent);
+  box-shadow: var(--focus-ring);
 }
 
 .login-error {
@@ -203,20 +255,33 @@
 }
 
 .login-submit {
-  padding: 12px;
+  height: 48px;
+  margin-top: 4px;
   font: inherit;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--color-accent-text);
   background: var(--color-accent);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 1px 2px rgba(0, 0, 0, 0.4);
   cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 
-.login-submit:hover {
+.login-submit:hover:not(:disabled) {
   background: var(--color-accent-hover);
-  transform: translateY(-1px);
+}
+
+.login-submit:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.login-submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .auth-switch-prompt {
@@ -230,7 +295,7 @@
   padding: 0;
   font: inherit;
   font-weight: 600;
-  color: var(--color-accent);
+  color: var(--color-accent-hover);
   background: none;
   border: 0;
   cursor: pointer;
@@ -252,8 +317,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-brand__logo {
+  .login-brand__logo,
+  .welcome-flyby,
+  .welcome-bee {
     animation: none;
+  }
+
+  .welcome-banner {
+    display: none;
   }
 }
 

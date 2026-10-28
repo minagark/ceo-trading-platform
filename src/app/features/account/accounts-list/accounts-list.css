@@ -9,73 +9,96 @@
 .accounts-list {
   display: flex;
   flex-direction: column;
-  width: 240px;
-  padding: .65rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  box-shadow: 0 14px 32px rgb(0 0 0 / 10%);
+  width: 260px;
   height: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .accounts-list__header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem 0.75rem;
+  padding: 10px 8px 10px 12px;
 }
 
 .accounts-list__header h2 {
   margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-faint);
 }
 
 .accounts-list__items {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.25rem 0;
+  gap: 2px;
+  padding: 0;
   overflow-y: auto;
 }
 
-.accounts-list__type {
+.accounts-list__item {
+  border-radius: var(--radius-control);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.accounts-list__item [matListItemMeta] {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-muted);
 }
 
-.accounts-list__empty {
-  padding: 0.75rem 1rem;
-  margin: 0;
+.accounts-list__type {
   color: var(--color-text-faint);
-  font-style: italic;
+  font-size: 12px;
+}
+
+.accounts-list__empty {
+  margin: 0;
+  padding: 12px;
+  color: var(--color-text-faint);
+  font-size: 13px;
 }
 
 .accounts-list__item--selected {
   --mat-list-list-item-container-color: var(--color-accent-soft);
   --mat-list-list-item-hover-state-layer-color: var(--color-accent-soft);
-  box-shadow: inset 3px 0 0 var(--color-accent);
-  border-radius: 10px;
 }
 
+.accounts-list__item--selected [matListItemMeta] {
+  color: var(--color-accent-hover);
+}
+
+/* Small square ghost button: the panel's only gold is the selected row. */
 .add-portfolio {
-  --mat-button-filled-container-color: var(--mat-sys-tertiary);
-	--mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
-  /* center the icon*/
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.35rem;
-  min-width: 2.35rem;
-  height: 2.35rem;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
   padding: 0;
-  border-radius: 999px;
-  box-shadow: 0 6px 14px rgb(0 0 0 / 14%);
+  --mat-button-filled-container-color: var(--color-surface-raised);
+  --mat-button-filled-label-text-color: var(--color-text);
+  --mat-button-filled-container-height: 32px;
+  border: 1px solid var(--color-border-strong);
+  box-shadow: none !important;
+}
 
-	/* --mat-button-filled-container-height: 3rem; */
+.add-portfolio:hover {
+  --mat-button-filled-container-color: var(--color-surface-raised-hover);
+  border-color: var(--color-accent-line);
 }
 
 .add-portfolio mat-icon {
-  /* how to center the icon */
-  display: inline-block;
-  align-items: center;
-  justify-content: center;
+  width: 18px;
+  height: 18px;
   margin: 0;
+  font-size: 18px;
 }

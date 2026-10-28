@@ -1,78 +1,67 @@
-<app-instrument-search class="search"></app-instrument-search>
-<mat-card class="stock-display-page" appearance="outlined">
-  <div class="stock-display-header">
-    <h1 class="stock-display-name">{{ stockDisplayInfo().name }}</h1>
-    <span class="stock-display-symbol">{{ stockDisplayInfo().symbol }}</span>
+<div class="stock-page">
+  <div class="search rise">
+    <app-instrument-search></app-instrument-search>
   </div>
 
-  <mat-card-content>
-    <div class="stock-display-prices">
-      <div class="current-price">
-        <span class="label">Current Price</span>
-        <span 
-          class="value current-price-value" 
-          [class.positive]="stockDisplayInfo().currentPrice >= stockDisplayInfo().previousClose" 
-          [class.negative]="stockDisplayInfo().currentPrice < stockDisplayInfo().previousClose"
-        >
-          {{ stockDisplayInfo().currentPrice | number: '1.2-2' }}
-        </span>
+  <mat-card class="stock-display-page rise" appearance="outlined">
+    <div class="stock-display-header">
+      <div>
+        <span class="stock-display-symbol num">{{ stockDisplayInfo().symbol }}</span>
+        <h1 class="stock-display-name">{{ stockDisplayInfo().name }}</h1>
       </div>
-      <div class="previous-close">
-        <span class="label">Previous Close</span>
-        <span class="value">{{ stockDisplayInfo().previousClose | number: '1.2-2' }}</span>
-      </div>
+      <button matButton="filled" class="trade-button" (click)="handleTrade()">
+        Trade {{ stockDisplayInfo().symbol }}
+      </button>
     </div>
 
-    <div class="stock-display-day-range">
-      <mat-form-field class="timeframe-select" appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Time Frame</mat-label>
-        <mat-select [(ngModel)]="selectedTimeFrame">
-          @for (tf of TIME_FRAMES; track tf) {
-            <mat-option [value]="tf">{{ tf }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <div class="high-price">
-        <span class="label">High Today</span>
-        <span class="value">{{ stockDisplayInfo().highPriceToday | number: '1.2-2' }}</span>
+    <mat-card-content class="stagger">
+      <div class="stock-display-prices">
+        <div class="current-price">
+          <span class="label eyebrow">Current Price</span>
+          <span
+            class="value current-price-value num"
+            [class.positive]="stockDisplayInfo().currentPrice >= stockDisplayInfo().previousClose"
+            [class.negative]="stockDisplayInfo().currentPrice < stockDisplayInfo().previousClose"
+          >
+            {{ stockDisplayInfo().currentPrice | number: '1.2-2' }}
+          </span>
+        </div>
       </div>
-      <div class="low-price">
-        <span class="label">Low Today</span>
-        <span class="value">{{ stockDisplayInfo().lowPriceToday | number: '1.2-2' }}</span>
+
+      <dl class="stock-stats">
+        <div class="previous-close">
+          <dt class="label eyebrow">Previous Close</dt>
+          <dd class="value num">{{ stockDisplayInfo().previousClose | number: '1.2-2' }}</dd>
+        </div>
+        <div class="high-price">
+          <dt class="label eyebrow">High Today</dt>
+          <dd class="value num">{{ stockDisplayInfo().highPriceToday | number: '1.2-2' }}</dd>
+        </div>
+        <div class="low-price">
+          <dt class="label eyebrow">Low Today</dt>
+          <dd class="value num">{{ stockDisplayInfo().lowPriceToday | number: '1.2-2' }}</dd>
+        </div>
+      </dl>
+
+      <div class="price-history">
+        <div class="price-history__head">
+          <span class="eyebrow">Price history</span>
+          <mat-form-field class="timeframe-select" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Time Frame</mat-label>
+            <mat-select [(ngModel)]="selectedTimeFrame">
+              @for (tf of TIME_FRAMES; track tf) {
+                <mat-option [value]="tf">{{ tf }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <performance-chart
+          [selectedTimeFrame]="selectedTimeFrame"
+          [instrumentSymbol]="stockDisplayInfo().symbol"
+          [instrumentType]="type"
+          [showTimeFrame]="false"
+        ></performance-chart>
       </div>
-    </div>
-
-    <div class="price-history" style="border-color: var(--mat-sys-tertiary);">
-      <!-- placeholder until real chart data/library is integrated -->
-      <p class="chart-placeholder">Price history chart for: {{ selectedTimeFrame }}</p>
-      <performance-chart
-        [selectedTimeFrame]="selectedTimeFrame"
-        [instrumentSymbol]="stockDisplayInfo().symbol"
-        [instrumentType]="type"
-        [showTimeFrame]="false"
-      ></performance-chart>
-    </div>
-    
-    <button matButton="filled" class="trade-button" (click)="handleTrade()">
-      Trade
-    </button>
-    
-  </mat-card-content>
-</mat-card>
-
-
-<!-- 
-Information needed:
-top row:
-Name (top middle)
-Symbol (top middle, after name)
-second row:
-Current Price (left)
-Previous close (right)
-third row:
-Time frame dropdown (left)
-High Price today (middle)
-Low Price today (right)
-last section:
-Price history graph (depending on time frame dropdown; for now, just do a placeholder which just says the time frame)
--->
+    </mat-card-content>
+  </mat-card>
+</div>

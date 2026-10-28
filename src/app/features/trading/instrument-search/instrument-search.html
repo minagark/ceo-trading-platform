@@ -1,22 +1,23 @@
 
 <div class="search">
     <form [formGroup]="instrumentSearchForm" (ngSubmit)="submit()">
-        <mat-form-field>
+        <mat-form-field class="search__type">
             <mat-label>Order Type</mat-label>
             <mat-select formControlName="orderType">
-                @for (orderType of NON_DEPOSIT_ORDER_TYPES.map(item => item.value); track $index) {
-                    <mat-option [value]="orderType">
-                        {{ orderType }}
+                @for (orderType of NON_DEPOSIT_ORDER_TYPES; track orderType.value) {
+                    <mat-option [value]="orderType.value">
+                        {{ orderType.label }}
                     </mat-option>
                 }
             </mat-select>
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field class="search__symbol">
             <mat-label>{{ searchDisplay() }}</mat-label>
-            <input matInput formControlName="symbol"/>
+            <mat-icon matIconPrefix aria-hidden="true">search</mat-icon>
+            <input matInput class="num" autocomplete="off" spellcheck="false" formControlName="symbol"/>
         </mat-form-field>
-        <button matButton="filled" class="search-submit"type="submit">
-            Submit
+        <button matButton="filled" class="search-submit" type="submit">
+            Search
         </button>
     </form>
 </div>

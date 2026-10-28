@@ -1,5 +1,12 @@
 <div class="portfolio-holdings-page">
-  <app-accounts-list [userId]="authService.currentUserId()" />
-  <app-holdings-list class="portfolio-holdings-page__holdings" [showLess]="false"/>
-
+  <header class="page-head rise">
+    <div>
+      <span class="eyebrow">Portfolio</span>
+      <h1>Holdings</h1>
+    </div>
+  </header>
+  <div class="portfolio-holdings-page__body">
+    <app-accounts-list class="rise" [userId]="authService.currentUserId()" />
+    <app-holdings-list class="portfolio-holdings-page__holdings rise" [showLess]="false"/>
+  </div>
 </div>

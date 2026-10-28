@@ -6,6 +6,7 @@ import { AuthService } from '../../auth/auth/auth.service';
 import { AgCharts } from 'ag-charts-angular';
 import { AgChartOptions, AllCommunityModule, ModuleRegistry } from 'ag-charts-community';
 import { catchError, forkJoin, of } from 'rxjs';
+import { CHART_COLORS, marketHiveChartTheme } from '../../../shared/chart-theme';
 import {
   AnalyticsApiService,
   Candle,
@@ -135,9 +136,9 @@ export class MarketAnalysis {
     if (!items.length) return null;
     return {
       data: items,
-      background: { fill: 'transparent' },
-      series: [{ type: 'bar', xKey: 'symbol', yKey: 'totalNotional', yName: 'Total notional', fill: '#e3b53c', tooltip: { renderer: ({ datum }: { datum: TopInstrumentAnalytics }) => ({ title: datum.symbol, data: [{ label: 'Notional', value: this.currency(datum.totalNotional) }, { label: 'Quantity', value: datum.totalQuantity.toLocaleString() }, { label: 'Fulfilled trades', value: datum.executedTrades.toLocaleString() }] }) } }],
-      axes: { x: { type: 'category', label: { color: '#a9a398' } }, y: { type: 'number', label: { color: '#a9a398', formatter: ({ value }: { value: number }) => this.currency(value) }, gridLine: { enabled: true, style: [{ stroke: '#322d24', lineDash: [3, 3] }] } } } as any,
+      theme: marketHiveChartTheme,
+      series: [{ type: 'bar', xKey: 'symbol', yKey: 'totalNotional', yName: 'Total notional', fill: CHART_COLORS.accent, cornerRadius: 4, tooltip: { renderer: ({ datum }: { datum: TopInstrumentAnalytics }) => ({ title: datum.symbol, data: [{ label: 'Notional', value: this.currency(datum.totalNotional) }, { label: 'Quantity', value: datum.totalQuantity.toLocaleString() }, { label: 'Fulfilled trades', value: datum.executedTrades.toLocaleString() }] }) } }],
+      axes: { x: { type: 'category', label: { color: CHART_COLORS.textFaint } }, y: { type: 'number', label: { color: CHART_COLORS.textFaint, formatter: ({ value }: { value: number }) => this.currency(value) }, gridLine: { enabled: true, style: [{ stroke: CHART_COLORS.border, lineDash: [3, 3] }] } } } as any,
     };
   }
 
@@ -152,7 +153,7 @@ export class MarketAnalysis {
       .sort((left, right) => right.totalNotional - left.totalNotional);
     return {
       data,
-      background: { fill: 'transparent' },
+      theme: marketHiveChartTheme,
       legend: { enabled: true, position: 'bottom' },
       series: [{
         type: 'pie',
@@ -167,7 +168,7 @@ export class MarketAnalysis {
 
   private buildCandleOptions(items: Candle[]): AgChartOptions | null {
     if (items.length < 2) return null;
-    return { data: items, background: { fill: 'transparent' }, series: [{ type: 'line', xKey: 'date', yKey: 'close', yName: 'Close', stroke: '#e3b53c', strokeWidth: 3, marker: { enabled: false } }], axes: { x: { type: 'category', label: { color: '#a9a398' } }, y: { type: 'number', label: { color: '#a9a398', formatter: ({ value }: { value: number }) => this.currency(value) }, gridLine: { enabled: true, style: [{ stroke: '#322d24', lineDash: [3, 3] }] } } } as any };
+    return { data: items, theme: marketHiveChartTheme, series: [{ type: 'line', xKey: 'date', yKey: 'close', yName: 'Close', stroke: CHART_COLORS.accent, strokeWidth: 2, marker: { enabled: false } }], axes: { x: { type: 'category', label: { color: CHART_COLORS.textFaint } }, y: { type: 'number', label: { color: CHART_COLORS.textFaint, formatter: ({ value }: { value: number }) => this.currency(value) }, gridLine: { enabled: true, style: [{ stroke: CHART_COLORS.border, lineDash: [3, 3] }] } } } as any };
   }
 
   private currency(value: number): string { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value); }

@@ -3,13 +3,11 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { AuthService } from './features/auth/auth/auth.service';
 import { UserProfile } from './features/account/user-profile/user-profile';
 
-import { MatButtonModule } from '@angular/material/button';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { filter } from 'rxjs';
 
 
 @Component({
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatButtonModule, MatToolbarModule, UserProfile],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, UserProfile],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

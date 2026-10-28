@@ -7,7 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
 import { Router } from '@angular/router';
-import { MatAnchor } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   imports: [
@@ -16,7 +17,8 @@ import { MatAnchor } from '@angular/material/button';
     MatFormFieldModule,
     ReactiveFormsModule,
     MatInputModule,
-    MatAnchor
+    MatButtonModule,
+    MatIconModule,
 ],
   selector: 'app-instrument-search',
   styleUrl: './instrument-search.css',

@@ -2,53 +2,91 @@
 
 /*
   ---------------------------------------------------------------------------
-  Theme: yellow & black
+  Theme: Market Hive (gold & warm black)
   ---------------------------------------------------------------------------
   Design tokens for the whole app, exposed as CSS custom properties on :root
   so every component stylesheet can reference them instead of hard-coding
-  hex values. Keep this the single source of truth for color — when the
-  theme changes, it should only need to change here.
+  hex values. Keep this the single source of truth for color, type, depth
+  and motion. theme-colors.scss mirrors the surface values into Material.
 
-  Palette notes:
-    - Backgrounds are warm near-blacks (not pure #000) so the yellow accents
-      don't vibrate against them.
-    - The yellow scale is a muted gold rather than a saturated/neon yellow —
-      reads as "modern fintech" instead of "caution tape".
-    - Prefer the semantic tokens (--color-accent, --color-surface, etc.) in
-      component CSS; the numbered scales exist mainly to derive those.
+  Depth model — three tones plus one shadow, no glow or gradients:
+    --color-bg       page ground (darkest)
+    --color-well     inset wells inside cards: inputs, summaries (= ground)
+    --color-surface  cards, sitting above the ground
+    --color-surface-hover / -raised   hover rows, selected controls, menus
+
+  Gold is reserved for the primary action, focus, and the active state.
+  Numbers use --font-mono (tabular figures) so columns line up.
 */
 
 :root {
   /* Neutrals (warm near-black surfaces) */
-  --color-bg: #201d1a;
-  --color-surface: #1a1815;
+  --color-bg: #14120f;
+  --color-well: #14120f;
+  --color-surface: #1b1915;
   --color-surface-hover: #221f1a;
-  --color-surface-raised: #221f1a;
-  --color-surface-raised-hover: #2a261f;
-  --color-border: #322d24;
-  --color-border-strong: #423b2d;
+  --color-surface-raised: #2b2721;
+  --color-surface-raised-hover: #332e27;
+  --color-border: #2f2a23;
+  --color-border-strong: #403a2f;
 
-  /* Text */
-  --color-text: #f5f1e6;
-  --color-text-muted: rgba(245, 241, 230, 0.68);
-  --color-text-faint: rgba(245, 241, 230, 0.45);
+  /* Text — solid values so contrast holds on every surface */
+  --color-text: #f3efe4;
+  --color-text-muted: #aaa396;
+  --color-text-faint: #8a8475;
 
   /* Yellow / gold accent scale */
   --color-yellow-100: #fbf0cd;
-  --color-yellow-300: #f0d27a;
+  --color-yellow-300: #efc65b;
   --color-yellow-500: #e3b53c;
   --color-yellow-600: #c99a26;
   --color-yellow-700: #9c761b;
 
   --color-accent: var(--color-yellow-500);
-  --color-accent-hover: var(--color-yellow-600);
+  /* Hover goes lighter, so pressing reads as "lit" rather than dimmed. */
+  --color-accent-hover: var(--color-yellow-300);
   --color-accent-text: #1a1509;
-  --color-accent-soft: rgba(227, 181, 60, 0.14);
+  --color-accent-soft: rgba(227, 181, 60, 0.12);
+  --color-accent-line: rgba(227, 181, 60, 0.45);
 
-  --color-danger: #e0553f;
-  --color-success: #3fb950;
+  /* Up/down. Always paired with an arrow or a word, never color alone. */
+  --color-danger: #ef6b55;
+  --color-danger-soft: rgba(239, 107, 85, 0.1);
+  --color-success: #4cc38a;
+  --color-success-soft: rgba(76, 195, 138, 0.1);
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Type */
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --tracking-display: -0.03em;
+  --tracking-title: -0.02em;
+  --tracking-label: 0.1em;
+
+  /* Shape */
+  --radius-control: 6px;
+  --radius-well: 8px;
+  --radius-card: 10px;
+
+  /* Depth */
+  --shadow-card:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 18px 40px -18px rgba(0, 0, 0, 0.65);
+  --shadow-raised:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-pop:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 16px 40px -8px rgba(0, 0, 0, 0.7);
+  --focus-ring: 0 0 0 3px rgba(227, 181, 60, 0.16);
+
+  /* Motion — one curve: fast start, soft settle, no overshoot */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-press: 120ms;
+  --dur-fast: 180ms;
+  --dur-slide: 300ms;
+  --dur-enter: 420ms;
+  --stagger: 40ms;
 }
 
 * {
@@ -60,9 +98,211 @@ body {
   height: 100%;
 }
 
-/* body {
+body {
   margin: 0;
-  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(227, 181, 60, 0.3);
   color: var(--color-text);
-  font-family: var(--font-sans);
-} */
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Shared utilities. Prefer these over re-declaring the same rules per page.
+   --------------------------------------------------------------------------- */
+
+/* Any price, quantity, ID or timestamp. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Small uppercase section label ("ORDER DETAILS", "PORTFOLIO"). */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+/* Page heading block used at the top of each routed page. */
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.page-head h1 {
+  margin: 6px 0 0;
+  font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2rem);
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.1;
+  color: var(--color-text);
+}
+
+.page-head p {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+/* Up/down figures. */
+.is-up { color: var(--color-success); }
+.is-down { color: var(--color-danger); }
+
+/* Entrance: content rises into place; children of .stagger follow in turn. */
+.rise {
+  animation: mh-rise var(--dur-enter) var(--ease-out) both;
+}
+
+.stagger > * {
+  animation: mh-rise var(--dur-enter) var(--ease-out) both;
+}
+
+.stagger > *:nth-child(2) { animation-delay: calc(var(--stagger) * 1); }
+.stagger > *:nth-child(3) { animation-delay: calc(var(--stagger) * 2); }
+.stagger > *:nth-child(4) { animation-delay: calc(var(--stagger) * 3); }
+.stagger > *:nth-child(5) { animation-delay: calc(var(--stagger) * 4); }
+.stagger > *:nth-child(6) { animation-delay: calc(var(--stagger) * 5); }
+.stagger > *:nth-child(7) { animation-delay: calc(var(--stagger) * 6); }
+.stagger > *:nth-child(n + 8) { animation-delay: calc(var(--stagger) * 7); }
+
+/* Price tick flash. Two identical keyframes so toggling a/b restarts it. */
+.flash-up-a { animation: mh-flash-up-a 900ms ease-out; }
+.flash-up-b { animation: mh-flash-up-b 900ms ease-out; }
+.flash-down-a { animation: mh-flash-down-a 900ms ease-out; }
+.flash-down-b { animation: mh-flash-down-b 900ms ease-out; }
+
+@keyframes mh-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mh-slide-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mh-slide-back {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mh-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mh-flash-up-a { from { color: var(--color-success); } }
+@keyframes mh-flash-up-b { from { color: var(--color-success); } }
+@keyframes mh-flash-down-a { from { color: var(--color-danger); } }
+@keyframes mh-flash-down-b { from { color: var(--color-danger); } }
+
+/* ---------------------------------------------------------------------------
+   Material refinements the token overrides can't express.
+   --------------------------------------------------------------------------- */
+
+/* Cards get the shared depth shadow. */
+.mat-mdc-card {
+  box-shadow: var(--shadow-card);
+}
+
+/* Outlined fields sit as inset wells inside cards, with a soft focus glow. */
+.mat-mdc-form-field .mdc-text-field--outlined {
+  background: var(--color-well);
+  border-radius: var(--radius-control);
+  transition: box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.mat-mdc-form-field.mat-focused .mdc-text-field--outlined {
+  box-shadow: var(--focus-ring);
+}
+
+.mdc-notched-outline__leading,
+.mdc-notched-outline__notch,
+.mdc-notched-outline__trailing {
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+/* Buttons: tactile press, lighter hover on filled gold. */
+.mat-mdc-button-base {
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+
+.mat-mdc-button-base:active:not([disabled]) {
+  transform: scale(0.985);
+}
+
+.mat-mdc-unelevated-button:not([disabled]) {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.mat-mdc-unelevated-button:not([disabled]):hover {
+  --mat-button-filled-container-color: var(--color-accent-hover);
+}
+
+/* Inputs showing numbers line up digits. */
+input[type='number'],
+.mat-mdc-input-element[type='number'] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+   Route transitions (router withViewTransitions). Old page fades, new page
+   rises. The nav is named separately so it stays put.
+   --------------------------------------------------------------------------- */
+
+::view-transition-old(root) {
+  animation: mh-vt-out 160ms ease-in both;
+}
+
+::view-transition-new(root) {
+  animation: mh-vt-in 240ms var(--ease-out) both;
+}
+
+@keyframes mh-vt-out {
+  to { opacity: 0; }
+}
+
+@keyframes mh-vt-in {
+  from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

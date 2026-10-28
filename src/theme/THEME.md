@@ -1,10 +1,30 @@
 ## Material Angular Theming
 
-In `theme-colors.scss`, our Material Angular theme is defined. The primary color is a very dark gray, and the secondary color is lighter than that. The tertiary (previously known to Material as "accent") color is gold, so the overall color scheme is like a bee's. 
+In `theme-colors.scss`, our Material Angular theme is defined. Surfaces are warm near-blacks and gold is the single accent (both `primary` and `tertiary` map to it), so the overall color scheme is like a bee's.
 
-Material, by default, puts rounded corners on the vast majority of components, but currently our theme has only sharp corners, which we believe feels more like a sleek trading platform than the rounded corners. 
+### Where things live
 
-To use a color variable defined in `theme-colors.scss`, use the CSS variable `var(--mat-sys-<name>)`, where `<name>` could be something like `tertiary` or `on-tertiary` (for text that is meant to be on a surface of tertiary color).
+- **`src/styles.css`** is the source of truth for design tokens (`--color-*`, `--font-*`, `--radius-*`, `--shadow-*`, `--ease-out`, `--dur-*`) plus shared utilities. Prefer these in component CSS.
+- **`theme-colors.scss`** mirrors the surface ladder into Material's system variables and sets component overrides (form fields, buttons, cards, selects, menus…) so Material components match hand-written ones.
+- **`src/app/shared/chart-theme.ts`** is the AG Charts theme. Charts draw to canvas and can't read CSS variables, so it repeats the hex values; keep it in step with `styles.css`.
+
+### Depth
+
+Three surface tones plus one shadow, no glow or gradients: page ground `--color-bg` < cards `--color-surface` < hover `--color-surface-hover` < raised/selected `--color-surface-raised`. Inputs and summaries inside a card are inset wells (`--color-well`, same as the ground). Cards use `--shadow-card`.
+
+### Shape
+
+Small radii: 6px on controls (`--radius-control`), 8px on wells (`--radius-well`), 10px on cards (`--radius-card`). This replaced the earlier all-square corners.
+
+### Type
+
+Geist for UI, Geist Mono for every price, quantity, ID and timestamp (add `class="num"`). Headings use negative tracking; small section labels use `class="eyebrow"` (11px, uppercase, +0.1em).
+
+### Motion
+
+One curve (`--ease-out`, fast start and soft settle), 120–420ms. Use `.rise` for an element entering and `.stagger` on a parent to cascade its children. Route changes cross-fade through the router's view transitions. Everything is switched off under `prefers-reduced-motion`.
+
+To use a Material color variable, use `var(--mat-sys-<name>)`, where `<name>` could be something like `tertiary` or `on-tertiary` (for text that is meant to be on a surface of tertiary color). For new code, prefer the `--color-*` tokens.
 
 For more information on Angular components etc, see [Getting Started](https://material.angular.dev/guide/getting-started).
 

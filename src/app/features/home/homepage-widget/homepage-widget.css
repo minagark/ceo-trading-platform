@@ -1,23 +1,31 @@
-.homepage-widget,
 :host {
     display: block;
     width: 100%;
     min-width: 0;
 }
 
-.container {
-    padding: 16px;
-    outline: 1px solid var(--mat-sys-on-surface);
+.view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
 }
 
-.view-all {
-    color: var(--mat-sys-on-surface);
-    position: relative;
-    right: 0;
-    padding-right: 20px; 
-    /* position on right*/
-    margin-left: auto;
-    
+.view-all::after {
+    content: '→';
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.view-all:hover {
+    color: var(--color-accent-hover);
+}
+
+.view-all:hover::after {
+    transform: translateX(3px);
 }
 
 .widget-container {
@@ -27,30 +35,32 @@
     height: 100%;
     min-width: 0;
     min-height: 0;
-    border-radius: 16px;
-    border-color: var(--color-border);
-    background: var(--color-surface);
-    box-shadow: 0 14px 32px rgb(0 0 0 / 12%);
     overflow: hidden;
+    transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.widget-container:hover {
+    border-color: var(--color-border-strong);
 }
 
 .widget-container mat-card-header {
-    padding: 1.1rem 1.25rem .75rem;
+    align-items: center;
+    padding: 18px 20px 12px;
 }
 
 .widget-container mat-card-title {
-    font-size: 1rem;
+    font-size: 15px;
     font-weight: 600;
+    letter-spacing: var(--tracking-title);
 }
 
 .widget-container mat-card-content {
-    padding: 0 1.25rem 1.25rem;
+    padding: 0 20px 20px;
 }
 
 .widget-container > mat-card-header,
 .widget-container > mat-card-content {
     width: 100%;
-    box-sizing: border-box;
 }
 
 .widget-container > mat-card-content {
@@ -58,7 +68,6 @@
     flex-direction: column;
     align-items: stretch;
     flex: 1 1 auto;
-    box-sizing: border-box;
     min-width: 0;
     min-height: 0;
 }

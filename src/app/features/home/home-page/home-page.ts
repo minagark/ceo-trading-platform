@@ -13,10 +13,11 @@ import { InstrumentSearch } from '../../trading/instrument-search/instrument-sea
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { PortfolioPrompt } from '../../portfolio/portfolio-prompt/portfolio-prompt';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @Component({
-  imports: [HomepageWidget, AccountsList, InstrumentSearch, MatDialogModule, MatButtonModule], // imports to the template
+  imports: [HomepageWidget, AccountsList, InstrumentSearch, MatDialogModule, MatButtonModule, MatIconModule], // imports to the template
   selector: 'app-home-page',
   styleUrl: './home-page.css',
   templateUrl: './home-page.html',

@@ -15,6 +15,7 @@ import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { HoldingsService } from '../holdings/holdings.service';
 import { InstrumentType } from '../../../core/trading.models';
 import { catchError, forkJoin, of } from 'rxjs';
+import { CHART_COLORS, marketHiveChartTheme } from '../../../shared/chart-theme';
 
 interface GraphItem {
   date: Date; // is it date... lowkey could be time too depending on time frame
@@ -70,12 +71,11 @@ export class PortfolioPerformance {
           marker: {
             enabled: false, // no dots
           },
-          stroke: "green" //red or green
+          stroke: CHART_COLORS.up, // set from the trend in updateChart
+          strokeWidth: 2,
         }
       ],
-      background: {
-        fill: 'var(--mat-sys-surface)'
-      },
+      theme: marketHiveChartTheme,
       axes: {
         x: {
           type: 'time', // changes this to time once get real time stamp (or leave as category depending on parsing)
@@ -84,7 +84,7 @@ export class PortfolioPerformance {
           },
           label: {
             enabled: true,
-            color: "var(--mat-sys-on-surface)",
+            color: CHART_COLORS.textFaint,
             format: '%b %d',
           },
           nice: false,
@@ -92,11 +92,12 @@ export class PortfolioPerformance {
         y: {
           type: 'number',
           gridLine: {
-            enabled: false
+            enabled: true,
+            style: [{ stroke: CHART_COLORS.border, lineDash: [2, 4] }],
           },
           label: {
             enabled: true,
-            color: "var(--mat-sys-on-surface)"
+            color: CHART_COLORS.textFaint
           }
         }
       }
@@ -181,10 +182,14 @@ export class PortfolioPerformance {
 
   private updateChart(data: GraphItem[]): void {
     this.items.set(data);
+    // green when the period ends at or above where it started, red otherwise
+    const rising = data.length < 2 || data[data.length - 1].balance >= data[0].balance;
+    const stroke = rising ? CHART_COLORS.up : CHART_COLORS.down;
       this.options.update((options) => ({
         ...options,
         data: [...data],
-    }));
+        series: options.series?.map((series) => ({ ...series, stroke })),
+    }) as AgChartOptions);
   }
 
 

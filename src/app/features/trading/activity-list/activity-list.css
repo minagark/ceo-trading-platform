@@ -16,8 +16,7 @@
 
 .account-activity__table {
   overflow-x: auto;
-  background: var(--mat-sys-surface);
-  border-block: 1px solid var(--mat-sys-outline-variant);
+  background: var(--color-surface);
   scrollbar-color: var(--mat-sys-outline) var(--mat-sys-surface);
 }
 
@@ -32,13 +31,13 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.85rem 1.25rem;
-  background: var(--mat-sys-surface-container-low);
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
-  color: var(--mat-sys-on-surface-variant);
-  font-size: 0.6875rem;
-  font-weight: 600;
+  background: var(--color-well);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-faint);
+  font-size: 11px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-label);
   white-space: nowrap;
 }
 
@@ -47,9 +46,15 @@
   min-width: 68rem;
 }
 
-.account-activity__col-headers span:first-child {
-  color: var(--mat-sys-tertiary);
+.account-activity__rows > * {
+  animation: mh-rise var(--dur-enter) var(--ease-out) both;
 }
+
+.account-activity__rows > :nth-child(2) { animation-delay: 30ms; }
+.account-activity__rows > :nth-child(3) { animation-delay: 60ms; }
+.account-activity__rows > :nth-child(4) { animation-delay: 90ms; }
+.account-activity__rows > :nth-child(5) { animation-delay: 120ms; }
+.account-activity__rows > :nth-child(n + 6) { animation-delay: 150ms; }
 
 .account-activity__numeric {
   text-align: right;
@@ -62,9 +67,7 @@
 
 .account-activity__empty {
   padding: 3rem 1.25rem;
-  background: var(--mat-sys-surface-container-low);
-  border-block: 1px solid var(--mat-sys-outline-variant);
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--color-text-faint);
   text-align: center;
 }
 

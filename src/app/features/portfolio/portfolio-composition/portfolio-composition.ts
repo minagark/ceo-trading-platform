@@ -7,6 +7,7 @@ import {
   PieSeriesModule,
 } from "ag-charts-community";
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
+import { CHART_COLORS, marketHiveChartTheme } from '../../../shared/chart-theme';
 import { HoldingsService } from '../holdings/holdings.service';
 
 ModuleRegistry.registerModules([LegendModule, PieSeriesModule]);
@@ -41,17 +42,17 @@ export class PortfolioComposition {
         {
           type: 'pie',
           angleKey: 'quantity',
-          legendItemKey: 'name'
+          legendItemKey: 'name',
+          strokeWidth: 2,
+          strokes: [CHART_COLORS.border],
         }
       ],
-      background: {
-        fill: 'var(--mat-sys-surface)'
-      },
+      theme: marketHiveChartTheme,
       legend: {
         position: 'bottom',
         item: {
           label: {
-            color: "var(--mat-sys-on-surface)"
+            color: CHART_COLORS.textMuted
           }
         }
       }

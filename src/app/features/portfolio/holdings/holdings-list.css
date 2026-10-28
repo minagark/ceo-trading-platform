@@ -262,3 +262,87 @@
   align-items: start;
   grid-column: span 3;
 }
+
+/* --- Market Hive refinements ---------------------------------------------- */
+
+.holdings-list__title {
+  font-weight: 600;
+  letter-spacing: var(--tracking-title);
+}
+
+.holdings-list__summary-value {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.holdings-list__summary-change,
+.holdings-list__col,
+.holdings-list__range-labels,
+.holdings-list__trade-date {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.holdings-list__quantity,
+.holdings-list__value,
+.holdings-list__period-change,
+.holdings-list__total-change {
+  font-weight: 500;
+}
+
+.holdings-list__col-headers,
+.holdings-list__trade-header {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+}
+
+.holdings-list__symbol {
+  letter-spacing: 0.02em;
+}
+
+.holdings-list__row,
+.holdings-list__toggle {
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.holdings-list__chevron {
+  color: var(--color-text-faint);
+}
+
+.holdings-list__toggle[aria-expanded='true'] .holdings-list__chevron {
+  color: var(--color-accent);
+}
+
+.holdings-list__toggle[aria-expanded='true'] + div {
+  animation: mh-rise var(--dur-enter) var(--ease-out) both;
+}
+
+.holdings-list__trade {
+  background: var(--color-well);
+}
+
+.holdings-list__trade-header {
+  background: var(--color-well);
+}
+
+.holdings-list__period-select {
+  border-radius: 4px;
+  background: var(--color-well);
+  font-family: var(--font-mono);
+}
+
+.holdings-list__range-bar {
+  border-radius: 2px;
+}
+
+.holdings-list__range-marker {
+  border-radius: 1px;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+
+.holdings-list__empty {
+  font-style: normal;
+}

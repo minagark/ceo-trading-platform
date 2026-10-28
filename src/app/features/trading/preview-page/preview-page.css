@@ -1,41 +1,42 @@
-/* matches the trade form's .order-panel card (trade-screen.css) so the flow reads as one */
+/* Rendered inside the trade ticket (trade-screen.css), which supplies the card surface. */
 :host {
   display: block;
-  width: min(100%, 34rem);
 }
 
 .review-card {
   overflow: hidden;
-  border-color: var(--mat-sys-outline-variant);
-  background: var(--mat-sys-surface-container-high);
-  box-shadow: 0 1rem 3rem color-mix(in srgb, var(--mat-sys-shadow) 22%, transparent);
 }
 
 .review-card__header {
-  padding: 1.5rem 1.5rem 1.25rem;
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .review-card__header mat-card-title {
-  color: var(--mat-sys-on-surface);
-  font-size: 1.35rem;
+  color: var(--color-text);
+  font-size: 1.05rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-title);
 }
 
 .review-card__header mat-card-subtitle {
-  margin-top: 0.35rem;
-  color: var(--mat-sys-on-surface-variant);
+  margin-top: 4px;
+  color: var(--color-text-faint);
+  font-size: 12px;
 }
 
 .review-card__content {
-  padding: 1.5rem 1.5rem 0;
+  padding: 20px 20px 0;
 }
 
+/* The two legs share one bordered well, split by a seam the arrow sits on. */
 .legs {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-well);
+  animation: mh-rise var(--dur-enter) var(--ease-out) both;
 }
 
 .leg {
@@ -43,55 +44,57 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.1rem 1.25rem;
-  border: 1px solid transparent;
-  background: var(--mat-sys-surface-container-highest);
+  padding: 16px;
+  background: var(--color-well);
 }
 
 .leg--get {
-  border-color: var(--mat-sys-tertiary);
+  background: var(--color-surface);
 }
 
 .leg__amount {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 6px;
   min-width: 0;
 }
 
 .leg__label {
-  font-size: 0.75rem;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.leg--get .leg__label {
-  color: var(--mat-sys-tertiary);
+  color: var(--color-text-faint);
 }
 
 .leg__value {
-  font-size: 1.6rem;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
-  color: var(--mat-sys-on-surface);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
   overflow-wrap: anywhere;
 }
 
 .leg__symbol {
   flex: none;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--mat-sys-on-surface);
-  background: var(--mat-sys-outline-variant);
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .leg__symbol--get {
-  color: var(--mat-sys-on-tertiary);
-  background: var(--mat-sys-tertiary);
+  border-color: var(--color-accent-line);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+  font-weight: 600;
 }
 
 /* the arrow sits on the seam between the two legs */
@@ -100,53 +103,62 @@
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  margin: -1.25rem auto;
-  border: 4px solid var(--mat-sys-surface-container-high);
-  color: var(--mat-sys-on-tertiary);
-  background: var(--mat-sys-tertiary);
+  width: 28px;
+  height: 28px;
+  margin: -14px auto;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-accent);
+  background: var(--color-surface);
+}
+
+.legs__arrow svg {
+  width: 14px;
+  height: 14px;
 }
 
 .review-details {
   display: flex;
   flex-direction: column;
-  margin: 1rem 0 0;
+  margin: 16px 0 0;
+  animation: mh-rise var(--dur-enter) var(--ease-out) 80ms both;
 }
 
 .review-details__row {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.5rem 0;
-  font-size: 0.875rem;
+  padding: 6px 0;
+  font-size: 13px;
 }
 
 .review-details__row dt {
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--color-text-muted);
 }
 
 .review-details__row dd {
   margin: 0;
   text-align: right;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  color: var(--mat-sys-on-surface);
+  color: var(--color-text);
 }
 
 .review-card__actions {
   display: flex;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem 1.5rem;
+  gap: 10px;
+  padding: 20px;
+  animation: mh-rise var(--dur-enter) var(--ease-out) 160ms both;
 }
 
 .review-back {
   flex: 1;
-  --mat-button-outlined-container-height: 3rem;
+  --mat-button-outlined-container-height: 48px;
 }
 
 .review-confirm {
   flex: 2;
-  --mat-button-filled-container-color: var(--mat-sys-tertiary);
-  --mat-button-filled-label-text-color: var(--mat-sys-on-tertiary);
-  --mat-button-filled-container-height: 3rem;
+  --mat-button-filled-container-height: 48px;
+  font-size: 15px;
+  font-weight: 600;
 }

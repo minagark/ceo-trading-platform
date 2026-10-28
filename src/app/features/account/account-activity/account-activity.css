@@ -2,8 +2,24 @@
   ActivityList owns its table styling; the page leaves room for all nine columns.
 */
 
-.account-activity {
-  display: block;
+.account-activity-page {
   max-width: 1280px;
   margin: 0 auto;
+  padding: 40px 24px 72px;
+}
+
+.account-activity {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  animation-delay: 60ms;
+}
+
+@media (max-width: 560px) {
+  .account-activity-page {
+    padding: 24px 16px 56px;
+  }
 }
