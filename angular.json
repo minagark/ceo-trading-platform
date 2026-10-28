@@ -25,7 +25,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/theme/theme-colors.scss", "src/styles.css"]
+            "styles": ["src/theme/theme-colors.scss", "src/styles.css", "src/theme/trade-ticket.scss"]
           },
           "configurations": {
             "production": {
@@ -44,7 +44,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumError": "16kB"
                 }
               ],
               "outputHashing": "all"
