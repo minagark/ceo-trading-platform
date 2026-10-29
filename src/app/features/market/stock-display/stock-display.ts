@@ -9,7 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { PortfolioPerformance } from '../../portfolio/portfolio-performance/portfolio-performance';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EMPTY, catchError, distinctUntilChanged, finalize, forkJoin, map, switchMap } from 'rxjs';
+import { EMPTY, catchError, distinctUntilChanged, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoadingIndicator } from '../../../shared/loading-indicator/loading-indicator';
 import { InstrumentSearch } from '../../trading/instrument-search/instrument-search';
@@ -59,11 +59,13 @@ export class StockDisplay {
   readonly TIME_FRAMES = TIME_FRAMES;
   // defualt values
   selectedTimeFrame: TimeFrame = '1D';
-  symbol = 'AAPL';
+  // defaults..?
+  symbol = '';
   type: InstrumentType = 'EQUITY';
   name = '';
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly hasInstrument = signal(false);
 
 
   stockDisplayInfo = signal<StockDisplayInfo>({
@@ -76,7 +78,7 @@ export class StockDisplay {
   constructor() {
     this.route.queryParamMap.pipe(
       map((params) => {
-        const symbol = params.get('symbol')?.trim().toUpperCase() || 'AAPL';
+        const symbol = params.get('symbol')?.trim().toUpperCase() || ''; // what is default
         const orderType = params.get('type') as NonDepositOrderType | null;
 
         return {
@@ -89,8 +91,15 @@ export class StockDisplay {
           previous.symbol === current.symbol && previous.type === current.type,
       ),
       switchMap(({ symbol, type }) => {
+        if (!symbol) { // empty '' is falsy
+          this.hasInstrument.set(false);
+          this.loading.set(false);
+          return of(null);
+        }
+
         this.loading.set(true);
         this.error.set(null);
+        this.hasInstrument.set(true);
         return forkJoin({
           symbol: [symbol],
           type: [type],
@@ -109,7 +118,12 @@ export class StockDisplay {
       }),
       takeUntilDestroyed(),
     ).subscribe({
-      next: ({ symbol, type, name, history, today, currentQuote }) => {
+      next: (result) => {
+        if (!result) { // empty symbol returns null above, processed here
+          return;
+        }
+
+        const { symbol, type, name, history, today, currentQuote } = result;
         this.symbol = symbol;
         this.type = type;
         this.name = name.trim() || symbol;
