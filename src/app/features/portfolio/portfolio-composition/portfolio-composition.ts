@@ -8,6 +8,8 @@ import {
 } from "ag-charts-community";
 import { AccountSelectionService } from '../../account/accounts-list/account-selection.service';
 import { HoldingsService } from '../holdings/holdings.service';
+import { AccountsService } from '../../account/accounts-list/accounts.service';
+import { LoadingIndicator } from '../../../shared/loading-indicator/loading-indicator';
 
 ModuleRegistry.registerModules([LegendModule, PieSeriesModule]);
 
@@ -18,7 +20,7 @@ interface ChartItem {
 }
 
 @Component({
-  imports: [AgCharts],
+  imports: [AgCharts, LoadingIndicator],
   selector: 'app-portfolio-composition',
   styleUrl: './portfolio-composition.css',
   templateUrl: './portfolio-composition.html',
@@ -31,7 +33,9 @@ export class PortfolioComposition {
   // ];
   readonly holdingsService = inject(HoldingsService);
   readonly accountSelectionService = inject(AccountSelectionService);
-  readonly loading = signal(false);
+  private readonly accountsService = inject(AccountsService);
+  readonly loading = computed(() => this.accountsService.loading() || this.holdingsService.loading());
+  readonly error = computed(() => this.accountsService.error() || this.holdingsService.error());
 
   readonly items = signal<ChartItem[]>([]);
 

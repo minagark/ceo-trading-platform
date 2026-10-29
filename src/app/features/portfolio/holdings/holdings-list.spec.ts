@@ -47,8 +47,8 @@ describe('HoldingsList', () => {
     await TestBed.configureTestingModule({
       imports: [HoldingsList],
       providers: [
-        { provide: HoldingsService, useValue: { holdings } },
-        { provide: AccountsService, useValue: { accounts: signal(accounts) } },
+        { provide: HoldingsService, useValue: { holdings, loading: signal(false), error: signal(null) } },
+        { provide: AccountsService, useValue: { accounts: signal(accounts), loading: signal(false), error: signal(null) } },
         { provide: PortfolioApiService, useValue: { getTotalValue: () => of(3500) } },
       ],
     }).compileComponents();

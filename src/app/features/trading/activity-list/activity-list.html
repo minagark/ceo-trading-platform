@@ -1,4 +1,8 @@
-@if (rows().length) {
+@if (loading()) {
+  <app-loading-indicator label="Loading account activity..." />
+} @else if (error()) {
+  <p role="alert">{{ error() }}</p>
+} @else if (rows().length) {
   <div class="account-activity__table" role="region" aria-label="Account activity" tabindex="0">
     <div class="account-activity__col-headers">
       <span>Created Date</span>

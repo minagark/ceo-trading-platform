@@ -12,8 +12,9 @@ import {
 import { ChangePeriod, HoldingsService } from './holdings.service';
 import { HoldingSummaryResponse } from '../../../core/portfolio-holdings.models';
 import { PortfolioApiService } from '../data-access/portfolio-api.service';
-import { forkJoin, Subscription } from 'rxjs';
+import { finalize, forkJoin, Subscription } from 'rxjs';
 import { MatAnchor } from '@angular/material/button';
+import { LoadingIndicator } from '../../../shared/loading-indicator/loading-indicator';
 
 export interface HoldingRow extends HoldingSummaryResponse {
   marketValue: number;
@@ -32,7 +33,7 @@ export interface HoldingGroup extends Omit<HoldingRow, 'holdingId' | 'portfolioI
 
 @Component({
   selector: 'app-holdings-list',
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, NgTemplateOutlet, PercentPipe, SlicePipe, MatAnchor],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, NgTemplateOutlet, PercentPipe, SlicePipe, MatAnchor, LoadingIndicator],
   templateUrl: './holdings-list.html',
   styleUrl: './holdings-list.css',
 })
@@ -42,6 +43,14 @@ export class HoldingsList {
   private accountSelectionService = inject(AccountSelectionService);
   private readonly portfolioApi = inject(PortfolioApiService);
   private totalValueSubscription: Subscription | null = null;
+  private readonly totalValueLoading = signal(false);
+  private readonly totalValueError = signal<string | null>(null);
+  readonly loading = computed(() =>
+    this.accountsService.loading() || this.holdingsService.loading() || this.totalValueLoading(),
+  );
+  readonly error = computed(() =>
+    this.accountsService.error() || this.holdingsService.error() || this.totalValueError(),
+  );
 
   // The portfolio to show holdings for. `null` means "All Portfolios", matching
   // the semantics of AccountsList's shared selection output.
@@ -159,7 +168,7 @@ export class HoldingsList {
       this.expandedGroups.set(new Set());
     });
 
-    effect(() => {
+    effect((onCleanup) => {
       const selectedPortfolio = this.activePortfolio();
       const accounts = this.accountsService.accounts();
       const portfolioIds = selectedPortfolio
@@ -167,19 +176,26 @@ export class HoldingsList {
         : accounts.map((account) => account.id);
 
       this.totalValueSubscription?.unsubscribe();
+      this.totalValueError.set(null);
 
       if (portfolioIds.length === 0) {
+        this.totalValueLoading.set(false);
         this.totalMarketValue.set(0);
         return;
       }
 
+      this.totalValueLoading.set(true);
       this.totalValueSubscription = forkJoin(
         portfolioIds.map((portfolioId) => this.portfolioApi.getTotalValue(portfolioId)),
-      ).subscribe({
+      ).pipe(finalize(() => this.totalValueLoading.set(false))).subscribe({
         next: (values) =>
           this.totalMarketValue.set(values.reduce((total, value) => total + value, 0)),
-        error: () => this.totalMarketValue.set(0),
+        error: () => {
+          this.totalValueError.set('Unable to load portfolio value.');
+          this.totalMarketValue.set(0);
+        },
       });
+      onCleanup(() => this.totalValueSubscription?.unsubscribe());
     });
   }
 

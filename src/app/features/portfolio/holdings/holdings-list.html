@@ -1,3 +1,8 @@
+@if (loading()) {
+  <app-loading-indicator label="Loading holdings..." />
+} @else if (error()) {
+  <p role="alert">{{ error() }}</p>
+} @else {
 <section class="holdings-list">
   <header class="holdings-list__header">
     <div class="holdings-list__heading">
@@ -217,6 +222,7 @@
     </span>
   </ng-template>
 </section>
+}
 
 <!-- Summary: Price, Quantity, Value, Change%, Total Change%, 52-week Range -->
 <!-- Individual Order: Price Bought, Quantity, Value, Date, -->

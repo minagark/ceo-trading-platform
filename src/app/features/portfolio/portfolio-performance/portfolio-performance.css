@@ -10,7 +10,7 @@
   overflow: hidden;
 }
 
-.performance-widget:has(.performance-chart--compact) {
+.performance-widget--compact {
   grid-template-rows: minmax(180px, 1fr);
   min-height: 220px;
   padding: 0;
@@ -41,4 +41,3 @@
   line-height: 1.25;
   text-align: right;
 }
-

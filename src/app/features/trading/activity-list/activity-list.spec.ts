@@ -29,13 +29,20 @@ describe('ActivityList', () => {
   let component: ActivityList;
   let fixture: ComponentFixture<ActivityList>;
   let orders: ReturnType<typeof signal<OrderResponse[]>>;
+  const loading = signal(false);
+  const error = signal<string | null>(null);
 
   beforeEach(async () => {
     orders = signal<OrderResponse[]>([]);
+    loading.set(false);
+    error.set(null);
     await TestBed.configureTestingModule({
       imports: [ActivityList],
       providers: [
-        { provide: ActivityListService, useValue: { orders, loadForClient: vi.fn() } },
+        {
+          provide: ActivityListService,
+          useValue: { orders, loading, error, loadForClient: vi.fn() },
+        },
         { provide: AuthService, useValue: { currentUserId: signal(null) } },
       ],
     }).compileComponents();
@@ -47,6 +54,30 @@ describe('ActivityList', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('shows a loading spinner instead of an empty state while loading activity', () => {
+    loading.set(true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('mat-spinner')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.account-activity__empty')).toBeNull();
+
+    orders.set([createOrder(0)]);
+    loading.set(false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('mat-spinner')).toBeNull();
+    expect(fixture.nativeElement.querySelectorAll('[role="listitem"]')).toHaveLength(1);
+  });
+
+  it('replaces loading with an error when activity cannot be loaded', () => {
+    loading.set(true);
+    fixture.detectChanges();
+    error.set('Unable to load account activity.');
+    loading.set(false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('mat-spinner')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain(error());
+    expect(fixture.nativeElement.querySelector('.account-activity__empty')).toBeNull();
   });
 
   it('shows the empty state without a table when there are no orders', () => {
