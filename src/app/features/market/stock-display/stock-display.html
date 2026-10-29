@@ -1,5 +1,10 @@
 <app-instrument-search class="search"></app-instrument-search>
 <mat-card class="stock-display-page" appearance="outlined">
+  @if (loading()) {
+    <app-loading-indicator label="Loading stock information..." />
+  } @else if (error()) {
+    <p role="alert">{{ error() }}</p>
+  } @else {
   <div class="stock-display-header">
     <h1 class="stock-display-name">{{ stockDisplayInfo().name }}</h1>
     <span class="stock-display-symbol">{{ stockDisplayInfo().symbol }}</span>
@@ -58,6 +63,7 @@
     </button>
     
   </mat-card-content>
+  }
 </mat-card>
 
 

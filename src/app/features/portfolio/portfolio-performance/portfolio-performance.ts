@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, model, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, model, signal } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.service';
@@ -14,7 +14,8 @@ import { AccountSelectionService } from '../../account/accounts-list/account-sel
 import { AccountsService } from '../../account/accounts-list/accounts.service';
 import { HoldingsService } from '../holdings/holdings.service';
 import { InstrumentType } from '../../../core/trading.models';
-import { catchError, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { LoadingIndicator } from '../../../shared/loading-indicator/loading-indicator';
 
 interface GraphItem {
   date: Date;
@@ -27,7 +28,7 @@ ModuleRegistry.registerModules([
 ]);
 
 @Component({
-  imports: [AgCharts, MatFormFieldModule, MatSelectModule],
+  imports: [AgCharts, MatFormFieldModule, MatSelectModule, LoadingIndicator],
   selector: 'performance-chart',
   styleUrl: './portfolio-performance.css',
   templateUrl: './portfolio-performance.html',
@@ -45,6 +46,11 @@ export class PortfolioPerformance {
   readonly marketApi = inject(MarketApiService);
 
   readonly items = signal<GraphItem[]>([]);
+  private readonly requestLoading = signal(false);
+  readonly loading = computed(() =>
+    this.requestLoading() || (!this.instrumentSymbol() && this.accountsService.loading()),
+  );
+  readonly error = signal<string | null>(null);
 
   readonly TIME_FRAMES: TimeFrame[] = ['1W', '1M', '3M', '1Y', '5Y'];
 
@@ -115,13 +121,19 @@ export class PortfolioPerformance {
       const accounts = this.accountsService.accounts();
       const timeframe = this.selectedTimeFrame();
       const symbol = this.instrumentSymbol();
+      this.error.set(null);
 
       if (symbol) {
+        this.requestLoading.set(true);
         const request = this.marketApi
           .getStockInfo(symbol, this.instrumentType(), timeframe)
+          .pipe(finalize(() => this.requestLoading.set(false)))
           .subscribe({
             next: (performance) => this.updateGraphData([performance]),
-            error: () => this.updateGraphData([]),
+            error: () => {
+              this.error.set('Unable to load price history.');
+              this.updateGraphData([]);
+            },
           });
 
         onCleanup(() => request.unsubscribe());
@@ -133,16 +145,21 @@ export class PortfolioPerformance {
         : accounts.map((account) => account.id);
 
       if (portfolioIds.length === 0) {
+        this.requestLoading.set(false);
         this.graphData.set([]);
         this.updateChart(this.graphData());
         return;
       }
 
+      this.requestLoading.set(true);
       const request = forkJoin(
         portfolioIds.map((portfolioId) =>
           this.portfolioApi.getPerformance(portfolioId, timeframe).pipe(
-            catchError(() => of([])),
-          )
+            catchError(() => {
+              this.error.set('Unable to load some portfolio performance data.');
+              return of([]);
+            }),
+          ).pipe(finalize(() => this.requestLoading.set(false)))
         )
       )
         .subscribe({
@@ -150,6 +167,7 @@ export class PortfolioPerformance {
             this.updateGraphData(performanceByPortfolio);
           },
           error: () => {
+            this.error.set('Unable to load portfolio performance.');
             this.graphData.set([]);
             this.updateChart(this.graphData());
           },

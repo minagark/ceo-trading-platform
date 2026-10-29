@@ -1,3 +1,9 @@
 <div class="pie-chart-container">
+  @if (loading()) {
+    <app-loading-indicator label="Loading portfolio composition..." />
+  } @else if (error()) {
+    <p role="alert">{{ error() }}</p>
+  } @else {
     <ag-charts [options]="options()"></ag-charts>
+  }
 </div>

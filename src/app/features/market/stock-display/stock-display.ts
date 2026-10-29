@@ -9,7 +9,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { PortfolioPerformance } from '../../portfolio/portfolio-performance/portfolio-performance';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
-import { distinctUntilChanged, forkJoin, map, switchMap } from 'rxjs';
+import { EMPTY, catchError, distinctUntilChanged, finalize, forkJoin, map, switchMap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LoadingIndicator } from '../../../shared/loading-indicator/loading-indicator';
 import { InstrumentSearch } from '../../trading/instrument-search/instrument-search';
 import { NonDepositOrderType } from '../../../core/trading.models';
 
@@ -42,7 +44,8 @@ export type TimeFrame = typeof TIME_FRAMES[number];
     MatSelectModule, 
     MatButtonModule, 
     PortfolioPerformance,
-    InstrumentSearch
+    InstrumentSearch,
+    LoadingIndicator
   ],
   selector: 'app-stock-display',
   styleUrl: './stock-display.css',
@@ -59,6 +62,8 @@ export class StockDisplay {
   symbol = 'AAPL';
   type: InstrumentType = 'EQUITY';
   name = '';
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
 
 
   stockDisplayInfo = signal<StockDisplayInfo>({
@@ -83,16 +88,26 @@ export class StockDisplay {
         (previous, current) =>
           previous.symbol === current.symbol && previous.type === current.type,
       ),
-      switchMap(({ symbol, type }) =>
-        forkJoin({
+      switchMap(({ symbol, type }) => {
+        this.loading.set(true);
+        this.error.set(null);
+        return forkJoin({
           symbol: [symbol],
           type: [type],
           name: this.marketApi.getInstrumentFullName(symbol, type),
           history: this.marketApi.getStockInfo(symbol, type, this.selectedTimeFrame),
           today: this.marketApi.getTodaysCandle(symbol, type),
           currentQuote: this.marketApi.getQuote(symbol, type),
-        }),
-      ),
+        }).pipe(
+          catchError((error: unknown) => {
+            console.error('Unable to load stock information:', error);
+            this.error.set('Unable to load stock information.');
+            return EMPTY;
+          }),
+          finalize(() => this.loading.set(false)),
+        );
+      }),
+      takeUntilDestroyed(),
     ).subscribe({
       next: ({ symbol, type, name, history, today, currentQuote }) => {
         this.symbol = symbol;

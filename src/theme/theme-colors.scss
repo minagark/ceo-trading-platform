@@ -166,3 +166,9 @@ body {
   color: var(--mat-sys-on-surface);
   font-family: var(--mat-sys-body-medium-font);
 }
+
+app-loading-indicator {
+  @include mat.progress-spinner-overrides((
+    active-indicator-color: var(--mat-sys-tertiary),
+  ));
+}

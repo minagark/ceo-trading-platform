@@ -4,17 +4,20 @@ import { ActivityListService } from './activity-list.service';
 import { SlicePipe } from '@angular/common';
 import { AuthService } from '../../auth/auth/auth.service';
 import { OrderResponse } from '../../../core/trading.models';
+import { LoadingIndicator } from '../../../shared/loading-indicator/loading-indicator';
 
 
 @Component({
   selector: 'app-activity-list',
-  imports: [AccountActivityRow, SlicePipe],
+  imports: [AccountActivityRow, SlicePipe, LoadingIndicator],
   templateUrl: './activity-list.html',
   styleUrl: './activity-list.css',
 })
 export class ActivityList {
   private activityListService = inject(ActivityListService);
   private authService = inject(AuthService);
+  readonly loading = this.activityListService.loading;
+  readonly error = this.activityListService.error;
   showLess = input<boolean>(false);
   clientId = computed(() => this.authService.currentUserId());
 
