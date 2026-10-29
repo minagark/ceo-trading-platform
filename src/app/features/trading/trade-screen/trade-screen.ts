@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { QuoteResponse } from '../../../core/api.models';
 import { AssetsService } from './assets.service';
@@ -72,6 +73,7 @@ function buildSparkline(values: number[]): Sparkline | null {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
   ],
   // outlined fields for this screen only; the rest of the app keeps Material's default
   providers: [
