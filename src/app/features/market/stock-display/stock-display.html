@@ -4,6 +4,11 @@
     <app-loading-indicator label="Loading stock information..." />
   } @else if (error()) {
     <p role="alert">{{ error() }}</p>
+  } @else if (!hasInstrument()) {
+    <div class="stock-display-empty">
+      <h1>Search for an instrument</h1>
+      <p>Choose an instrument above to view its market information.</p>
+    </div>
   } @else {
   <div class="stock-display-header">
     <h1 class="stock-display-name">{{ stockDisplayInfo().name }}</h1>

@@ -18,6 +18,22 @@
   gap: 1.5rem;
 }
 
+.stock-display-empty {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.stock-display-empty h1 {
+  margin: 0 0 0.5rem;
+  color: var(--mat-sys-on-surface);
+  font-size: 1.35rem;
+}
+
+.stock-display-empty p {
+  margin: 0;
+}
+
 .stock-display-header {
   display: flex;
   justify-content: center;
