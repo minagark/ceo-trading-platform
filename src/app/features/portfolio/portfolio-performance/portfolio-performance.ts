@@ -1,11 +1,11 @@
-import { Component, effect, inject, Input, input, model, signal } from '@angular/core';
+import { Component, effect, inject, input, model, signal } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { PortfolioApiService } from '../../portfolio/data-access/portfolio-api.service';
 import { MarketApiService } from '../../market/data-access/market-api.service';
 import { AgCharts } from "ag-charts-angular";
 import {
-  AgChartOptions,
+  AgCartesianChartOptions,
   AllCommunityModule,
   ModuleRegistry,
 } from "ag-charts-community";
@@ -17,7 +17,8 @@ import { InstrumentType } from '../../../core/trading.models';
 import { catchError, forkJoin, of } from 'rxjs';
 
 interface GraphItem {
-  date: Date; // is it date... lowkey could be time too depending on time frame
+  date: Date;
+  dateLabel: string;
   balance: number;
 }
 
@@ -55,7 +56,7 @@ export class PortfolioPerformance {
   }
 
 
-  public options = signal<AgChartOptions>({
+  public options = signal<AgCartesianChartOptions>({
  // title: {
       //   text: this.accounts[0].name,
       // },
@@ -64,11 +65,15 @@ export class PortfolioPerformance {
       series: [
         {
           type: 'line',
-          xKey: 'date',
+          xKey: 'dateLabel',
           yKey: 'balance',
           // title: 'Account Balance'
           marker: {
-            enabled: false, // no dots
+            enabled: true,
+            itemStyler: () => ({
+              size: this.graphData().length === 1 ? 8 : 0,
+              fill: "green",
+            }),
           },
           stroke: "green" //red or green
         }
@@ -78,16 +83,16 @@ export class PortfolioPerformance {
       },
       axes: {
         x: {
-          type: 'time', // changes this to time once get real time stamp (or leave as category depending on parsing)
+          type: 'category', // changes this to time once get real time stamp (or leave as category depending on parsing)
           gridLine: {
             enabled: false
           },
           label: {
             enabled: true,
             color: "var(--mat-sys-on-surface)",
-            format: '%b %d',
+            avoidCollisions: false,
           },
-          nice: false,
+          // nice: false,
         },
         y: {
           type: 'number',
@@ -172,11 +177,26 @@ export class PortfolioPerformance {
     }
 
     const graphData = Array.from(balancesByDate.entries())
-      .map(([date, balance]) => ({ date: new Date(date), balance }))
+      .map(([date, balance]) => {
+        const parsedDate = new Date(date);
+
+        return {
+          date: parsedDate,
+          dateLabel: this.formatDateLabel(parsedDate),
+          balance,
+        };
+      })
       .sort((left, right) => left.date.getTime() - right.date.getTime());
 
     this.graphData.set(graphData);
     this.updateChart(graphData);
+  }
+
+  private formatDateLabel(date: Date): string {
+    return new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
   }
 
   private updateChart(data: GraphItem[]): void {
