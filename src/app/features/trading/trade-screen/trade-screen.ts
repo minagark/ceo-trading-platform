@@ -605,13 +605,6 @@ export class Trades {
   }
 
   finishConfirmation() {
-    this.submittedOrder.set(null);
-    this.submitError.set(null);
-    this.returnedToForm.set(true);
-    this.screen.set('form');
-    // the order just placed may have moved cash, so refresh the balance shown on the ticket
-    if (this.orderForm.controls.portfolioId.value) {
-      this.updateOwnedCurrencies();
-    }
+    void this.router.navigate(['/home']);
   }
 }

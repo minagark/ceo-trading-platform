@@ -390,6 +390,7 @@
   --mat-button-filled-container-height: 48px;
   font-size: 15px;
   font-weight: 600;
+  background-color: var(--mat-sys-tertiary);
 }
 
 /* --- Quote panel ----------------------------------------------------------- */
