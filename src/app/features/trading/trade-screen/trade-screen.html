@@ -128,7 +128,19 @@
           @if (formState().orderType !== 'DEPOSIT') {
             <div class="threshold">
               <div class="threshold__head">
-                <span class="eyebrow" id="threshold-label">Change threshold</span>
+                <span class="eyebrow" id="threshold-label">
+                  Change threshold
+                  <button
+                    class="threshold__info"
+                    type="button"
+                    mat-icon-button
+                    matSuffix
+                    matTooltip="Limits how much the price can move from the quote before your order is rejected (up for buys, down for sells)."
+                    matTooltipPosition="above"
+                    aria-label="About the change threshold">
+                    <mat-icon aria-hidden="true">info_outline</mat-icon>
+                </button>
+                </span>
                 <span class="threshold__hint">Optional percentage</span>
               </div>
               <div class="threshold__options" role="group" aria-labelledby="threshold-label">

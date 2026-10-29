@@ -286,6 +286,20 @@
   margin-top: 4px;
 }
 
+.threshold__info {
+  color: var(--color-text-faint);
+  width: 2.5rem;
+  height: 2rem;
+}
+
+.threshold__info mat-icon {
+  font-size: 18px;
+}
+
+.threshold__info:hover {
+  color: var(--color-text);
+}
+
 /* Running estimate, set in an inset well. */
 .order-summary {
   display: flex;
